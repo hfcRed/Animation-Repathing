@@ -104,6 +104,7 @@ namespace AutoAnimationRepath
             BaseSelection = EditorPrefs.GetInt("AAR BaseSelection");
             AvatarSelection = EditorPrefs.GetInt("AAR AvatarSelection");
             LanguageSelection = EditorPrefs.GetInt("AAR LanguageSelection");
+            PlayableSelection = (Playables)EditorPrefs.GetInt("AAR PlayableSelection");
 
             Toggle = EditorPrefs.GetBool("AAR Toggle");
             RenameAvtive = EditorPrefs.GetBool("AAR RenameActive");
