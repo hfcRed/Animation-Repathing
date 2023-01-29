@@ -13,6 +13,20 @@ namespace AutoAnimationRepath
 {
     public class AAREditor : EditorWindow
     {
+        internal sealed class BGColoredScope : System.IDisposable
+        {
+            private readonly Color ogColor;
+
+            public BGColoredScope(bool isActive, Color active, Color inactive)
+            {
+                ogColor = GUI.backgroundColor;
+                GUI.backgroundColor = isActive ? active : inactive;
+            }
+            public void Dispose()
+            {
+                GUI.backgroundColor = ogColor;
+            }
+        }
 
         #region Window
         //Create window
@@ -100,7 +114,7 @@ namespace AutoAnimationRepath
                         }
                         GUILayout.Space(10);
 
-                        //Draw toggle button
+                        //Draw toggle button                      
                         if (AARAutomatic.Toggle == false)
                         {
                             AARAutomatic.Toggle = GUILayout.Toggle(AARAutomatic.Toggle, "<color=#969696><b>Disabled</b></color>", UIStyles.ToggleButton, GUILayout.Height(30));
@@ -109,6 +123,10 @@ namespace AutoAnimationRepath
                         {
                             AARAutomatic.Toggle = GUILayout.Toggle(AARAutomatic.Toggle, "<color=#2bff80><b>Enabled</b></color>", UIStyles.ToggleButton, GUILayout.Height(30));
                         }
+                        
+                        //using (new BGColoredScope(AARAutomatic.Toggle, Color.green, Color.gray))
+                        //AARAutomatic.Toggle = GUILayout.Toggle(AARAutomatic.Toggle, "<color=#2bff80><b>Enabled</b></color>", UIStyles.ToggleButton, GUILayout.Height(30));
+
                         GUILayout.Space(10);
                     }
                     GUILayout.Space(20);
@@ -175,7 +193,7 @@ namespace AutoAnimationRepath
                                             {
                                                 GUILayout.Space(5);
                                                 GUILayout.Label("Controller to use", GUILayout.Width(150));
-                                                AARAutomatic.Controller = (AnimatorController)EditorGUILayout.ObjectField(AARAutomatic.Controller, typeof(AnimatorController), true);
+                                                AARAutomatic.Controller = (Animator)EditorGUILayout.ObjectField(AARAutomatic.Controller, typeof(Animator), true);
                                                 GUILayout.Space(5);
                                             }
                                         }
@@ -293,3 +311,7 @@ namespace AutoAnimationRepath
         #endregion
     }
 }
+
+//var color = GUI.backgroundColor;
+//GUI.backgroundColor = Color.green;
+//GUI.backgroundColor = color;
