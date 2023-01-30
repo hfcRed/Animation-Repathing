@@ -24,24 +24,24 @@ namespace AutoAnimationRepath
         }
 
         //Create variables
-        public static int ToolSelection;
-        public static string[] Tools = { "Automatic", "Manual" };
-        public static int BaseSelection;
-        public static string[] BaseOptions = { "Animator Component", "VRChat Avatar" };
-        public static int LanguageSelection;
-        public static string[] LanguageOptions = { "English", "日本" };
+        public static int toolSelection;
+        public static string[] tools = { "Automatic", "Manual" };
+        public static int baseSelection;
+        public static string[] baseOptions = { "Animator Component", "VRChat Avatar" };
+        public static int languageSelection;
+        public static string[] languageOptions = { "English", "日本" };
 
-        public static Animator Controller;
-        public static AnimatorController TargetController;
-        public static GameObject Avatar;
+        public static Animator animator;
+        public static AnimatorController controller;
+        public static GameObject avatar;
 
-        public static bool Toggle;
-        public static bool RenameAvtive = true;
-        public static bool ReparentActive = true;
-        public static bool RenameWarning = true;
-        public static bool ReparentWarning = true;
-        public static bool ActiveInBackground;
-        public static bool ShowDebug = false;
+        public static bool toggle;
+        public static bool renameActive = true;
+        public static bool reparentActive = true;
+        public static bool renameWarning = true;
+        public static bool reparentWarning = true;
+        public static bool activeInBackground;
+        public static bool showDebug = false;
 
         public enum Playables
         {
@@ -57,50 +57,36 @@ namespace AutoAnimationRepath
         }
         public static Playables PlayableSelection = Playables.all;
 
-        static Transform SelectedTransform;
-        static Transform OldParent;
-        static Transform NewParent;
-        static string OldName;
-        static string NewName;
-        static string OldPath;
-        static string NewPath;
-        static string FullPath;
-        static int Remove;
+        private static Transform selectedTransform;
+        private static Transform oldParent;
+        private static Transform newParent;
+        private static string oldName;
+        private static string newName;
+        private static string oldPath;
+        private static string newPath;
+        private static string fullPath;
+        private static int removeLength;
 
         #region Save settings
         //Save settings to disk
         public static void SaveData()
         {
             //Save directly
-            EditorPrefs.SetInt("AAR BaseSelection", BaseSelection);
-            EditorPrefs.SetInt("AAR LanguageSelection", LanguageSelection);
+            EditorPrefs.SetInt("AAR BaseSelection", baseSelection);
+            EditorPrefs.SetInt("AAR LanguageSelection", languageSelection);
 
-            EditorPrefs.SetBool("AAR Toggle", Toggle);
-            EditorPrefs.SetBool("AAR RenameActive", RenameAvtive);
-            EditorPrefs.SetBool("AAR ReparentActive", ReparentActive);
-            EditorPrefs.SetBool("AAR RenameWarning", RenameWarning);
-            EditorPrefs.SetBool("AAR ReparentWarning", ReparentWarning);
-            EditorPrefs.SetBool("AAR ActiveInBackground", ActiveInBackground);
+            EditorPrefs.SetBool("AAR Toggle", toggle);
+            EditorPrefs.SetBool("AAR RenameActive", renameActive);
+            EditorPrefs.SetBool("AAR ReparentActive", reparentActive);
+            EditorPrefs.SetBool("AAR RenameWarning", renameWarning);
+            EditorPrefs.SetBool("AAR ReparentWarning", reparentWarning);
+            EditorPrefs.SetBool("AAR ActiveInBackground", activeInBackground);
 
             //Get controller name to save as string
-            if (Controller != null)
-            {
-                EditorPrefs.SetString("AAR Controller", Controller.gameObject.transform.name);
-            }
-            else
-            {
-                EditorPrefs.SetString("AAR Controller", null);
-            }
+            EditorPrefs.SetString("AAR Controller", animator == null ? null : animator.gameObject.transform.name );
 
             //Get avatar name to save as string
-            if (Avatar != null)
-            {
-                EditorPrefs.SetString("AAR Avatar", Avatar.name);
-            }
-            else
-            {
-                EditorPrefs.SetString("AAR Avatar", null);
-            }
+            EditorPrefs.SetString("AAR Avatar", avatar == null ? null : avatar.name);
 
             EditorPrefs.SetInt("AAR PlayableSelection", (int)PlayableSelection);
 
@@ -113,28 +99,26 @@ namespace AutoAnimationRepath
         public static void LoadData()
         {
             //Load directly
-            BaseSelection = EditorPrefs.GetInt("AAR BaseSelection");
+            baseSelection = EditorPrefs.GetInt("AAR BaseSelection");
 
-            Toggle = EditorPrefs.GetBool("AAR Toggle");
-            RenameAvtive = EditorPrefs.GetBool("AAR RenameActive");
-            ReparentActive = EditorPrefs.GetBool("AAR ReparentActive");
-            RenameWarning = EditorPrefs.GetBool("AAR RenameWarning");
-            ReparentWarning = EditorPrefs.GetBool("AAR ReparentWarning");
-            ActiveInBackground = EditorPrefs.GetBool("AAR ActiveInBackground");
+            toggle = EditorPrefs.GetBool("AAR Toggle");
+            renameActive = EditorPrefs.GetBool("AAR RenameActive");
+            reparentActive = EditorPrefs.GetBool("AAR ReparentActive");
+            renameWarning = EditorPrefs.GetBool("AAR RenameWarning");
+            reparentWarning = EditorPrefs.GetBool("AAR ReparentWarning");
+            activeInBackground = EditorPrefs.GetBool("AAR ActiveInBackground");
 
             //Load GUID of custom controller to load the asset
-            string FindController = EditorPrefs.GetString("AAR Controller");
-            GameObject AnimatorHolder = GameObject.Find(FindController);
-            if (AnimatorHolder != null)
+            string findController = EditorPrefs.GetString("AAR Controller");
+            GameObject animatorHolder = GameObject.Find(findController);
+            if (animatorHolder != null)
             {
-                Controller = AnimatorHolder.GetComponent(typeof(Animator)) as Animator;
-                RuntimeAnimatorController RuntimeController = Controller.runtimeAnimatorController;
-                TargetController = AssetDatabase.LoadAssetAtPath<AnimatorController>(AssetDatabase.GetAssetPath(RuntimeController));
+                animator = animatorHolder.GetComponent(typeof(Animator)) as Animator;
+                controller = animator == null ? null : animator.runtimeAnimatorController as AnimatorController;
             }
 
             //Load avatar name to load the gameobject
-            string FindAvatar = EditorPrefs.GetString("AAR Avatar");
-            Avatar = GameObject.Find(FindAvatar);
+            avatar = GameObject.Find(EditorPrefs.GetString("AAR Avatar"));
 
             PlayableSelection = (Playables)EditorPrefs.GetInt("AAR PlayableSelection");
         }
@@ -144,16 +128,16 @@ namespace AutoAnimationRepath
         //Run when selection has changed
         public static void SelectionChanged()
         {
-            if (EditorWindow.HasOpenInstances<AAREditor>() && Toggle == true || !EditorWindow.HasOpenInstances<AAREditor>() && ActiveInBackground == true && Toggle == true)
+            if (EditorWindow.HasOpenInstances<AAREditor>() && toggle || !EditorWindow.HasOpenInstances<AAREditor>() && activeInBackground && toggle)
             {
                 if (Selection.activeGameObject == null || Selection.activeTransform.parent == null)
                 {
                     return;
                 }
-                OldParent = Selection.activeTransform.parent;
-                OldName = Selection.activeGameObject.name;
-                OldPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, Controller.transform);
-                Remove = OldPath.Length;
+                oldParent = Selection.activeTransform.parent;
+                oldName = Selection.activeGameObject.name;
+                oldPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, animator.transform);
+                removeLength = oldPath.Length;
             }
         }
         #endregion
@@ -162,40 +146,30 @@ namespace AutoAnimationRepath
         //Run when anything in the hierarchy changes
         public static void HierarchyChanged()
         {
-            if (EditorWindow.HasOpenInstances<AAREditor>() && Toggle == true && Selection.activeTransform != null && Selection.activeTransform.IsChildOf(Controller.transform) == true|| !EditorWindow.HasOpenInstances<AAREditor>() && ActiveInBackground == true && Toggle == true && Selection.activeTransform != null && Selection.activeTransform.IsChildOf(Controller.transform) == true)
+            if (EditorWindow.HasOpenInstances<AAREditor>() && toggle && Selection.activeTransform != null && Selection.activeTransform.IsChildOf(animator.transform) || !EditorWindow.HasOpenInstances<AAREditor>() && activeInBackground && toggle && Selection.activeTransform != null && Selection.activeTransform.IsChildOf(animator.transform))
             {
-                NewName = Selection.activeTransform.name;
-                NewParent = Selection.activeTransform.parent;
-                SelectedTransform = Selection.activeTransform;
+                newName = Selection.activeTransform.name;
+                newParent = Selection.activeTransform.parent;
+                selectedTransform = Selection.activeTransform;
 
-                if (ReparentActive == true && NewParent != null && OldParent != null)
+                if (reparentActive && newParent != null && oldParent != null)
                 {
-                    if (ReparentWarning == true)
-                    {
-                        if (EditorUtility.DisplayDialog("Auto Repathing", "Repathing animation properties for " + SelectedTransform.name + " to " + SelectedTransform.parent.name, "Continue", "Cancel"))
-                        {
-                            RepathParent();
-                        }
-                    }
-                    else
+                    if (!reparentWarning) RepathParent();
+                    else if (EditorUtility.DisplayDialog("Auto Repathing", "Repathing animation properties for " + selectedTransform.name + " to " + selectedTransform.parent.name, "Continue", "Cancel"))
                     {
                         RepathParent();
                     }
                 }
 
-                if (RenameAvtive == true && OldName != NewName && OldName != null)
+                if (renameActive && oldName != newName && oldName != null)
                 {
-                    if (RenameWarning == true)
-                    {
-                        if (EditorUtility.DisplayDialog("Auto Repathing", "Repathing animation properties from " + OldName + " to " + SelectedTransform.name, "Continue", "Cancel"))
-                        {
-                            RepathName();
-                        }
-                    }
-                    else
+                    if (!renameWarning) RepathName();
+                    else if (EditorUtility.DisplayDialog("Auto Repathing", "Repathing animation properties from " + oldName + " to " + selectedTransform.name, "Continue", "Cancel"))
                     {
                         RepathName();
                     }
+
+
                 }
             }
         }
@@ -203,31 +177,31 @@ namespace AutoAnimationRepath
         
         public static void RepathParent()
         {
-            if (BaseSelection == 0 && TargetController != null && OldPath != null)
+            if (baseSelection == 0 && controller != null && oldPath != null)
             {
-                NewPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, Controller.transform);
+                newPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, animator.transform);
 
                 try
                 {
                     AssetDatabase.StartAssetEditing();
                     
-                    foreach (AnimationClip Clip in TargetController.animationClips)
+                    foreach (AnimationClip clip in controller.animationClips)
                     {
-                        Array Curves = AnimationUtility.GetCurveBindings(Clip);
+                        Array curves = AnimationUtility.GetCurveBindings(clip);
 
-                        foreach (EditorCurveBinding B in Curves)
+                        foreach (EditorCurveBinding b in curves)
                         {
-                            EditorCurveBinding Binding = B;
-                            AnimationCurve Curve = AnimationUtility.GetEditorCurve(Clip, Binding);
+                            EditorCurveBinding binding = b;
+                            AnimationCurve Curve = AnimationUtility.GetEditorCurve(clip, binding);
 
-                            if (Binding.path.Contains(OldPath) && Binding.path != FullPath)
+                            if (binding.path.Contains(oldPath) && binding.path != fullPath)
                             {
-                                
-                                AnimationUtility.SetEditorCurve(Clip, Binding, null);
-                                string OldPathCut = Binding.path.Remove(0, Remove);
-                                FullPath = NewPath + OldPathCut;
-                                Binding.path = FullPath;
-                                AnimationUtility.SetEditorCurve(Clip, Binding, Curve);
+                                string OldPathCut = binding.path.Remove(0, removeLength);
+                                fullPath = newPath + OldPathCut;
+
+                                AnimationUtility.SetEditorCurve(clip, binding, null);
+                                binding.path = fullPath;
+                                AnimationUtility.SetEditorCurve(clip, binding, Curve);
                             }
                         }
                     }                   
@@ -237,15 +211,15 @@ namespace AutoAnimationRepath
                     AssetDatabase.StopAssetEditing();
                 }
             }          
-            OldParent = NewParent;
-            OldPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, Controller.transform);
-            Remove = OldPath.Length;
-            FullPath = null;
+            oldParent = newParent;
+            oldPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, animator.transform);
+            removeLength = oldPath.Length;
+            fullPath = null;
         }
 
         public static void RepathName()
         {
-            OldName = NewName;
+            oldName = newName;
         }
     }
 }

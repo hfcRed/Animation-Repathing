@@ -8,7 +8,6 @@ using UnityEditor.Animations;
 
 namespace AutoAnimationRepath
 {
-    [InitializeOnLoad]
     public static class AARManual
     {
 
