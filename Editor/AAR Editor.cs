@@ -96,8 +96,8 @@ namespace AutoAnimationRepath
                 }
 
                 //Draw toggle button
-                string buttonLabel = AARAutomatic.toggle ? "<color=#2bff80><b>Enabled</b></color>" : "<color=#969696><b>Disabled</b></color>";
-                AARAutomatic.toggle = GUILayout.Toggle(AARAutomatic.toggle, buttonLabel, UIStyles.toggleButton, GUILayout.Height(30));
+                string buttonLabel = AARAutomatic.isEnabled ? "<color=#2bff80><b>Enabled</b></color>" : "<color=#969696><b>Disabled</b></color>";
+                AARAutomatic.isEnabled = GUILayout.Toggle(AARAutomatic.isEnabled, buttonLabel, UIStyles.toggleButton, GUILayout.Height(30));
 
                 //using (new BGColoredScope(AARAutomatic.Toggle, Color.green, Color.gray))
                 //AARAutomatic.Toggle = GUILayout.Toggle(AARAutomatic.Toggle, "<color=#2bff80><b>Enabled</b></color>", UIStyles.ToggleButton, GUILayout.Height(30));
@@ -123,7 +123,7 @@ namespace AutoAnimationRepath
                         AARAutomatic.animator = null;
                         AARAutomatic.avatar = null;
 
-                        AARAutomatic.toggle = false;
+                        AARAutomatic.isEnabled = false;
                         AARAutomatic.renameActive = true;
                         AARAutomatic.reparentActive = true;
                         AARAutomatic.renameWarning = true;
@@ -165,6 +165,7 @@ namespace AutoAnimationRepath
                                     using (new SqueezeScope(5))
                                     {
                                         GUILayout.Label("Controller to use", GUILayout.Width(150));
+
                                         AARAutomatic.animator = (Animator)EditorGUILayout.ObjectField(AARAutomatic.animator, typeof(Animator), true);
                                     }
                                 }
@@ -173,7 +174,9 @@ namespace AutoAnimationRepath
                                     using (new SqueezeScope(5))
                                     {
                                         GUILayout.Label("Avatar to use", GUILayout.Width(150));
+
                                         AARAutomatic.avatar = (GameObject)EditorGUILayout.ObjectField(AARAutomatic.avatar, typeof(GameObject), true);
+
                                     }
 
 #if VRC_SDK_VRCSDK3
