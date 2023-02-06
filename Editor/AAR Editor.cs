@@ -62,6 +62,8 @@ namespace AutoAnimationRepath
                 case 1: DrawManualGUI(); break;
             }
 
+            DrawSettings();
+
             GUILayout.EndScrollView();
 
             if (EditorGUI.EndChangeCheck())
@@ -90,8 +92,7 @@ namespace AutoAnimationRepath
                             Application.OpenURL("https://hfcred.carrd.co");
                         
                         if (GUILayout.Button(UIContent.linkIcon, "label", GUILayout.Height(21)))
-                            Application.OpenURL("https://hfcred.carrd.co");
-                        
+                            Application.OpenURL("https://hfcred.carrd.co");                        
                     }
                 }
 
@@ -99,11 +100,77 @@ namespace AutoAnimationRepath
                 string buttonLabel = AARAutomatic.isEnabled ? "<color=#2bff80><b>Enabled</b></color>" : "<color=#969696><b>Disabled</b></color>";
                 AARAutomatic.isEnabled = GUILayout.Toggle(AARAutomatic.isEnabled, buttonLabel, UIStyles.toggleButton, GUILayout.Height(30));
 
+                GUILayout.Space(10);
+
                 //using (new BGColoredScope(AARAutomatic.Toggle, Color.green, Color.gray))
                 //AARAutomatic.Toggle = GUILayout.Toggle(AARAutomatic.Toggle, "<color=#2bff80><b>Enabled</b></color>", UIStyles.ToggleButton, GUILayout.Height(30));
             }
 
-            //Draw settings
+        }
+
+        public static void DrawManualGUI()
+        {
+            using (new SqueezeScope(10, 20, 0))
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                using (new SqueezeScope(10, 10, 2))
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                {
+
+                    //Draw title and credits
+                    using (new SqueezeScope(5))
+                    {
+                        using (new SqueezeScope(5, 5, 4))
+                            GUILayout.Label("<b>Manual Animation Repathing</b>", UIStyles.title, GUILayout.Height(20));
+
+
+                        GUILayout.FlexibleSpace();
+
+                        if (GUILayout.Button("Made by hfcRed", "linkLabel"))
+                            Application.OpenURL("https://hfcred.carrd.co");
+
+                        if (GUILayout.Button(UIContent.linkIcon, "label", GUILayout.Height(21)))
+                            Application.OpenURL("https://hfcred.carrd.co");
+                    }
+                }
+
+                using (new SqueezeScope(0, 10, 0))
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                {
+                    using (new SqueezeScope(5, 5, 0))
+                    using (new EditorGUILayout.HorizontalScope())                    
+                    {
+                        using (new EditorGUILayout.VerticalScope())
+                        {
+                            using (new SqueezeScope(5, 5, 0))
+                                AARAutomatic.foldout = EditorGUILayout.Foldout(AARAutomatic.foldout, "Missing Paths");
+                        }
+
+                        GUILayout.FlexibleSpace();
+                        using (new EditorGUILayout.VerticalScope())
+                        {
+                            using (new SqueezeScope(5, 5, 0))
+                                if (GUILayout.Button("Scan Animator", GUILayout.Width(116)))
+                                {
+                                    AARManual.ScanPaths();
+                                }
+                        }
+                    }
+                    if (AARAutomatic.foldout == true)
+                    {
+                        //foreach missing path
+                        using (new SqueezeScope(0, 10, 0))
+                        using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void DrawSettings()
+        {
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 GUILayout.Space(5);
@@ -134,7 +201,6 @@ namespace AutoAnimationRepath
 
                         AARAutomatic.SaveData();
                     }
-
                     GUILayout.Space(5);
                 }
 
@@ -205,9 +271,7 @@ namespace AutoAnimationRepath
                                     }
 #endif
                                 }
-
                             }
-
                         }
 
                         //Draw misc settings
@@ -227,21 +291,20 @@ namespace AutoAnimationRepath
                                 AARAutomatic.renameWarning = GUILayout.Toggle(AARAutomatic.renameWarning, "Warn when renamed");
                                 AARAutomatic.reparentWarning = GUILayout.Toggle(AARAutomatic.reparentWarning, "Warn when reparented");
                             }
-
                         }
 
                         GUILayout.Space(10);
                         using (new SqueezeScope(5, 5, 4, EditorStyles.helpBox))
-                        using (new SqueezeScope(5,5,3))
-                                AARAutomatic.activeInBackground = GUILayout.Toggle(AARAutomatic.activeInBackground, "Run when window is closed");
-                            
-                        
+                        using (new SqueezeScope(5, 5, 3))
+                            AARAutomatic.activeInBackground = GUILayout.Toggle(AARAutomatic.activeInBackground, "Run when window is closed");
+
+
 
                         //Draw language settings
                         GUILayout.Space(10);
-                        using (new SqueezeScope(5,5,4, EditorStyles.helpBox))
+                        using (new SqueezeScope(5, 5, 4, EditorStyles.helpBox))
                         {
-                            using (new SqueezeScope(5,5,3))
+                            using (new SqueezeScope(5, 5, 3))
                             {
                                 GUILayout.Label("Language", GUILayout.Width(150));
                                 AARAutomatic.languageSelection = EditorGUILayout.Popup(AARAutomatic.languageSelection, AARAutomatic.languageOptions);
@@ -249,7 +312,6 @@ namespace AutoAnimationRepath
                         }
 
                         GUILayout.Space(10);
-
                     }
 
                     using (new EditorGUILayout.HorizontalScope(GUILayout.MaxWidth(5)))
@@ -257,11 +319,6 @@ namespace AutoAnimationRepath
                     }
                 }
             }
-        }
-
-        public static void DrawManualGUI()
-        {
-
         }
         #endregion
     }
@@ -339,7 +396,3 @@ namespace AutoAnimationRepath
     #endregion
 
 }
-
-//var color = GUI.backgroundColor;
-//GUI.backgroundColor = Color.green;
-//GUI.backgroundColor = color;

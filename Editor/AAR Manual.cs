@@ -8,8 +8,12 @@ using UnityEditor.Animations;
 
 namespace AutoAnimationRepath
 {
-    public static class AARManual
+    [InitializeOnLoad]
+    public class AARManual
     {
-
+        public static void ScanPaths()
+        {
+            Debug.Log("Yippie!");
+        }
     }
 }

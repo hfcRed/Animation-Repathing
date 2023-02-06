@@ -71,6 +71,7 @@ namespace AutoAnimationRepath
         public static bool reparentWarning = true;
         public static bool activeInBackground;
         public static bool showDebug = false;
+        public static bool foldout;
 
         public enum Playables
         {
@@ -106,7 +107,7 @@ namespace AutoAnimationRepath
             EditorPrefs.SetBool("AAR ActiveInBackground", activeInBackground);
 
             //Get controller name to save as string
-            EditorPrefs.SetString("AAR Controller", animator == null ? null : animator.gameObject.transform.name );
+            EditorPrefs.SetString("AAR Controller", animator == null ? null : animator.gameObject.transform.name);
 
             //Get avatar name to save as string
             EditorPrefs.SetString("AAR Avatar", avatar == null ? null : avatar.name);
@@ -195,9 +196,9 @@ namespace AutoAnimationRepath
                     try { changedPaths.Add(ht.path, currentPath); }
                     catch
                     {
-                       //ignore error
-                       //only errors if key already exists
-                       //i.e: two hierarchy transforms with the same name
+                        //ignore error
+                        //only errors if key already exists
+                        //i.e: two hierarchy transforms with the same name
                     }
 
                 ht.path = currentPath;
@@ -237,7 +238,7 @@ namespace AutoAnimationRepath
         */
         }
         #endregion
-        
+
         public static void RepathParent(AnimatorController target)
         {
             try
@@ -254,7 +255,7 @@ namespace AutoAnimationRepath
                         if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
                         if (isObjectCurve)
                         {
-                            ObjectReferenceKeyframe[] objectCurve =  AnimationUtility.GetObjectReferenceCurve(clip, b);
+                            ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, b);
                             AnimationUtility.SetObjectReferenceCurve(clip, b, null);
                             b.path = newPath;
                             AnimationUtility.SetObjectReferenceCurve(clip, b, objectCurve);
