@@ -27,6 +27,7 @@ namespace AutoAnimationRepath
             public static GUIStyle toggleButton = new GUIStyle(GUI.skin.button) { fontSize = 16, richText = true };
             public static GUIStyle settings = new GUIStyle(GUI.skin.label) { fontSize = 20, richText = true };
             public static GUIStyle settingsButtons = new GUIStyle(GUI.skin.label) { richText = true };
+            public static GUIStyle invalidPath = new GUIStyle(GUI.skin.box) { fontSize= 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleLeft };
         }
 
         //Create UI contents
@@ -110,7 +111,7 @@ namespace AutoAnimationRepath
 
         public static void DrawManualGUI()
         {
-            using (new SqueezeScope(10, 20, 0))
+            using (new SqueezeScope(10, 10, 0))
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 using (new SqueezeScope(10, 10, 2))
@@ -133,36 +134,88 @@ namespace AutoAnimationRepath
                             Application.OpenURL("https://hfcred.carrd.co");
                     }
                 }
+            }
 
-                using (new SqueezeScope(0, 10, 0))
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            using (new SqueezeScope(0, 20, 0))
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                using (new SqueezeScope(5, 5, 0))
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    using (new SqueezeScope(5, 5, 0))
-                    using (new EditorGUILayout.HorizontalScope())                    
+                    using (new EditorGUILayout.VerticalScope())
                     {
-                        using (new EditorGUILayout.VerticalScope())
-                        {
-                            using (new SqueezeScope(5, 5, 0))
-                                AARAutomatic.foldout = EditorGUILayout.Foldout(AARAutomatic.foldout, "Missing Paths");
-                        }
-
-                        GUILayout.FlexibleSpace();
-                        using (new EditorGUILayout.VerticalScope())
-                        {
-                            using (new SqueezeScope(5, 5, 0))
-                                if (GUILayout.Button("Scan Animator", GUILayout.Width(116)))
-                                {
-                                    AARManual.ScanPaths();
-                                }
-                        }
+                        using (new SqueezeScope(5, 5, 0))
+                            AARAutomatic.foldout = EditorGUILayout.Foldout(AARAutomatic.foldout, "Invalid Paths");
                     }
-                    if (AARAutomatic.foldout == true)
-                    {
-                        //foreach missing path
-                        using (new SqueezeScope(0, 10, 0))
-                        using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
-                        {
 
+                    GUILayout.FlexibleSpace();
+                    using (new EditorGUILayout.VerticalScope())
+                    {
+                        using (new SqueezeScope(5, 5, 0))
+                            if (GUILayout.Button("Scan Animator", GUILayout.Width(116)))
+                            {
+                                AARManual.ScanPaths();
+                            }
+                    }
+                }
+                if (AARAutomatic.foldout == true)
+                {
+                    int count = -1;
+                    foreach (string str in AARManual.invalidPaths)
+                    {
+                        count++;
+
+                        using (new SqueezeScope(0, 10, 0))
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            using (new SqueezeScope(5, 5, 0))
+                            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                            {
+                                using (new EditorGUILayout.VerticalScope())
+                                {
+                                    using (new SqueezeScope(5, 0, 0))
+                                    {
+                                       using (new EditorGUILayout.HorizontalScope())
+                                       {
+                                            using (new SqueezeScope(5, 5, 0))
+                                            using (new EditorGUILayout.VerticalScope())
+                                            {
+                                                GUILayout.Label("<color=#F0DE08><b>" + str + "</b></color>", UIStyles.invalidPath);
+
+                                                using (new SqueezeScope(5, 5, 0))
+                                                using (new EditorGUILayout.HorizontalScope())
+                                                {
+                                                    AARManual.newPaths[count] = GUILayout.TextField(AARManual.newPaths[count], GUILayout.Width(200));
+
+                                                    GUILayout.FlexibleSpace();
+                                                    if (GUILayout.Button("Apply", GUILayout.Width(116)))
+                                                    {
+
+                                                    }
+                                                }
+
+                                                using (new SqueezeScope(0, 5, 0))
+                                                using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
+                                                {
+                                                    using (new EditorGUILayout.VerticalScope())
+                                                    {
+                                                        AARManual.foldouts[count] = EditorGUILayout.Foldout(AARManual.foldouts[count], "Affected Clips" + " (" + AARManual.invalidClips[AARManual.invalidPaths.IndexOf(str)].Count + ")");
+                                                        if (AARManual.foldouts[count] == true)
+                                                        {
+                                                            foreach (AnimationClip clip in AARManual.invalidClips[AARManual.invalidPaths.IndexOf(str)])
+                                                            {
+                                                                EditorGUI.BeginDisabledGroup(true);
+                                                                EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
+                                                                EditorGUI.EndDisabledGroup();
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                       }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -310,7 +363,6 @@ namespace AutoAnimationRepath
                                 AARAutomatic.languageSelection = EditorGUILayout.Popup(AARAutomatic.languageSelection, AARAutomatic.languageOptions);
                             }
                         }
-
                         GUILayout.Space(10);
                     }
 
@@ -394,5 +446,4 @@ namespace AutoAnimationRepath
         }
     }
     #endregion
-
 }
