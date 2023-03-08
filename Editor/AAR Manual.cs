@@ -15,6 +15,7 @@ namespace AutoAnimationRepath
         public static List<string> invalidPaths = new List<string>();
         public static List<bool> foldouts = new List<bool>();
         public static List<string> newPaths = new List<string>();
+        public static int position;
 
         public static void ScanPaths()
         {
@@ -60,7 +61,37 @@ namespace AutoAnimationRepath
 
         public static void RenamePath()
         {
+            Transform parent = Selection.activeTransform.root;
+            GameObject parentObject = parent.gameObject;
+            object animatedObject = 0;
 
+            try
+            {
+                AssetDatabase.StartAssetEditing();
+
+                foreach (AnimationClip clip in invalidClips[position])
+                {
+                    Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                    foreach (EditorCurveBinding x in curves)
+                    {
+                        EditorCurveBinding binding = x;
+                        AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
+
+                        animatedObject = AnimationUtility.GetAnimatedObject(parentObject, binding);
+
+                        if (animatedObject == null)
+                        {
+                            AnimationUtility.SetEditorCurve(clip, binding, null);
+                            binding.path = newPaths[position];
+                            AnimationUtility.SetEditorCurve(clip, binding, curve);
+                        }
+                    }
+                    animatedObject = 0;
+                }
+            }
+            finally { AssetDatabase.StopAssetEditing(); }
+            ScanPaths();
         }
     }
 }

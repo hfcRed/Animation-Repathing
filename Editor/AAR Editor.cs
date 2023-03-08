@@ -35,6 +35,7 @@ namespace AutoAnimationRepath
         {
             public static GUIContent linkIcon = new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies"));
             public static GUIContent resetIcon = new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = "Reset settings to default values" };
+            public static GUIContent test = new GUIContent() { tooltip = "test" };
         }
 
         private static Vector2 scroll = Vector2.zero;
@@ -160,10 +161,10 @@ namespace AutoAnimationRepath
                 }
                 if (AARAutomatic.foldout == true)
                 {
-                    int count = -1;
+                    AARManual.position = -1;
                     foreach (string str in AARManual.invalidPaths)
                     {
-                        count++;
+                        AARManual.position++;
 
                         using (new SqueezeScope(0, 10, 0))
                         using (new EditorGUILayout.HorizontalScope())
@@ -185,12 +186,14 @@ namespace AutoAnimationRepath
                                                 using (new SqueezeScope(5, 5, 0))
                                                 using (new EditorGUILayout.HorizontalScope())
                                                 {
-                                                    AARManual.newPaths[count] = GUILayout.TextField(AARManual.newPaths[count], GUILayout.Width(200));
+                                                    var hover = string.Empty;
+
+                                                    AARManual.newPaths[AARManual.position] = GUILayout.TextField(AARManual.newPaths[AARManual.position], GUILayout.MaxWidth(300));
 
                                                     GUILayout.FlexibleSpace();
-                                                    if (GUILayout.Button("Apply", GUILayout.Width(116)))
+                                                    if (GUILayout.Button("Apply", GUILayout.Width(116)) && AARManual.newPaths[AARManual.position] != string.Empty)
                                                     {
-
+                                                        AARManual.RenamePath();
                                                     }
                                                 }
 
@@ -199,10 +202,10 @@ namespace AutoAnimationRepath
                                                 {
                                                     using (new EditorGUILayout.VerticalScope())
                                                     {
-                                                        AARManual.foldouts[count] = EditorGUILayout.Foldout(AARManual.foldouts[count], "Affected Clips" + " (" + AARManual.invalidClips[AARManual.invalidPaths.IndexOf(str)].Count + ")");
-                                                        if (AARManual.foldouts[count] == true)
+                                                        AARManual.foldouts[AARManual.position] = EditorGUILayout.Foldout(AARManual.foldouts[AARManual.position], "Affected Clips" + " (" + AARManual.invalidClips[AARManual.position].Count + ")");
+                                                        if (AARManual.foldouts[AARManual.position] == true)
                                                         {
-                                                            foreach (AnimationClip clip in AARManual.invalidClips[AARManual.invalidPaths.IndexOf(str)])
+                                                            foreach (AnimationClip clip in AARManual.invalidClips[AARManual.position])
                                                             {
                                                                 EditorGUI.BeginDisabledGroup(true);
                                                                 EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
