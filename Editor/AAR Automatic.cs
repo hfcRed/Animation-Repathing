@@ -13,10 +13,9 @@ namespace AutoAnimationRepath
     [InitializeOnLoad]
     public class AARAutomatic
     {
-        //Run on initialization
         static AARAutomatic()
         {
-            LoadData();
+            AARSettings.LoadData();
 
             EditorApplication.hierarchyChanged -= HierarchyChanged;
             //Selection.selectionChanged -= SelectionChanged;
@@ -24,129 +23,6 @@ namespace AutoAnimationRepath
             EditorApplication.hierarchyChanged += HierarchyChanged;
             //Selection.selectionChanged += SelectionChanged;
         }
-
-        //Create variables
-        public static int toolSelection;
-        public static string[] tools = { "Automatic", "Manual" };
-        public static int baseSelection;
-        public static string[] baseOptions = { "Animator Component", "VRChat Avatar" };
-        public static int languageSelection;
-        public static string[] languageOptions = { "English", "日本" };
-
-        private static Animator _animator;
-
-        public static Animator animator
-        {
-            get => _animator;
-            set
-            {
-                if (_animator != value)
-                {
-                    _animator = value;
-                    OnRootChanged();
-                }
-            }
-        }
-        public static AnimatorController controller;
-
-        private static GameObject _avatar;
-
-        public static GameObject avatar
-        {
-            get => _avatar;
-            set
-            {
-                if (_avatar != value)
-                {
-                    _avatar = value;
-                    OnRootChanged();
-                }
-            }
-        }
-
-        public static bool isEnabled;
-        public static bool renameActive = true;
-        public static bool reparentActive = true;
-        public static bool renameWarning = true;
-        public static bool reparentWarning = true;
-        public static bool activeInBackground;
-        public static bool showDebug = false;
-        public static bool foldout;
-
-        public enum Playables
-        {
-            Base = 1 << 0,
-            Additive = 1 << 1,
-            Gesture = 1 << 2,
-            Action = 1 << 3,
-            FX = 1 << 4,
-            Sitting = 1 << 5,
-            TPose = 1 << 6,
-            IKPose = 1 << 7,
-            all = ~0
-        }
-        public static Playables PlayableSelection = Playables.all;
-
-        private static readonly List<HierarchyTransform> hierarchyTransforms = new List<HierarchyTransform>();
-        private static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
-
-
-        #region Save settings
-        //Save settings to disk
-        public static void SaveData()
-        {
-            //Save directly
-            EditorPrefs.SetInt("AAR BaseSelection", baseSelection);
-            EditorPrefs.SetInt("AAR LanguageSelection", languageSelection);
-
-            EditorPrefs.SetBool("AAR Toggle", isEnabled);
-            EditorPrefs.SetBool("AAR RenameActive", renameActive);
-            EditorPrefs.SetBool("AAR ReparentActive", reparentActive);
-            EditorPrefs.SetBool("AAR RenameWarning", renameWarning);
-            EditorPrefs.SetBool("AAR ReparentWarning", reparentWarning);
-            EditorPrefs.SetBool("AAR ActiveInBackground", activeInBackground);
-
-            //Get controller name to save as string
-            EditorPrefs.SetString("AAR Controller", animator == null ? null : animator.gameObject.transform.name);
-
-            //Get avatar name to save as string
-            EditorPrefs.SetString("AAR Avatar", avatar == null ? null : avatar.name);
-
-            EditorPrefs.SetInt("AAR PlayableSelection", (int)PlayableSelection);
-
-            LoadData();
-        }
-        #endregion
-
-        #region Load settings
-        //Load settings on call
-        public static void LoadData()
-        {
-            //Load directly
-            baseSelection = EditorPrefs.GetInt("AAR BaseSelection");
-
-            isEnabled = EditorPrefs.GetBool("AAR Toggle");
-            renameActive = EditorPrefs.GetBool("AAR RenameActive");
-            reparentActive = EditorPrefs.GetBool("AAR ReparentActive");
-            renameWarning = EditorPrefs.GetBool("AAR RenameWarning");
-            reparentWarning = EditorPrefs.GetBool("AAR ReparentWarning");
-            activeInBackground = EditorPrefs.GetBool("AAR ActiveInBackground");
-
-            //Load GUID of custom controller to load the asset
-            string findController = EditorPrefs.GetString("AAR Controller");
-            GameObject animatorHolder = GameObject.Find(findController);
-            if (animatorHolder != null)
-            {
-                animator = animatorHolder.GetComponent(typeof(Animator)) as Animator;
-                controller = animator == null ? null : animator.runtimeAnimatorController as AnimatorController;
-            }
-
-            //Load avatar name to load the gameobject
-            avatar = GameObject.Find(EditorPrefs.GetString("AAR Avatar"));
-
-            PlayableSelection = (Playables)EditorPrefs.GetInt("AAR PlayableSelection");
-        }
-        #endregion
 
         /*
         #region Selection Change
@@ -166,34 +42,33 @@ namespace AutoAnimationRepath
         */
 
         #region Hierarchy Change
-        //Run when anything in the hierarchy changes
         public static void HierarchyChanged()
         {
-            bool shouldRun = isEnabled;
-            shouldRun &= activeInBackground || EditorWindow.HasOpenInstances<AAREditor>();
-            shouldRun &= renameActive || reparentActive;
+            bool shouldRun = AARVariables.isEnabled;
+            shouldRun &= AARVariables.activeInBackground || EditorWindow.HasOpenInstances<AAREditor>();
+            shouldRun &= AARVariables.renameActive || AARVariables.reparentActive;
 
             var root = GetRoot();
             shouldRun &= root;
 
             //temporary condition for current method of targetting a controller
-            controller = animator.runtimeAnimatorController as AnimatorController;
-            shouldRun &= baseSelection == 0 && controller;
+            AARVariables.controller = AARVariables.animator.runtimeAnimatorController as AnimatorController;
+            shouldRun &= AARVariables.controllerSelection == 0 && AARVariables.controller;
             if (!shouldRun) return;
 
-            changedPaths.Clear();
-            for (int i = hierarchyTransforms.Count - 1; i >= 0; i--)
+            AARVariables.changedPaths.Clear();
+            for (int i = AARVariables.hierarchyTransforms.Count - 1; i >= 0; i--)
             {
-                var ht = hierarchyTransforms[i];
+                var ht = AARVariables.hierarchyTransforms[i];
                 if (ht.target == null || !ht.target.IsChildOf(root))
                 {
-                    hierarchyTransforms.RemoveAt(i);
+                    AARVariables.hierarchyTransforms.RemoveAt(i);
                     continue;
                 }
 
                 var currentPath = AnimationUtility.CalculateTransformPath(ht.target, root);
                 if (ht.path != currentPath)
-                    try { changedPaths.Add(ht.path, currentPath); }
+                    try { AARVariables.changedPaths.Add(ht.path, currentPath); }
                     catch
                     {
                         //ignore error
@@ -204,9 +79,9 @@ namespace AutoAnimationRepath
                 ht.path = currentPath;
             }
 
-            if (changedPaths.Count == 0) return;
-            if (!reparentWarning || DisplayReparentDialog())
-                RepathParent(controller);
+            if (AARVariables.changedPaths.Count == 0) return;
+            if (!AARVariables.reparentWarning || DisplayReparentDialog())
+                RepathParent(AARVariables.controller);
 
             /*
             if (isEnabled && Selection.activeTransform != null && Selection.activeTransform.IsChildOf(animator.transform))
@@ -245,14 +120,14 @@ namespace AutoAnimationRepath
             {
                 AssetDatabase.StartAssetEditing();
 
-                foreach (AnimationClip clip in controller.animationClips)
+                foreach (AnimationClip clip in AARVariables.controller.animationClips)
                 {
                     EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                     EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
                     void HandleBinding(EditorCurveBinding b, bool isObjectCurve)
                     {
-                        if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
+                        if (!AARVariables.changedPaths.TryGetValue(b.path, out string newPath)) return;
                         if (isObjectCurve)
                         {
                             ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, b);
@@ -345,7 +220,7 @@ namespace AutoAnimationRepath
         {
             StringBuilder displayedChanges = new StringBuilder($"Repathing animation properties for:{Environment.NewLine}");
             
-            foreach (var s in changedPaths.Keys.Zip(changedPaths.Values, (s1, s2) => $"{s1} to {s2}"))
+            foreach (var s in AARVariables.changedPaths.Keys.Zip(AARVariables.changedPaths.Values, (s1, s2) => $"{s1} to {s2}"))
                 displayedChanges.AppendLine(s);
             
             return EditorUtility.DisplayDialog("Auto Repathing", displayedChanges.ToString(), "Continue", "Cancel");
@@ -353,7 +228,7 @@ namespace AutoAnimationRepath
 
         public static void OnRootChanged()
         {
-            hierarchyTransforms.Clear();
+            AARVariables.hierarchyTransforms.Clear();
 
             Transform root = GetRoot();
             if (!root) return;
@@ -362,13 +237,13 @@ namespace AutoAnimationRepath
             for (int i = 1; i < allChildren.Length; i++)
             {
                 var t = allChildren[i];
-                hierarchyTransforms.Add(new HierarchyTransform(t, root));
+                AARVariables.hierarchyTransforms.Add(new HierarchyTransform(t, root));
             }
         }
 
-        private static Transform GetRoot() => baseSelection == 0 ?
-            animator == null ? null : animator.transform :
-            avatar == null ? null : avatar.transform;
+        public static Transform GetRoot() => AARVariables.controllerSelection == 0 ?
+            AARVariables.animator == null ? null : AARVariables.animator.transform :
+            AARVariables.avatar == null ? null : AARVariables.avatar.transform;
 
         public class HierarchyTransform
         {

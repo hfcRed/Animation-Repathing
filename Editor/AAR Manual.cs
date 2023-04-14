@@ -1,97 +1,189 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
-using UnityEditor.Animations;
-
+using static AutoAnimationRepath.AARVariables;
+using System.Linq;
 
 namespace AutoAnimationRepath
 {
     [InitializeOnLoad]
     public class AARManual
     {
-        public static List<List<AnimationClip>> invalidClips = new List<List<AnimationClip>>();
-        public static List<string> invalidPaths = new List<string>();
-        public static List<bool> foldouts = new List<bool>();
-        public static List<string> newPaths = new List<string>();
-        public static int position;
-
-        public static void ScanPaths()
+        static AARManual()
         {
-            Transform parent = Selection.activeTransform.root;
-            GameObject parentObject = parent.gameObject;
-            Animator parentAnimator = parent.GetComponent<Animator>();
-            RuntimeAnimatorController runtime = parentAnimator.runtimeAnimatorController;
-            AARAutomatic.controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(AssetDatabase.GetAssetPath(runtime));
-
-            invalidClips.Clear();
-            invalidPaths.Clear();
-            foldouts.Clear();
-            newPaths.Clear();
-
-            List<AnimationClip> invalidClip = new List<AnimationClip>();
-            object animatedObject = 0;
-
-            foreach (AnimationClip clip in AARAutomatic.controller.animationClips)
-            {
-                Array curves = AnimationUtility.GetCurveBindings(clip);
-
-                foreach (EditorCurveBinding x in curves)
-                {
-                    EditorCurveBinding curve = x;
-                    animatedObject = AnimationUtility.GetAnimatedObject(parentObject, curve);
-
-                    if (animatedObject == null && !invalidPaths.Contains(curve.path))
-                    {
-                        newPaths.Add(string.Empty);
-                        foldouts.Add(new bool());
-                        invalidPaths.Add(curve.path);
-                        invalidClips.Add(new List<AnimationClip>());
-                    }
-                    if (animatedObject == null && !invalidClips[invalidPaths.IndexOf(curve.path)].Contains(clip))
-                    {
-                        invalidClips[invalidPaths.IndexOf(curve.path)].Add(clip);
-                    }
-                }
-                animatedObject = 0;
-            }
-            AARAutomatic.foldout = true;
+            Selection.selectionChanged += ClipEditing.GetClipPaths;
         }
 
-        public static void RenamePath()
+        public static class InvalidPaths
         {
-            Transform parent = Selection.activeTransform.root;
-            GameObject parentObject = parent.gameObject;
-            object animatedObject = 0;
-
-            try
+            public static void ScanInvalidPaths()
             {
-                AssetDatabase.StartAssetEditing();
+                invalidClips.Clear();
+                invalidOldPaths.Clear();
+                invalidFoldouts.Clear();
+                invalidNewPaths.Clear();
 
-                foreach (AnimationClip clip in invalidClips[position])
+                List<AnimationClip> invalidClip = new List<AnimationClip>();
+                object animatedObject = 0;
+
+                foreach (AnimationClip clip in controller.animationClips)
                 {
                     Array curves = AnimationUtility.GetCurveBindings(clip);
 
                     foreach (EditorCurveBinding x in curves)
                     {
-                        EditorCurveBinding binding = x;
-                        AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
+                        EditorCurveBinding curve = x;
+                        animatedObject = AnimationUtility.GetAnimatedObject(AARAutomatic.GetRoot().gameObject, curve);
 
-                        animatedObject = AnimationUtility.GetAnimatedObject(parentObject, binding);
-
-                        if (animatedObject == null)
+                        if (animatedObject == null && !invalidOldPaths.Contains(curve.path))
                         {
-                            AnimationUtility.SetEditorCurve(clip, binding, null);
-                            binding.path = newPaths[position];
-                            AnimationUtility.SetEditorCurve(clip, binding, curve);
+                            invalidFoldouts.Add(new bool());
+                            invalidOldPaths.Add(curve.path);
+                            invalidClips.Add(new List<AnimationClip>());
+                            invalidNewPaths.Add(curve.path);
+
+                        }
+                        if (animatedObject == null && !invalidClips[invalidOldPaths.IndexOf(curve.path)].Contains(clip))
+                        {
+                            invalidClips[invalidOldPaths.IndexOf(curve.path)].Add(clip);
                         }
                     }
                     animatedObject = 0;
                 }
+                invalidPathsFoldout = true;
             }
-            finally { AssetDatabase.StopAssetEditing(); }
-            ScanPaths();
+
+            public static void RenameInvalidPaths()
+            {
+                GameObject parentObject = animator.gameObject;
+                object animatedObject = 0;
+
+                try
+                {
+                    AssetDatabase.StartAssetEditing();
+
+                    foreach (AnimationClip clip in invalidClips[invalidPosition])
+                    {
+                        Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                        foreach (EditorCurveBinding x in curves)
+                        {
+                            EditorCurveBinding binding = x;
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
+
+                            animatedObject = AnimationUtility.GetAnimatedObject(parentObject, binding);
+
+                            if (animatedObject == null)
+                            {
+                                AnimationUtility.SetEditorCurve(clip, binding, null);
+                                binding.path = invalidNewPaths[invalidPosition];
+                                AnimationUtility.SetEditorCurve(clip, binding, curve);
+                            }
+                        }
+                        animatedObject = 0;
+                    }
+                }
+                finally { AssetDatabase.StopAssetEditing(); }
+
+                invalidNewPaths.RemoveAt(invalidPosition);
+                invalidOldPaths.RemoveAt(invalidPosition);
+                invalidFoldouts.RemoveAt(invalidPosition);
+                invalidClips.RemoveAt(invalidPosition);
+            }
+        }
+
+        public static class ClipEditing
+        {
+            public static void GetClipPaths()
+            {
+                clipsClips.Clear();
+                sharedProperties.Clear();
+                pathToSharedProperty.Clear();
+
+                clipsClips = Selection.GetFiltered<AnimationClip>(SelectionMode.Assets).ToList();
+
+                foreach (AnimationClip clip in clipsClips)
+                {
+                    Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                    foreach (EditorCurveBinding curve in curves)
+                    {
+                        if (pathToSharedProperty.TryGetValue(curve.path, out SharedProperty sp))
+                        {
+                            if (!sp.foldoutClips.Contains(clip))
+                            {
+                                sp.foldoutClips.Add(clip);                                
+                            }
+                            sp.count++;
+                        }
+                        else
+                        {
+                            SharedProperty sp2 = new SharedProperty();
+                            pathToSharedProperty.Add(curve.path, sp2);
+                            sp2.oldPath = curve.path;
+                            sp2.newPath = curve.path;
+                            sp2.foldoutClips.Add(clip);
+                            sp2.count++;
+                        }
+                    }
+                }
+            }
+
+            public static void RenameClipPathsSingle(SharedProperty sp)
+            {
+                try
+                {
+                    AssetDatabase.StartAssetEditing();
+
+                    foreach (AnimationClip clip in sp.foldoutClips)
+                    {
+                        Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                        foreach (EditorCurveBinding x in curves)
+                        {
+                            EditorCurveBinding binding = x;
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
+
+                            if (binding.path == sp.oldPath)
+                            {
+                                AnimationUtility.SetEditorCurve(clip, binding, null);
+                                binding.path = sp.newPath;
+                                AnimationUtility.SetEditorCurve(clip, binding, curve);
+                            }
+                        }
+                    }
+                }
+                finally { AssetDatabase.StopAssetEditing(); GetClipPaths(); }
+            }
+
+            public static void RenameClipPathsMultiple(Boo.Lang.List<AnimationClip> clipsTarget)
+            {
+                try
+                {
+                    AssetDatabase.StartAssetEditing();
+
+                    foreach (AnimationClip clip in clipsTarget)
+                    {
+                        Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                        foreach (EditorCurveBinding x in curves)
+                        {
+                            EditorCurveBinding binding = x;
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
+
+                            if (binding.path.Contains(clipsReplaceFrom))
+                            {
+                                AnimationUtility.SetEditorCurve(clip, binding, null);
+                                binding.path = binding.path.Replace(clipsReplaceFrom, clipsReplaceTo);
+                                AnimationUtility.SetEditorCurve(clip, binding, curve);
+                            }
+                        }
+                    }
+                }
+                finally { AssetDatabase.StopAssetEditing(); GetClipPaths(); }
+            }
+
         }
     }
 }

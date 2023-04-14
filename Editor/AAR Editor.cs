@@ -1,452 +1,577 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using System;
-using UnityEditor.Animations;
-using UnityEngine.Animations;
 using System.Linq;
 using VRC.SDK3.Avatars.Components;
-
+using static AutoAnimationRepath.AARVariables;
+using static AutoAnimationRepath.AARSettings;
+using static WindowsUtil;
+using Boo.Lang;
 
 namespace AutoAnimationRepath
 {
     public class AAREditor : EditorWindow
     {
-        #region Window
-        //Create window
-        [MenuItem("hfcRed/Auto Repath")]
-        static void ShowWindow() => GetWindow<AAREditor>(false, string.Empty, true).titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
-        #endregion
+        [MenuItem("hfcRed/Tools/Auto Repath")]
+        static void ShowWindow() => GetWindow<AAREditor>().titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
-        #region UI variables
-        //Create UI styles
-        public static class UIStyles
-        {
-            public static GUIStyle title = new GUIStyle(GUI.skin.label) { fontSize = 15, richText = true };
-            public static GUIStyle toggleButton = new GUIStyle(GUI.skin.button) { fontSize = 16, richText = true };
-            public static GUIStyle settings = new GUIStyle(GUI.skin.label) { fontSize = 20, richText = true };
-            public static GUIStyle settingsButtons = new GUIStyle(GUI.skin.label) { richText = true };
-            public static GUIStyle invalidPath = new GUIStyle(GUI.skin.box) { fontSize= 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleLeft };
-        }
-
-        //Create UI contents
-        public static class UIContent
-        {
-            public static GUIContent linkIcon = new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies"));
-            public static GUIContent resetIcon = new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = "Reset settings to default values" };
-            public static GUIContent test = new GUIContent() { tooltip = "test" };
-        }
-
-        private static Vector2 scroll = Vector2.zero;
-        #endregion
-
-        #region UI
-        //Draw UI
         public void OnGUI()
         {
-            //Check if any settings changed, then call SaveData to save all settings
+            Repaint();
             EditorGUI.BeginChangeCheck();
-
-            //Draw scrollbar
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(position.width));
 
-            GUILayout.Space(10);
-
-            using (new SqueezeScope(10))
-                AARAutomatic.toolSelection = GUILayout.Toolbar(AARAutomatic.toolSelection, AARAutomatic.tools);
-     
-
-            //Draw UI of the selected tool
-            switch (AARAutomatic.toolSelection)
+            DrawHeader();
+            switch (toolSelection)
             {
-                case 0: DrawAutomaticGUI(); break;
-                case 1: DrawManualGUI(); break;
+                case 0: DrawAutomatic(); break;
+                case 1: DrawManual(); break;
             }
-
-            DrawSettings();
-
+            if (manualToolSelection != 1 || toolSelection == 0)
+            {
+                DrawSettings();
+            }
+            
             GUILayout.EndScrollView();
-
             if (EditorGUI.EndChangeCheck())
-                AARAutomatic.SaveData();
+            {
+                SaveData();
+            }
         }
 
-        public static void DrawAutomaticGUI()
+        public static void DrawHeader()
         {
-            using (new SqueezeScope(10, 20, 0))
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            using (new SqueezeScope((5, 5, 3), (10, 5, 4)))
             {
-                using (new SqueezeScope(10, 10, 2))
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-                {
-
-                    //Draw title and credits
-                    using (new SqueezeScope(5))
-                    {
-                        using (new SqueezeScope(5, 5, 4))
-                            GUILayout.Label("<b>Auto Animation Repathing</b>", UIStyles.title, GUILayout.Height(20));
-                        
-
-                        GUILayout.FlexibleSpace();
-
-                        if (GUILayout.Button("Made by hfcRed", "linkLabel"))
-                            Application.OpenURL("https://hfcred.carrd.co");
-                        
-                        if (GUILayout.Button(UIContent.linkIcon, "label", GUILayout.Height(21)))
-                            Application.OpenURL("https://hfcred.carrd.co");                        
-                    }
-                }
-
-                //Draw toggle button
-                string buttonLabel = AARAutomatic.isEnabled ? "<color=#2bff80><b>Enabled</b></color>" : "<color=#969696><b>Disabled</b></color>";
-                AARAutomatic.isEnabled = GUILayout.Toggle(AARAutomatic.isEnabled, buttonLabel, UIStyles.toggleButton, GUILayout.Height(30));
-
-                GUILayout.Space(10);
-
-                //using (new BGColoredScope(AARAutomatic.Toggle, Color.green, Color.gray))
-                //AARAutomatic.Toggle = GUILayout.Toggle(AARAutomatic.Toggle, "<color=#2bff80><b>Enabled</b></color>", UIStyles.ToggleButton, GUILayout.Height(30));
+                toolSelection = GUILayout.Toolbar(toolSelection, tools, GUILayout.Height(25));
             }
-
         }
 
-        public static void DrawManualGUI()
+        public static void DrawAutomatic()
         {
-            using (new SqueezeScope(10, 10, 0))
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (10, 10, 4), (5, 5, 3)))
             {
-                using (new SqueezeScope(10, 10, 2))
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-                {
+                GUILayout.Label("Auto Animation Repathing", AARStyle.title);
 
-                    //Draw title and credits
-                    using (new SqueezeScope(5))
-                    {
-                        using (new SqueezeScope(5, 5, 4))
-                            GUILayout.Label("<b>Manual Animation Repathing</b>", UIStyles.title, GUILayout.Height(20));
-
-
-                        GUILayout.FlexibleSpace();
-
-                        if (GUILayout.Button("Made by hfcRed", "linkLabel"))
-                            Application.OpenURL("https://hfcred.carrd.co");
-
-                        if (GUILayout.Button(UIContent.linkIcon, "label", GUILayout.Height(21)))
-                            Application.OpenURL("https://hfcred.carrd.co");
-                    }
-                }
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Made by hfcRed", "linkLabel"))
+                    Application.OpenURL("https://hfcred.carrd.co");
+                if (GUILayout.Button(AARContent.linkIcon, "label", GUILayout.Height(21)))
+                    Application.OpenURL("https://hfcred.carrd.co");
             }
 
-            using (new SqueezeScope(0, 20, 0))
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            using (new SqueezeScope((5, 5, 3), (5, 5, 4)))
             {
-                using (new SqueezeScope(5, 5, 0))
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    using (new EditorGUILayout.VerticalScope())
-                    {
-                        using (new SqueezeScope(5, 5, 0))
-                            AARAutomatic.foldout = EditorGUILayout.Foldout(AARAutomatic.foldout, "Invalid Paths");
-                    }
+                string buttonLabel = isEnabled ? "<color=#4aff93><b>Enabled</b></color>" : "<color=#ff5263><b>Disabled</b></color>";
+                isEnabled = GUILayout.Toggle(isEnabled, buttonLabel, AARStyle.toggleButton, GUILayout.Height(30));
+            }
+        }
 
-                    GUILayout.FlexibleSpace();
-                    using (new EditorGUILayout.VerticalScope())
-                    {
-                        using (new SqueezeScope(5, 5, 0))
-                            if (GUILayout.Button("Scan Animator", GUILayout.Width(116)))
-                            {
-                                AARManual.ScanPaths();
-                            }
-                    }
+        public static void DrawManual()
+        {
+            using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (10, 10, 4), (5, 5, 3)))
+            {
+                GUILayout.Label("Manual Animation Repathing", AARStyle.title);
+
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Made by hfcRed", "linkLabel"))
+                    Application.OpenURL("https://hfcred.carrd.co");
+                if (GUILayout.Button(AARContent.linkIcon, "label", GUILayout.Height(21)))
+                    Application.OpenURL("https://hfcred.carrd.co");
+            }
+
+            using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
+            {
+                using (new SqueezeScope((0, 0, 4)))
+                {
+                    manualToolSelection = GUILayout.Toolbar(manualToolSelection, manualTools, GUILayout.Height(25));
                 }
-                if (AARAutomatic.foldout == true)
-                {
-                    AARManual.position = -1;
-                    foreach (string str in AARManual.invalidPaths)
-                    {
-                        AARManual.position++;
 
-                        using (new SqueezeScope(0, 10, 0))
-                        using (new EditorGUILayout.HorizontalScope())
+                if (manualToolSelection == 0)
+                {
+                    using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
+                    {
+                        using (new SqueezeScope((5, 0, 4)))
                         {
-                            using (new SqueezeScope(5, 5, 0))
-                            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                            invalidPathsFoldout = EditorGUILayout.Foldout(invalidPathsFoldout, "Invalid Paths", AARStyle.foldout);
+                        }
+
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button(AARContent.resetIcon, GUILayout.Height(30), GUILayout.Width(30)))
+                        {
+                            invalidNewPaths.Clear();
+                            AARManual.InvalidPaths.ScanInvalidPaths();
+                        }
+                    }
+                }
+
+                if (invalidPathsFoldout && manualToolSelection == 0)
+                {
+                    for (invalidPosition = 0; invalidPosition < invalidOldPaths.Count; invalidPosition++)
+                    {
+                        string str = invalidOldPaths[invalidPosition];
+
+                        using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
+                        {
+                            GUILayout.Label("<color=#F0DE08><b>" + str + "</b></color>", AARStyle.invalidPath);
+
+                            using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
                             {
-                                using (new EditorGUILayout.VerticalScope())
+                                if (GUILayout.Button(AARContent.resetIcon, AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
                                 {
-                                    using (new SqueezeScope(5, 0, 0))
+                                    invalidNewPaths[invalidPosition] = invalidOldPaths[invalidPosition];
+                                }
+
+                                invalidNewPaths[invalidPosition] = GUILayout.TextField(invalidNewPaths[invalidPosition], GUILayout.MinWidth(1));
+                                string path = DragAndDropGameobject();
+                                if (path != null)
+                                {
+                                    invalidNewPaths[invalidPosition] = path;
+                                }
+
+                                if (invalidNewPaths[invalidPosition] == string.Empty || invalidNewPaths[invalidPosition] == invalidOldPaths[invalidPosition])
+                                {
+                                    EditorGUI.BeginDisabledGroup(true);
+                                }
+                                if (GUILayout.Button("Apply", GUILayout.Width(75)))
+                                {
+                                    AARManual.InvalidPaths.RenameInvalidPaths();
+                                }
+                                EditorGUI.EndDisabledGroup();
+                            }
+
+                            using (new SqueezeScope((5, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                            {
+                                invalidFoldouts[invalidPosition] = EditorGUILayout.Foldout(invalidFoldouts[invalidPosition], "Affected Clips" + " (" + invalidClips[invalidPosition].Count + ")");
+                                if (invalidFoldouts[invalidPosition] == true)
+                                {
+                                    GUILayout.Space(5);
+                                    EditorGUI.BeginDisabledGroup(true);
+                                    foreach (AnimationClip clip in invalidClips[invalidPosition])
                                     {
-                                       using (new EditorGUILayout.HorizontalScope())
-                                       {
-                                            using (new SqueezeScope(5, 5, 0))
-                                            using (new EditorGUILayout.VerticalScope())
-                                            {
-                                                GUILayout.Label("<color=#F0DE08><b>" + str + "</b></color>", UIStyles.invalidPath);
-
-                                                using (new SqueezeScope(5, 5, 0))
-                                                using (new EditorGUILayout.HorizontalScope())
-                                                {
-                                                    var hover = string.Empty;
-
-                                                    AARManual.newPaths[AARManual.position] = GUILayout.TextField(AARManual.newPaths[AARManual.position], GUILayout.MaxWidth(300));
-
-                                                    GUILayout.FlexibleSpace();
-                                                    if (GUILayout.Button("Apply", GUILayout.Width(116)) && AARManual.newPaths[AARManual.position] != string.Empty)
-                                                    {
-                                                        AARManual.RenamePath();
-                                                    }
-                                                }
-
-                                                using (new SqueezeScope(0, 5, 0))
-                                                using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
-                                                {
-                                                    using (new EditorGUILayout.VerticalScope())
-                                                    {
-                                                        AARManual.foldouts[AARManual.position] = EditorGUILayout.Foldout(AARManual.foldouts[AARManual.position], "Affected Clips" + " (" + AARManual.invalidClips[AARManual.position].Count + ")");
-                                                        if (AARManual.foldouts[AARManual.position] == true)
-                                                        {
-                                                            foreach (AnimationClip clip in AARManual.invalidClips[AARManual.position])
-                                                            {
-                                                                EditorGUI.BeginDisabledGroup(true);
-                                                                EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
-                                                                EditorGUI.EndDisabledGroup();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                       }
+                                        EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
                                     }
+                                    EditorGUI.EndDisabledGroup();
                                 }
                             }
                         }
                     }
-                }
-            }
-        }
 
-        public static void DrawSettings()
-        {
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                GUILayout.Space(5);
-                using (new GUILayout.HorizontalScope())
-                {
-                    using (new EditorGUILayout.VerticalScope(EditorStyles.boldLabel))
+                    using (new SqueezeScope((10, 0, 4)))
                     {
-                        GUILayout.Space(5);
-                        GUILayout.Label("<b>Settings</b>", UIStyles.settings);
-                    }
-
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(UIContent.resetIcon, GUILayout.Height(30), GUILayout.Width(30)))
-                    {
-                        AARAutomatic.baseSelection = 0;
-
-                        AARAutomatic.animator = null;
-                        AARAutomatic.avatar = null;
-
-                        AARAutomatic.isEnabled = false;
-                        AARAutomatic.renameActive = true;
-                        AARAutomatic.reparentActive = true;
-                        AARAutomatic.renameWarning = true;
-                        AARAutomatic.reparentWarning = true;
-                        AARAutomatic.activeInBackground = false;
-
-                        AARAutomatic.PlayableSelection = AARAutomatic.Playables.all;
-
-                        AARAutomatic.SaveData();
-                    }
-                    GUILayout.Space(5);
-                }
-
-                GUILayout.Space(15);
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    using (new EditorGUILayout.HorizontalScope(GUILayout.MaxWidth(5)))
-                    {
-                    }
-
-                    using (new EditorGUILayout.VerticalScope())
-                    {
-                        //Draw controller settings
-                        using (new EditorGUILayout.HorizontalScope())
+                        if (invalidOldPaths.Count == 0)
                         {
-                            using (new SqueezeScope(5, 5, 4, EditorStyles.helpBox))
+                            GUILayout.Label("You have no invalid paths in your controller", AARStyle.invalidPathTip);
+                        }
+                        else
+                        {
+                            GUILayout.Label("You can drag and drop GameObjects into the text fields", AARStyle.invalidPathTip);
+                        }
+                    }
+                }
+
+                if (manualToolSelection == 1)
+                {
+                    if (clipsClips.Count != 0)
+                    {
+                        using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
+                        {
+                            using (new SqueezeScope((0, 0, 3)))
                             {
-                                using (new SqueezeScope(5))
+                                GUILayout.Label("<color=#ffffff>Replace part of all paths</color>", AARStyle.replacePath);
+                            }
+
+                            using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
+                            {
+                                GUILayout.Label("", GUILayout.Width(50));
+                                GUILayout.Label("From", AARStyle.replaceFromTo);
+                                GUILayout.Label("To", AARStyle.replaceFromTo);
+                                GUILayout.Label("", GUILayout.Width(130));
+                            }
+
+                            bool warning = false;
+                            int countTotal = 0;
+                            List<AnimationClip> clipsTarget = new List<AnimationClip>();
+                            using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
+                            {
+                                foreach (SharedProperty sp in pathToSharedProperty.Values)
                                 {
-                                    GUILayout.Label("Target", GUILayout.Width(150));
-                                    AARAutomatic.baseSelection = EditorGUILayout.Popup(AARAutomatic.baseSelection, AARAutomatic.baseOptions);
-                                }
+                                    sp.warning = false;
 
-                                GUILayout.Space(5);
-                                if (AARAutomatic.baseSelection == 0)
-                                {
-                                    using (new SqueezeScope(5))
+                                    if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
                                     {
-                                        GUILayout.Label("Controller to use", GUILayout.Width(150));
+                                        countTotal = countTotal + sp.count;
 
-                                        AARAutomatic.animator = (Animator)EditorGUILayout.ObjectField(AARAutomatic.animator, typeof(Animator), true);
-                                    }
-                                }
-                                else
-                                {
-                                    using (new SqueezeScope(5))
-                                    {
-                                        GUILayout.Label("Avatar to use", GUILayout.Width(150));
-
-                                        AARAutomatic.avatar = (GameObject)EditorGUILayout.ObjectField(AARAutomatic.avatar, typeof(GameObject), true);
-
-                                    }
-
-#if VRC_SDK_VRCSDK3
-                                    if (AARAutomatic.avatar != null && AARAutomatic.avatar.GetComponent<VRCAvatarDescriptor>() != null)
-                                    {
-                                        GUILayout.Space(5);
-                                        using (new EditorGUILayout.HorizontalScope())
+                                        var checkDuplicates = sp.oldPath.IndexOf(clipsReplaceFrom);
+                                        if (checkDuplicates != sp.oldPath.LastIndexOf(clipsReplaceFrom))
                                         {
-                                            using (new SqueezeScope(5, 5, 0))
-                                            {
-                                                GUILayout.Label("Layer to target", GUILayout.Width(150));
-                                                AARAutomatic.PlayableSelection = (AARAutomatic.Playables)EditorGUILayout.EnumFlagsField(AARAutomatic.PlayableSelection);
-                                            }
+                                            warning = true;
+                                            sp.warning = true;
+                                        }
 
-                                            if (AARAutomatic.showDebug)
+                                        foreach (AnimationClip clip in sp.foldoutClips)
+                                        {
+                                            if (!clipsTarget.Contains(clip))
                                             {
-                                                int PlayableSelectionAsInt = (int)AARAutomatic.PlayableSelection;
-
-                                                using (new SqueezeScope(5, 5, 0))
-                                                {
-                                                    GUILayout.Label("Int", GUILayout.Width(45));
-                                                    EditorGUILayout.IntField(PlayableSelectionAsInt);
-                                                }
+                                                clipsTarget.Add(clip);
                                             }
                                         }
                                     }
-#endif
+                                }
+
+                                if (GUILayout.Button(AARContent.resetIcon, AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
+                                {
+                                    clipsReplaceFrom = string.Empty;
+                                    clipsReplaceTo = string.Empty;
+                                }
+
+                                string buttonLabel = clipsFoldout ? "<b>v</b>" : "<b>></b>";
+                                clipsFoldout = GUILayout.Toggle(clipsFoldout, buttonLabel, AARStyle.customFoldout, GUILayout.Width(25));
+
+                                clipsReplaceFrom = EditorGUILayout.TextField(clipsReplaceFrom, GUILayout.MinWidth(1));
+                                string path = DragAndDropGameobject();
+                                if (path != null)
+                                {
+                                    clipsReplaceFrom = path;
+                                }
+
+                                clipsReplaceTo = EditorGUILayout.TextField(clipsReplaceTo, GUILayout.MinWidth(1));
+                                string path2 = DragAndDropGameobject();
+                                if (path2 != null)
+                                {
+                                    clipsReplaceTo = path2;
+                                }
+
+                                if (clipsReplaceFrom == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
+                                {
+                                    EditorGUI.BeginDisabledGroup(true);
+                                }
+                                if (GUILayout.Button("Apply", GUILayout.Width(75)))
+                                {
+                                    AARManual.ClipEditing.RenameClipPathsMultiple(clipsTarget);
+                                }
+                                EditorGUI.EndDisabledGroup();
+
+                                GUILayout.Label("(" + countTotal.ToString() + ")", GUILayout.Width(41));
+                            }
+
+                            if (clipsFoldout == true)
+                            {
+                                using (new SqueezeScope((5, 0, 4)))
+                                {
+                                    EditorGUI.BeginDisabledGroup(true);
+                                    foreach (AnimationClip clip in clipsTarget)
+                                    {
+                                        EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
+                                    }
+                                    EditorGUI.EndDisabledGroup();
+                                }
+                            }
+
+                            using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
+                            {
+                                if (warning == true)
+                                {
+                                    EditorGUILayout.HelpBox("One or more paths contain the input string multiple times within it. Pressing apply replaces all instances of the string within the paths!", MessageType.Warning);
+                                }
+                            }
+
+                            using (new SqueezeScope((20, 15, 4)))
+                            {
+                                UnityEngine.Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
+                                EditorGUI.DrawRect(new UnityEngine.Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
+                            }
+
+                            using (new SqueezeScope((0, 10, 4), (0, 0, 3)))
+                            {
+                                GUILayout.Label("<color=#ffffff>Replace paths individually</color>", AARStyle.replacePath);
+                            }
+
+                            foreach (SharedProperty sp in pathToSharedProperty.Values)
+                            {
+                                string str = sp.oldPath;
+
+                                using (new SqueezeScope((0, 0, 4), (0, 0, 3)))
+                                {
+                                    if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
+                                    {
+                                        sp.newPath = sp.oldPath;
+
+                                        if (sp.warning == true)
+                                        {
+                                            GUILayout.Label(AARContent.warningIcon, GUILayout.Width(20), GUILayout.Height(20));
+                                        }
+                                        else if (sp.oldPath.Contains(clipsReplaceFrom))
+                                        {
+                                            GUILayout.Label(AARContent.passedIcon, GUILayout.Width(20), GUILayout.Height(20));
+                                        }
+                                        else
+                                        {
+                                            GUILayout.Label("", GUILayout.Width(20), GUILayout.Height(20));
+                                        }
+                                    }
+                                    else if (GUILayout.Button(AARContent.resetIcon, AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
+                                    {
+                                        sp.newPath = sp.oldPath;
+                                    }
+
+                                    string buttonLabel = sp.foldout ? "<b>v</b>" : "<b>></b>";
+                                    sp.foldout = GUILayout.Toggle(sp.foldout, buttonLabel, AARStyle.customFoldout, GUILayout.Width(25));
+
+                                    if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
+                                    {
+                                        GUI.contentColor = Color.green;
+                                    }
+                                    else if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
+                                    {
+                                        GUI.contentColor = Color.gray;
+                                    }
+
+                                    sp.newPath = GUILayout.TextField(sp.newPath, GUILayout.MinWidth(1));
+                                    string path = DragAndDropGameobject();
+                                    if (path != null)
+                                    {
+                                        sp.newPath = path;
+                                    }
+
+                                    if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
+                                    {
+                                        GUI.contentColor = Color.white;
+                                    }
+
+                                    if (sp.newPath == string.Empty || sp.newPath == sp.oldPath)
+                                    {
+                                        EditorGUI.BeginDisabledGroup(true);
+                                    }
+                                    if (GUILayout.Button("Apply", GUILayout.Width(75)))
+                                    {
+                                        AARManual.ClipEditing.RenameClipPathsSingle(sp);
+                                    }
+                                    EditorGUI.EndDisabledGroup();
+
+                                    GUILayout.Label("(" + sp.count.ToString() + ")", GUILayout.Width(41));
+                                }
+
+                                if (sp.foldout == true)
+                                {
+                                    using (new SqueezeScope((5, 5, 4)))
+                                    {
+                                        EditorGUI.BeginDisabledGroup(true);
+                                        foreach (AnimationClip clip in sp.foldoutClips)
+                                        {
+                                            EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
+                                        }
+                                        EditorGUI.EndDisabledGroup();
+                                    }
                                 }
                             }
                         }
-
-                        //Draw misc settings
-                        GUILayout.Space(10);
-                        using (new SqueezeScope(5, 5, 4, EditorStyles.helpBox))
-                        {
-                            using (new SqueezeScope(5, 5, 3))
-                            {
-                                AARAutomatic.renameActive = GUILayout.Toggle(AARAutomatic.renameActive, "Repath when renamed");
-                                AARAutomatic.reparentActive = GUILayout.Toggle(AARAutomatic.reparentActive, "Repath when reparented");
-                            }
-
-                            GUILayout.Space(5);
-
-                            using (new SqueezeScope(5, 5, 3))
-                            {
-                                AARAutomatic.renameWarning = GUILayout.Toggle(AARAutomatic.renameWarning, "Warn when renamed");
-                                AARAutomatic.reparentWarning = GUILayout.Toggle(AARAutomatic.reparentWarning, "Warn when reparented");
-                            }
-                        }
-
-                        GUILayout.Space(10);
-                        using (new SqueezeScope(5, 5, 4, EditorStyles.helpBox))
-                        using (new SqueezeScope(5, 5, 3))
-                            AARAutomatic.activeInBackground = GUILayout.Toggle(AARAutomatic.activeInBackground, "Run when window is closed");
-
-
-
-                        //Draw language settings
-                        GUILayout.Space(10);
-                        using (new SqueezeScope(5, 5, 4, EditorStyles.helpBox))
-                        {
-                            using (new SqueezeScope(5, 5, 3))
-                            {
-                                GUILayout.Label("Language", GUILayout.Width(150));
-                                AARAutomatic.languageSelection = EditorGUILayout.Popup(AARAutomatic.languageSelection, AARAutomatic.languageOptions);
-                            }
-                        }
-                        GUILayout.Space(10);
                     }
 
-                    using (new EditorGUILayout.HorizontalScope(GUILayout.MaxWidth(5)))
+                    using (new SqueezeScope((10, 0, 4)))
                     {
+                        if (clipsClips.Count == 0)
+                        {
+                            GUILayout.Label("No Animation Clips selected", AARStyle.invalidPathTip);
+                        }
+                        else
+                        {
+                            GUILayout.Label("You can drag and drop GameObjects into the text fields", AARStyle.invalidPathTip);
+                        }
                     }
                 }
             }
         }
-        #endregion
-    }
 
-    #region GUI Classes
-    public class BGColoredScope : System.IDisposable
-    {
-        private readonly Color ogColor;
 
-        public BGColoredScope(bool isActive, Color active, Color inactive)
+        public static void DrawSettings()
         {
-            ogColor = GUI.backgroundColor;
-            GUI.backgroundColor = isActive ? active : inactive;
+            using (new SqueezeScope((15, 15, 4)))
+            {
+                UnityEngine.Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
+                EditorGUI.DrawRect(new UnityEngine.Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
+            }
+
+            using (new SqueezeScope((5, 5, 3), (0, 10, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
+            {
+                using (new SqueezeScope((0, 0, 3)))
+                {
+                    GUILayout.Label("<b>Settings</b>", AARStyle.settings);
+
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(AARContent.resetIcon, GUILayout.Height(30), GUILayout.Width(30)))
+                    {
+                        ResetData();
+                    }
+                }
+
+                using (new SqueezeScope((15, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                {
+                    using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
+                    {
+                        GUILayout.Label("Target", GUILayout.Width(150));
+                        controllerSelection = EditorGUILayout.Popup(controllerSelection, controllerOptions);
+                    }
+
+                    if (controllerSelection == 0)
+                    {
+                        using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
+                        {
+                            GUILayout.Label("Controller to use", GUILayout.Width(150));
+                            animator = (Animator)EditorGUILayout.ObjectField(animator, typeof(Animator), true);
+                        }
+                    }
+                    else
+                    {
+                        using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
+                        {
+                            GUILayout.Label("Avatar to use", GUILayout.Width(150));
+                            avatar = (GameObject)EditorGUILayout.ObjectField(avatar, typeof(GameObject), true);
+                        }
+#if VRC_SDK_VRCSDK3
+                        if (avatar != null && avatar.GetComponent<VRCAvatarDescriptor>() != null)
+                        {
+                            using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
+                            {
+                                GUILayout.Label("Layer to target", GUILayout.Width(150));
+                                PlayableSelection = (Playables)EditorGUILayout.EnumFlagsField(PlayableSelection);
+                            }
+                        }
+#endif
+                    }
+                }
+
+                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                {
+                    using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
+                    {
+                        renameActive = GUILayout.Toggle(renameActive, "Repath when renamed");
+                        reparentActive = GUILayout.Toggle(reparentActive, "Repath when reparented");
+                    }
+
+                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
+                    {
+                        renameWarning = GUILayout.Toggle(renameWarning, "Warn when renamed");
+                        reparentWarning = GUILayout.Toggle(reparentWarning, "Warn when reparented");
+                    }
+                }
+
+                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                {
+                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
+                    {
+                        activeInBackground = GUILayout.Toggle(activeInBackground, "Run when window is closed");
+                    }
+                }
+
+                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                {
+                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
+                    {
+                        GUILayout.Label("Language", GUILayout.Width(150));
+                        languageSelection = EditorGUILayout.Popup(languageSelection, languageOptions);
+                    }
+                }
+            }
         }
-        public void Dispose()
+
+        public static string DragAndDropGameobject()
         {
-            GUI.backgroundColor = ogColor;
+            UnityEngine.Rect r = GUILayoutUtility.GetLastRect();
+            Event e = Event.current;
+
+            if (r.Contains(e.mousePosition))
+            {
+                var draggedObjects = DragAndDrop.objectReferences.Where(o => o is GameObject).Select(o => o as GameObject);
+
+                if (e.type == EventType.DragUpdated)
+                {
+                    if (draggedObjects.Any())
+                    {
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+                    }
+                }
+
+                if (e.type == EventType.DragPerform)
+                {
+                    var go = draggedObjects.First();
+                    string p = AnimationUtility.CalculateTransformPath(go.transform, AARAutomatic.GetRoot());
+                    return(p);
+                    //sp.newPath = p;
+                }
+            }
+            return(null);
         }
     }
 
     public class SqueezeScope : System.IDisposable
     {
-        private readonly int width1;
-        private readonly int width2;
-        private readonly int type;
+        private SqueezeSettings[] settings;
         //0 = none
         //1 = Horizontal
         //2 = Vertical
         //3 = EditorH
         //4 = EditorV
 
-        public SqueezeScope(int width1, int width2, int type = 1, GUIStyle style = null)
-        {
-            this.width1 = width1;
-            this.width2 = width2;
-            this.type = type;
-            BeginSqueeze(style ?? GUIStyle.none);
-        }
+        public SqueezeScope(SqueezeSettings input) : this(new[] { input }) { }
 
-        public SqueezeScope(int width1, int type = 1, GUIStyle style = null)
+        public SqueezeScope(params SqueezeSettings[] input)
         {
-            this.width1 = width1;
-            this.width2 = width1;
-            this.type = type;
-            BeginSqueeze(style ?? GUIStyle.none);
-        }
-
-        private void BeginSqueeze(GUIStyle style = null)
-        {
-            switch (type)
+            settings = input;
+            foreach (var squeezeSettings in input)
             {
-                case 1: GUILayout.BeginHorizontal(style); break;
-                case 2: GUILayout.BeginVertical(style); break;
-                case 3: EditorGUILayout.BeginHorizontal(style); break;
-                case 4: EditorGUILayout.BeginVertical(style); break;
+                BeginSqueeze(squeezeSettings);
+            }
+        }
+
+        private void BeginSqueeze(SqueezeSettings squeezeSettings)
+        {
+            switch (squeezeSettings.type)
+            {
+                case 1: GUILayout.BeginHorizontal(squeezeSettings.style); break;
+                case 2: GUILayout.BeginVertical(squeezeSettings.style); break;
+                case 3: EditorGUILayout.BeginHorizontal(squeezeSettings.style); break;
+                case 4: EditorGUILayout.BeginVertical(squeezeSettings.style); break;
             }
 
-            GUILayout.Space(width1);
+            GUILayout.Space(squeezeSettings.width1);
         }
 
 
         public void Dispose()
         {
-            GUILayout.Space(width2);
-
-            switch (type)
+            foreach (var squeezeSettings in settings.Reverse())
             {
-                case 1: GUILayout.EndHorizontal(); break;
-                case 2: GUILayout.EndVertical(); break;
-                case 3: EditorGUILayout.EndHorizontal(); break;
-                case 4: EditorGUILayout.EndVertical(); break;
+                GUILayout.Space(squeezeSettings.width2);
+                switch (squeezeSettings.type)
+                {
+                    case 1: GUILayout.EndHorizontal(); break;
+                    case 2: GUILayout.EndVertical(); break;
+                    case 3: EditorGUILayout.EndHorizontal(); break;
+                    case 4: EditorGUILayout.EndVertical(); break;
+                }
             }
         }
     }
-    #endregion
+
+    public struct SqueezeSettings
+    {
+        public int width1;
+        public int width2;
+        public int type;
+        public GUIStyle style;
+
+        public static implicit operator SqueezeSettings((int, int) val)
+        {
+            return new SqueezeSettings() { width1 = val.Item1, width2 = val.Item2, type = 1, style = GUIStyle.none };
+        }
+        public static implicit operator SqueezeSettings((int, int, int) val)
+        {
+            return new SqueezeSettings() { width1 = val.Item1, width2 = val.Item2, type = val.Item3, style = GUIStyle.none };
+        }
+
+        public static implicit operator SqueezeSettings((int, int, int, GUIStyle) val)
+        {
+            return new SqueezeSettings() { width1 = val.Item1, width2 = val.Item2, type = val.Item3, style = val.Item4 };
+        }
+    }
 }
