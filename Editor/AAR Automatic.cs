@@ -15,8 +15,6 @@ namespace AutoAnimationRepath
     {
         static AARAutomatic()
         {
-            AARSettings.LoadData();
-
             EditorApplication.hierarchyChanged -= HierarchyChanged;
             //Selection.selectionChanged -= SelectionChanged;
 

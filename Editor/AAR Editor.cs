@@ -3,9 +3,8 @@ using UnityEditor;
 using System.Linq;
 using VRC.SDK3.Avatars.Components;
 using static AutoAnimationRepath.AARVariables;
-using static AutoAnimationRepath.AARSettings;
-using static WindowsUtil;
 using Boo.Lang;
+using System;
 
 namespace AutoAnimationRepath
 {
@@ -34,7 +33,7 @@ namespace AutoAnimationRepath
             GUILayout.EndScrollView();
             if (EditorGUI.EndChangeCheck())
             {
-                SaveData();
+                AARSaveData.SaveData();
             }
         }
 
@@ -50,10 +49,10 @@ namespace AutoAnimationRepath
         {
             using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (10, 10, 4), (5, 5, 3)))
             {
-                GUILayout.Label("Auto Animation Repathing", AARStyle.title);
+                GUILayout.Label(Strings.Automatic.title, AARStyle.title);
 
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button("Made by hfcRed", "linkLabel"))
+                if (GUILayout.Button(Strings.Automatic.credit, "linkLabel"))
                     Application.OpenURL("https://hfcred.carrd.co");
                 if (GUILayout.Button(AARContent.linkIcon, "label", GUILayout.Height(21)))
                     Application.OpenURL("https://hfcred.carrd.co");
@@ -61,7 +60,7 @@ namespace AutoAnimationRepath
 
             using (new SqueezeScope((5, 5, 3), (5, 5, 4)))
             {
-                string buttonLabel = isEnabled ? "<color=#4aff93><b>Enabled</b></color>" : "<color=#ff5263><b>Disabled</b></color>";
+                string buttonLabel = isEnabled ? "<color=#4aff93><b>"+ Strings.Automatic.enabled + "</b></color>" : "<color=#ff5263><b>" + Strings.Automatic.disabled + "</b></color>";
                 isEnabled = GUILayout.Toggle(isEnabled, buttonLabel, AARStyle.toggleButton, GUILayout.Height(30));
             }
         }
@@ -70,10 +69,10 @@ namespace AutoAnimationRepath
         {
             using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (10, 10, 4), (5, 5, 3)))
             {
-                GUILayout.Label("Manual Animation Repathing", AARStyle.title);
+                GUILayout.Label(Strings.Manual.title, AARStyle.title);
 
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button("Made by hfcRed", "linkLabel"))
+                if (GUILayout.Button(Strings.Manual.credit, "linkLabel"))
                     Application.OpenURL("https://hfcred.carrd.co");
                 if (GUILayout.Button(AARContent.linkIcon, "label", GUILayout.Height(21)))
                     Application.OpenURL("https://hfcred.carrd.co");
@@ -92,7 +91,7 @@ namespace AutoAnimationRepath
                     {
                         using (new SqueezeScope((5, 0, 4)))
                         {
-                            invalidPathsFoldout = EditorGUILayout.Foldout(invalidPathsFoldout, "Invalid Paths", AARStyle.foldout);
+                            invalidPathsFoldout = EditorGUILayout.Foldout(invalidPathsFoldout, Strings.InvalidPaths.invalidPaths, AARStyle.foldout);
                         }
 
                         GUILayout.FlexibleSpace();
@@ -132,7 +131,7 @@ namespace AutoAnimationRepath
                                 {
                                     EditorGUI.BeginDisabledGroup(true);
                                 }
-                                if (GUILayout.Button("Apply", GUILayout.Width(75)))
+                                if (GUILayout.Button(Strings.InvalidPaths.apply, GUILayout.Width(75)))
                                 {
                                     AARManual.InvalidPaths.RenameInvalidPaths();
                                 }
@@ -141,7 +140,7 @@ namespace AutoAnimationRepath
 
                             using (new SqueezeScope((5, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
                             {
-                                invalidFoldouts[invalidPosition] = EditorGUILayout.Foldout(invalidFoldouts[invalidPosition], "Affected Clips" + " (" + invalidClips[invalidPosition].Count + ")");
+                                invalidFoldouts[invalidPosition] = EditorGUILayout.Foldout(invalidFoldouts[invalidPosition], Strings.InvalidPaths.affectedClips + " (" + invalidClips[invalidPosition].Count + ")");
                                 if (invalidFoldouts[invalidPosition] == true)
                                 {
                                     GUILayout.Space(5);
@@ -160,11 +159,11 @@ namespace AutoAnimationRepath
                     {
                         if (invalidOldPaths.Count == 0)
                         {
-                            GUILayout.Label("You have no invalid paths in your controller", AARStyle.invalidPathTip);
+                            GUILayout.Label(Strings.InvalidPaths.noInvalidPaths, AARStyle.invalidPathTip);
                         }
                         else
                         {
-                            GUILayout.Label("You can drag and drop GameObjects into the text fields", AARStyle.invalidPathTip);
+                            GUILayout.Label(Strings.InvalidPaths.dragAndDrop, AARStyle.invalidPathTip);
                         }
                     }
                 }
@@ -177,14 +176,14 @@ namespace AutoAnimationRepath
                         {
                             using (new SqueezeScope((0, 0, 3)))
                             {
-                                GUILayout.Label("<color=#ffffff>Replace part of all paths</color>", AARStyle.replacePath);
+                                GUILayout.Label("<color=#ffffff>" + Strings.ClipEditing.replacePartOfAll + "</color>", AARStyle.replacePath);
                             }
 
                             using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
                             {
                                 GUILayout.Label("", GUILayout.Width(50));
-                                GUILayout.Label("From", AARStyle.replaceFromTo);
-                                GUILayout.Label("To", AARStyle.replaceFromTo);
+                                GUILayout.Label(Strings.ClipEditing.from, AARStyle.replaceFromTo);
+                                GUILayout.Label(Strings.ClipEditing.to, AARStyle.replaceFromTo);
                                 GUILayout.Label("", GUILayout.Width(130));
                             }
 
@@ -199,7 +198,7 @@ namespace AutoAnimationRepath
 
                                     if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
                                     {
-                                        countTotal = countTotal + sp.count;
+                                        countTotal += sp.count;
 
                                         var checkDuplicates = sp.oldPath.IndexOf(clipsReplaceFrom);
                                         if (checkDuplicates != sp.oldPath.LastIndexOf(clipsReplaceFrom))
@@ -245,9 +244,13 @@ namespace AutoAnimationRepath
                                 {
                                     EditorGUI.BeginDisabledGroup(true);
                                 }
-                                if (GUILayout.Button("Apply", GUILayout.Width(75)))
+                                if (GUILayout.Button(Strings.ClipEditing.apply, GUILayout.Width(75)))
                                 {
-                                    AARManual.ClipEditing.RenameClipPathsMultiple(clipsTarget);
+                                    foreach (AnimationClip clip in clipsTarget)
+                                    {
+                                        AARManual.ClipEditing.RenameClipPaths(clip, false, string.Empty, string.Empty);
+                                    }
+
                                 }
                                 EditorGUI.EndDisabledGroup();
 
@@ -271,7 +274,7 @@ namespace AutoAnimationRepath
                             {
                                 if (warning == true)
                                 {
-                                    EditorGUILayout.HelpBox("One or more paths contain the input string multiple times within it. Pressing apply replaces all instances of the string within the paths!", MessageType.Warning);
+                                    EditorGUILayout.HelpBox(Strings.ClipEditing.warning, MessageType.Warning);
                                 }
                             }
 
@@ -283,7 +286,7 @@ namespace AutoAnimationRepath
 
                             using (new SqueezeScope((0, 10, 4), (0, 0, 3)))
                             {
-                                GUILayout.Label("<color=#ffffff>Replace paths individually</color>", AARStyle.replacePath);
+                                GUILayout.Label("<color=#ffffff>" + Strings.ClipEditing.replaceIndividual + "</color>", AARStyle.replacePath);
                             }
 
                             foreach (SharedProperty sp in pathToSharedProperty.Values)
@@ -342,9 +345,12 @@ namespace AutoAnimationRepath
                                     {
                                         EditorGUI.BeginDisabledGroup(true);
                                     }
-                                    if (GUILayout.Button("Apply", GUILayout.Width(75)))
+                                    if (GUILayout.Button(Strings.ClipEditing.apply, GUILayout.Width(75)))
                                     {
-                                        AARManual.ClipEditing.RenameClipPathsSingle(sp);
+                                        foreach (AnimationClip clip in sp.foldoutClips)
+                                        {
+                                            AARManual.ClipEditing.RenameClipPaths(clip, true, sp.oldPath, sp.newPath);
+                                        }
                                     }
                                     EditorGUI.EndDisabledGroup();
 
@@ -371,11 +377,11 @@ namespace AutoAnimationRepath
                     {
                         if (clipsClips.Count == 0)
                         {
-                            GUILayout.Label("No Animation Clips selected", AARStyle.invalidPathTip);
+                            GUILayout.Label(Strings.ClipEditing.noClipsSelected, AARStyle.invalidPathTip);
                         }
                         else
                         {
-                            GUILayout.Label("You can drag and drop GameObjects into the text fields", AARStyle.invalidPathTip);
+                            GUILayout.Label(Strings.ClipEditing.dragAndDrop, AARStyle.invalidPathTip);
                         }
                     }
                 }
@@ -395,12 +401,12 @@ namespace AutoAnimationRepath
             {
                 using (new SqueezeScope((0, 0, 3)))
                 {
-                    GUILayout.Label("<b>Settings</b>", AARStyle.settings);
+                    GUILayout.Label("<b>" + Strings.Settings.settings +  "</b>", AARStyle.settings);
 
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button(AARContent.resetIcon, GUILayout.Height(30), GUILayout.Width(30)))
                     {
-                        ResetData();
+                        AARSaveData.ResetData();
                     }
                 }
 
@@ -408,7 +414,7 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
                     {
-                        GUILayout.Label("Target", GUILayout.Width(150));
+                        GUILayout.Label(Strings.Settings.target, GUILayout.Width(150));
                         controllerSelection = EditorGUILayout.Popup(controllerSelection, controllerOptions);
                     }
 
@@ -416,7 +422,7 @@ namespace AutoAnimationRepath
                     {
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
-                            GUILayout.Label("Controller to use", GUILayout.Width(150));
+                            GUILayout.Label(Strings.Settings.controllerToUse, GUILayout.Width(150));
                             animator = (Animator)EditorGUILayout.ObjectField(animator, typeof(Animator), true);
                         }
                     }
@@ -424,7 +430,7 @@ namespace AutoAnimationRepath
                     {
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
-                            GUILayout.Label("Avatar to use", GUILayout.Width(150));
+                            GUILayout.Label(Strings.Settings.avatarToUse, GUILayout.Width(150));
                             avatar = (GameObject)EditorGUILayout.ObjectField(avatar, typeof(GameObject), true);
                         }
 #if VRC_SDK_VRCSDK3
@@ -432,7 +438,7 @@ namespace AutoAnimationRepath
                         {
                             using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
                             {
-                                GUILayout.Label("Layer to target", GUILayout.Width(150));
+                                GUILayout.Label(Strings.Settings.layersToUse, GUILayout.Width(150));
                                 PlayableSelection = (Playables)EditorGUILayout.EnumFlagsField(PlayableSelection);
                             }
                         }
@@ -444,14 +450,14 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
                     {
-                        renameActive = GUILayout.Toggle(renameActive, "Repath when renamed");
-                        reparentActive = GUILayout.Toggle(reparentActive, "Repath when reparented");
+                        renameActive = GUILayout.Toggle(renameActive, Strings.Settings.repathWhenRenamed);
+                        reparentActive = GUILayout.Toggle(reparentActive, Strings.Settings.repathWhenReparented);
                     }
 
                     using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
                     {
-                        renameWarning = GUILayout.Toggle(renameWarning, "Warn when renamed");
-                        reparentWarning = GUILayout.Toggle(reparentWarning, "Warn when reparented");
+                        renameWarning = GUILayout.Toggle(renameWarning, Strings.Settings.warnWhenRenamed);
+                        reparentWarning = GUILayout.Toggle(reparentWarning, Strings.Settings.warnWhenReparented);
                     }
                 }
 
@@ -459,7 +465,7 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                     {
-                        activeInBackground = GUILayout.Toggle(activeInBackground, "Run when window is closed");
+                        activeInBackground = GUILayout.Toggle(activeInBackground, Strings.Settings.runWhenWindowClosed);
                     }
                 }
 
@@ -467,8 +473,17 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                     {
-                        GUILayout.Label("Language", GUILayout.Width(150));
+                        GUILayout.Label(Strings.Settings.language, GUILayout.Width(150));
+
+                        EditorGUI.BeginChangeCheck();
                         languageSelection = EditorGUILayout.Popup(languageSelection, languageOptions);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            if (languageSelection == 0)
+                                Strings.loadEnglisch();
+                            else
+                                Strings.loadJapanese();
+                        }
                     }
                 }
             }
@@ -496,7 +511,6 @@ namespace AutoAnimationRepath
                     var go = draggedObjects.First();
                     string p = AnimationUtility.CalculateTransformPath(go.transform, AARAutomatic.GetRoot());
                     return(p);
-                    //sp.newPath = p;
                 }
             }
             return(null);

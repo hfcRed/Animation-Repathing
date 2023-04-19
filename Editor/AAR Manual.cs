@@ -130,54 +130,31 @@ namespace AutoAnimationRepath
                 }
             }
 
-            public static void RenameClipPathsSingle(SharedProperty sp)
+            public static void RenameClipPaths(AnimationClip clip, bool replaceEntire, string oldPath, string newPath)
             {
                 try
                 {
                     AssetDatabase.StartAssetEditing();
 
-                    foreach (AnimationClip clip in sp.foldoutClips)
+                    Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                    foreach (EditorCurveBinding x in curves)
                     {
-                        Array curves = AnimationUtility.GetCurveBindings(clip);
+                        EditorCurveBinding binding = x;
+                        AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
 
-                        foreach (EditorCurveBinding x in curves)
+                        if (replaceEntire == false && binding.path.Contains(clipsReplaceFrom))
                         {
-                            EditorCurveBinding binding = x;
-                            AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
-
-                            if (binding.path == sp.oldPath)
-                            {
-                                AnimationUtility.SetEditorCurve(clip, binding, null);
-                                binding.path = sp.newPath;
-                                AnimationUtility.SetEditorCurve(clip, binding, curve);
-                            }
+                            AnimationUtility.SetEditorCurve(clip, binding, null);
+                            binding.path = binding.path.Replace(clipsReplaceFrom, clipsReplaceTo);
+                            AnimationUtility.SetEditorCurve(clip, binding, curve);
                         }
-                    }
-                }
-                finally { AssetDatabase.StopAssetEditing(); GetClipPaths(); }
-            }
 
-            public static void RenameClipPathsMultiple(Boo.Lang.List<AnimationClip> clipsTarget)
-            {
-                try
-                {
-                    AssetDatabase.StartAssetEditing();
-
-                    foreach (AnimationClip clip in clipsTarget)
-                    {
-                        Array curves = AnimationUtility.GetCurveBindings(clip);
-
-                        foreach (EditorCurveBinding x in curves)
+                        if (replaceEntire == true && binding.path == oldPath)
                         {
-                            EditorCurveBinding binding = x;
-                            AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
-
-                            if (binding.path.Contains(clipsReplaceFrom))
-                            {
-                                AnimationUtility.SetEditorCurve(clip, binding, null);
-                                binding.path = binding.path.Replace(clipsReplaceFrom, clipsReplaceTo);
-                                AnimationUtility.SetEditorCurve(clip, binding, curve);
-                            }
+                            AnimationUtility.SetEditorCurve(clip, binding, null);
+                            binding.path = newPath;
+                            AnimationUtility.SetEditorCurve(clip, binding, curve);
                         }
                     }
                 }

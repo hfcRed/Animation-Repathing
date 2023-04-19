@@ -10,13 +10,13 @@ namespace AutoAnimationRepath
     public class AARVariables
     {
         public static int toolSelection;
-        public static string[] tools = { "Automatic", "Manual" };
+        public static string[] tools = new string[2];
         public static bool isEnabled;
         public static int manualToolSelection;
-        public static string[] manualTools = { "Fix Invalid Paths", "Edit Animation Clips" };
+        public static string[] manualTools = new string [2];
         public static bool invalidPathsFoldout = true;
         public static int controllerSelection;
-        public static string[] controllerOptions = { "Animator Component", "VRChat Avatar" };
+        public static string[] controllerOptions = new string[2];
         public static bool renameActive = true;
         public static bool reparentActive = true;
         public static bool renameWarning = true;
@@ -117,8 +117,19 @@ namespace AutoAnimationRepath
         public static GUIContent passedIcon = new GUIContent(EditorGUIUtility.IconContent("TestPassed"));
     }
 
-    public static class AARSettings
+    [InitializeOnLoad]
+    public static class AARSaveData
     {
+        static AARSaveData()
+        {
+            LoadData();
+
+            if (languageSelection == 0)
+                Strings.loadEnglisch();
+            else
+                Strings.loadJapanese();
+        }
+
         public static void SaveData()
         {
             EditorPrefs.SetInt("AAR BaseSelection", controllerSelection);
@@ -150,7 +161,6 @@ namespace AutoAnimationRepath
             activeInBackground = EditorPrefs.GetBool("AAR ActiveInBackground");
 
             string findController = EditorPrefs.GetString("AAR Controller");
-            Debug.Log(findController);
 
             GameObject animatorHolder = GameObject.Find(findController);
             if (animatorHolder != null)
@@ -184,5 +194,176 @@ namespace AutoAnimationRepath
         }
     }
 
+    public static class Strings
+    {
+        public static class Main
+        {
+            public static string windowName;
+            public static string automatic;
+            public static string manual;
+        }
 
+        public static class Automatic
+        {
+            public static string title;
+            public static string credit;
+            public static string disabled;
+            public static string enabled;
+        }
+
+        public static class Manual
+        {
+            public static string title;
+            public static string credit;
+            public static string fixPaths;
+            public static string editClips;
+        }
+
+        public static class InvalidPaths
+        {
+            public static string invalidPaths;
+            public static string apply;
+            public static string affectedClips;
+            public static string noInvalidPaths;
+            public static string dragAndDrop;
+        }
+
+        public static class ClipEditing
+        {
+            public static string replacePartOfAll;
+            public static string from;
+            public static string to;
+            public static string apply;
+            public static string warning;
+            public static string replaceIndividual;
+            public static string noClipsSelected;
+            public static string dragAndDrop;
+        }
+
+        public static class Settings
+        {
+            public static string settings;
+            public static string target;
+            public static string animatorComponent;
+            public static string vrchatAvatar;
+            public static string controllerToUse;
+            public static string layersToUse;
+            public static string avatarToUse;
+            public static string repathWhenRenamed;
+            public static string repathWhenReparented;
+            public static string warnWhenRenamed;
+            public static string warnWhenReparented;
+            public static string runWhenWindowClosed;
+            public static string language;
+        }
+
+        public static class ToolTips
+        {
+
+        }
+
+        public static void loadEnglisch()
+        {
+            Main.windowName = "Animation Repathing";
+            Main.automatic = "Automatic";
+            Main.manual = "Manual";
+            tools[0] = Main.automatic;
+            tools[1] = Main.manual;
+
+            Automatic.title = "Auto Animation Repathing";
+            Automatic.credit = "Made by hfcRed";
+            Automatic.disabled = "Disabled";
+            Automatic.enabled = "Enabled";
+
+            Manual.title = "Manual Animation Repathing";
+            Manual.credit = "Made by hfcRed";
+            Manual.fixPaths = "Fix Invalid Paths";
+            Manual.editClips = "Edit Animation Clips";
+            manualTools[0] = Manual.fixPaths;
+            manualTools[1] = Manual.editClips;
+
+            InvalidPaths.invalidPaths = "Invalid Paths";
+            InvalidPaths.apply = "Apply";
+            InvalidPaths.affectedClips = "Affected Clips";
+            InvalidPaths.noInvalidPaths = "You have no invalid paths in your controller";
+            InvalidPaths.dragAndDrop = "You can drag and drop GameObjects into the text fields";
+
+            ClipEditing.replacePartOfAll = "Replace part of all paths";
+            ClipEditing.from = "From";
+            ClipEditing.to = "To";
+            ClipEditing.apply = "Apply";
+            ClipEditing.warning = "One or more paths contain the input string multiple times within it. Pressing apply replaces all instances of the string within the paths!";
+            ClipEditing.replaceIndividual = "Replace paths individually";
+            ClipEditing.noClipsSelected = "No Animation Clips selected";
+            ClipEditing.dragAndDrop = "You can drag and drop GameObjects into the text fields";
+
+            Settings.settings = "Settings";
+            Settings.target = "Target";
+            Settings.animatorComponent = "Animator Component";
+            Settings.vrchatAvatar = "VRChat Avatar";
+            Settings.controllerToUse = "Controller to use";
+            Settings.layersToUse = "Layers to use";
+            Settings.avatarToUse = "Avatar to use";
+            Settings.repathWhenRenamed = "Repath when renamed";
+            Settings.repathWhenReparented = "Repath when reparented";
+            Settings.warnWhenRenamed = "Warn when renamed";
+            Settings.warnWhenReparented = "Warn when reparented";
+            Settings.runWhenWindowClosed = "Run when window is closed";
+            Settings.language = "Language";
+            controllerOptions[0] = Settings.animatorComponent;
+            controllerOptions[1] = Settings.vrchatAvatar;
+        }
+
+        public static void loadJapanese()
+        {
+            Main.windowName = "";
+            Main.automatic = "";
+            Main.manual = "";
+            tools[0] = Main.automatic;
+            tools[1] = Main.manual;
+
+            Automatic.title = "";
+            Automatic.credit = "";
+            Automatic.disabled = "";
+            Automatic.enabled = "";
+
+            Manual.title = "";
+            Manual.credit = "";
+            Manual.fixPaths = "";
+            Manual.editClips = "";
+            manualTools[0] = Manual.fixPaths;
+            manualTools[1] = Manual.editClips;
+
+            InvalidPaths.invalidPaths = "";
+            InvalidPaths.apply = "";
+            InvalidPaths.affectedClips = "";
+            InvalidPaths.noInvalidPaths = "";
+            InvalidPaths.dragAndDrop = "";
+
+            ClipEditing.replacePartOfAll = "";
+            ClipEditing.from = "";
+            ClipEditing.to = "";
+            ClipEditing.apply = "";
+            ClipEditing.warning = "";
+            ClipEditing.replaceIndividual = "";
+            ClipEditing.noClipsSelected = "";
+            ClipEditing.dragAndDrop = "";
+
+            Settings.settings = "";
+            Settings.target = "";
+            Settings.animatorComponent = "";
+            Settings.vrchatAvatar = "";
+            Settings.controllerToUse = "";
+            Settings.layersToUse = "";
+            Settings.avatarToUse = "";
+            Settings.repathWhenRenamed = "";
+            Settings.repathWhenReparented = "";
+            Settings.warnWhenRenamed = "";
+            Settings.warnWhenReparented = "";
+            Settings.runWhenWindowClosed = "";
+            Settings.language = "";
+            controllerOptions[0] = Settings.animatorComponent;
+            controllerOptions[1] = Settings.vrchatAvatar;
+        }
+    }
 }
