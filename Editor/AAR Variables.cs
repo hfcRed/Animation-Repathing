@@ -259,7 +259,38 @@ namespace AutoAnimationRepath
 
         public static class ToolTips
         {
+            public static string automatic;
+            public static string manual;
 
+            public static string toggleButton;
+
+            public static string fixPaths;
+            public static string editClips;
+
+            public static string invalidPaths;
+            public static string resetInvalidPaths;
+            public static string applyValidPath;
+
+            public static string replacePartOfAll;
+            public static string replaceFrom;
+            public static string replaceTo;
+            public static string applyPartOfAll;
+            public static string replaceIndividual;
+            public static string resetIndividual;
+            public static string replaceWithPath;
+            public static string applyIndividual;
+
+            public static string resetSettings;
+            public static string target;
+            public static string controllerToUse;
+            public static string avatarToUse;
+            public static string layersToTarget;
+            public static string repathWhenRenamed;
+            public static string repathWhenReparented;
+            public static string warnWhenRenamed;
+            public static string warnWhenReparented;
+            public static string runWhenWindowClosed;
+            public static string language;
         }
 
         public static void loadEnglisch()
