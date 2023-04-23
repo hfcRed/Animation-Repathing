@@ -1,32 +1,58 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 using UnityEditor.Animations;
-using static AutoAnimationRepath.AARAutomatic;
+using UnityEngine;
 using static AutoAnimationRepath.AARVariables;
 
 namespace AutoAnimationRepath
 {
     public class AARVariables
     {
+        public static Vector2 scroll = Vector2.zero;
         public static int toolSelection;
-        public static string[] tools = new string[2];
-        public static bool isEnabled;
+        public static bool automaticIsEnabled;
         public static int manualToolSelection;
-        public static string[] manualTools = new string [2];
-        public static bool invalidPathsFoldout = true;
+        public static string[] manualTools = new string[2];
         public static int controllerSelection;
         public static string[] controllerOptions = new string[2];
         public static bool renameActive = true;
         public static bool reparentActive = true;
         public static bool renameWarning = true;
         public static bool reparentWarning = true;
-        public static bool activeInBackground;
+        public static bool activeInBackground = false;
         public static int languageSelection;
         public static string[] languageOptions = { "English", "日本" };
-        public static bool selectedClipsFoldout;
 
-        public static readonly List<HierarchyTransform> hierarchyTransforms = new List<HierarchyTransform>();
+        public static List<InvalidSharedProperty> invalidSharedProperties = new List<InvalidSharedProperty>();
+        public static Dictionary<string, InvalidSharedProperty> invalidPathToSharedProperty = new Dictionary<string, InvalidSharedProperty>();
+        public static int invalidPosition;
+        public static bool invalidPathsFoldout = true;
+        public class InvalidSharedProperty
+        {
+            public HashSet<AnimationClip> foldoutClips = new HashSet<AnimationClip>();
+            public bool foldout;
+            public string oldPath;
+            public string newPath;
+            public int count;
+        }
+
+        public static List<AnimationClip> clipsSelected = new List<AnimationClip>();
+        public static List<ClipsSharedProperty> clipsSharedProperties = new List<ClipsSharedProperty>();
+        public static Dictionary<string, ClipsSharedProperty> clipsPathToSharedProperty = new Dictionary<string, ClipsSharedProperty>();
+        public static string clipsReplaceFrom = string.Empty;
+        public static string clipsReplaceTo = string.Empty;
+        public static bool clipsReplaceFoldout;
+        public class ClipsSharedProperty
+        {
+            public HashSet<AnimationClip> foldoutClips = new HashSet<AnimationClip>();
+            public bool foldout;
+            public string oldPath;
+            public string newPath;
+            public int count;
+            public bool warning;
+        }
+
+        public static readonly List<AARAutomatic.HierarchyTransform> hierarchyTransforms = new List<AARAutomatic.HierarchyTransform>();
         public static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
         public static AnimatorController controller;
         public static Animator _animator;
@@ -39,7 +65,7 @@ namespace AutoAnimationRepath
                 if (_animator != value)
                 {
                     _animator = value;
-                    OnRootChanged();
+                    AARAutomatic.OnRootChanged();
                 }
             }
         }
@@ -51,7 +77,7 @@ namespace AutoAnimationRepath
                 if (_avatar != value)
                 {
                     _avatar = value;
-                    OnRootChanged();
+                    AARAutomatic.OnRootChanged();
                 }
             }
         }
@@ -68,31 +94,6 @@ namespace AutoAnimationRepath
             all = ~0
         }
         public static Playables PlayableSelection = Playables.all;
-
-        public static List<List<AnimationClip>> invalidClips = new List<List<AnimationClip>>();
-        public static List<bool> invalidFoldouts = new List<bool>();
-        public static List<string> invalidOldPaths = new List<string>();
-        public static List<string> invalidNewPaths = new List<string>();
-        public static int invalidPosition;
-
-        public static List<AnimationClip> clipsClips = new List<AnimationClip>();
-        public static List<SharedProperty> sharedProperties = new List<SharedProperty>();
-        public static Dictionary<string, SharedProperty> pathToSharedProperty = new Dictionary<string, SharedProperty>();
-        public static string clipsReplaceFrom;
-        public static string clipsReplaceTo = string.Empty;
-        public static bool clipsFoldout;
-
-        public static Vector2 scroll = Vector2.zero;
-    }
-
-    public class SharedProperty
-    {
-        public HashSet<AnimationClip> foldoutClips = new HashSet<AnimationClip>();
-        public bool foldout;
-        public string oldPath;
-        public string newPath;
-        public int count;
-        public bool warning;
     }
 
     public static class AARStyle
@@ -112,7 +113,6 @@ namespace AutoAnimationRepath
     public static class AARContent
     {
         public static GUIContent linkIcon = new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies"));
-        public static GUIContent resetIcon = new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = "Reset settings to default values" };
         public static GUIContent warningIcon = new GUIContent(EditorGUIUtility.IconContent("console.warnicon"));
         public static GUIContent passedIcon = new GUIContent(EditorGUIUtility.IconContent("TestPassed"));
     }
@@ -125,9 +125,13 @@ namespace AutoAnimationRepath
             LoadData();
 
             if (languageSelection == 0)
-                Strings.loadEnglisch();
+            {
+                AARStrings.loadEnglisch();
+            }
             else
-                Strings.loadJapanese();
+            {
+                AARStrings.loadJapanese();
+            }
         }
 
         public static void SaveData()
@@ -135,7 +139,7 @@ namespace AutoAnimationRepath
             EditorPrefs.SetInt("AAR BaseSelection", controllerSelection);
             EditorPrefs.SetInt("AAR LanguageSelection", languageSelection);
 
-            EditorPrefs.SetBool("AAR Toggle", isEnabled);
+            EditorPrefs.SetBool("AAR Toggle", automaticIsEnabled);
             EditorPrefs.SetBool("AAR RenameActive", renameActive);
             EditorPrefs.SetBool("AAR ReparentActive", reparentActive);
             EditorPrefs.SetBool("AAR RenameWarning", renameWarning);
@@ -152,16 +156,15 @@ namespace AutoAnimationRepath
         public static void LoadData()
         {
             controllerSelection = EditorPrefs.GetInt("AAR BaseSelection");
-
-            isEnabled = EditorPrefs.GetBool("AAR Toggle");
+            automaticIsEnabled = EditorPrefs.GetBool("AAR Toggle");
             renameActive = EditorPrefs.GetBool("AAR RenameActive");
             reparentActive = EditorPrefs.GetBool("AAR ReparentActive");
             renameWarning = EditorPrefs.GetBool("AAR RenameWarning");
             reparentWarning = EditorPrefs.GetBool("AAR ReparentWarning");
             activeInBackground = EditorPrefs.GetBool("AAR ActiveInBackground");
+            PlayableSelection = (Playables)EditorPrefs.GetInt("AAR PlayableSelection");
 
             string findController = EditorPrefs.GetString("AAR Controller");
-
             GameObject animatorHolder = GameObject.Find(findController);
             if (animatorHolder != null)
             {
@@ -170,8 +173,6 @@ namespace AutoAnimationRepath
             }
 
             avatar = GameObject.Find(EditorPrefs.GetString("AAR Avatar"));
-
-            PlayableSelection = (Playables)EditorPrefs.GetInt("AAR PlayableSelection");
         }
 
         public static void ResetData()
@@ -181,7 +182,7 @@ namespace AutoAnimationRepath
             animator = null;
             avatar = null;
 
-            isEnabled = false;
+            automaticIsEnabled = false;
             renameActive = true;
             reparentActive = true;
             renameWarning = true;
@@ -194,7 +195,7 @@ namespace AutoAnimationRepath
         }
     }
 
-    public static class Strings
+    public static class AARStrings
     {
         public static class Main
         {
@@ -261,23 +262,20 @@ namespace AutoAnimationRepath
         {
             public static string automatic;
             public static string manual;
-
             public static string toggleButton;
-
             public static string fixPaths;
             public static string editClips;
-
             public static string resetInvalidPaths;
+            public static string resetInvalidPath;
             public static string applyValidPath;
-
             public static string replacePartOfAll;
+            public static string resetPartOfAll;
             public static string replaceFrom;
             public static string replaceTo;
             public static string applyPartOfAll;
             public static string replaceIndividual;
             public static string resetIndividual;
             public static string applyIndividual;
-
             public static string resetSettings;
             public static string target;
             public static string controllerToUse;
@@ -295,8 +293,6 @@ namespace AutoAnimationRepath
             Main.windowName = "Animation Repathing";
             Main.automatic = "Automatic";
             Main.manual = "Manual";
-            tools[0] = Main.automatic;
-            tools[1] = Main.manual;
 
             Automatic.title = "Auto Animation Repathing";
             Automatic.credit = "Made by hfcRed";
@@ -341,26 +337,22 @@ namespace AutoAnimationRepath
             controllerOptions[0] = Settings.animatorComponent;
             controllerOptions[1] = Settings.vrchatAvatar;
 
-
             ToolTips.automatic = "Automatically change Animation Paths if something in the hierarchy gets changed";
             ToolTips.manual = "Change Animation Paths by hand";
-
             ToolTips.toggleButton = "Turn the automatic Animation repathing on or off";
-
             ToolTips.fixPaths = "Repair broken (yellow) Animation Paths in the Animator defined in the settings";
             ToolTips.editClips = "Directly change the Animation Paths of one or more Animation Clips";
-
-            ToolTips.resetInvalidPaths = "Refresh the list of broken Animation Paths in the Animator defined in the settings settings";
+            ToolTips.resetInvalidPaths = "Refresh the list of broken Animation Paths in the Animator defined in the settings";
+            ToolTips.resetInvalidPath = "Restore original Animation Path";
             ToolTips.applyValidPath = "Replace the broken Animation Path with the specified Path. Path can not be empty or the same as the broken Path";
-
             ToolTips.replacePartOfAll = "Replace a specified part of all Animation Paths in every selected Animation clip with a specified string";
+            ToolTips.resetPartOfAll = "Clear out both textboxes";
             ToolTips.replaceFrom = "The part of all Animation Paths that you want to replace";
             ToolTips.replaceTo = "What you want the specified part of all Animation Paths to be replaced with";
             ToolTips.applyPartOfAll = "Replace the specified part of all Animation Paths with the specified string. Replace from can not be empty or the same as replace to";
             ToolTips.replaceIndividual = "Replace an entire Animation Path with a new one";
             ToolTips.resetIndividual = "Restore original Animation Path";
             ToolTips.applyIndividual = "Replace the old Animation Path with the specified Path. Path can not be empty or the same as the old Path";
-
             ToolTips.resetSettings = "Reset all settings to their default values";
             ToolTips.target = "The object the tool should target. Can be set to either target the Animator Controller inside of the Animator Component of a Gameobject or target all Animator Controllers on a VRChat Avatar ";
             ToolTips.controllerToUse = "The Gameobject which holds the Animator Component with the target Animator Controller";
@@ -375,54 +367,7 @@ namespace AutoAnimationRepath
 
         public static void loadJapanese()
         {
-            Main.windowName = "";
-            Main.automatic = "";
-            Main.manual = "";
-            tools[0] = Main.automatic;
-            tools[1] = Main.manual;
 
-            Automatic.title = "";
-            Automatic.credit = "";
-            Automatic.disabled = "";
-            Automatic.enabled = "";
-
-            Manual.title = "";
-            Manual.credit = "";
-            Manual.fixPaths = "";
-            Manual.editClips = "";
-            manualTools[0] = Manual.fixPaths;
-            manualTools[1] = Manual.editClips;
-
-            InvalidPaths.invalidPaths = "";
-            InvalidPaths.apply = "";
-            InvalidPaths.affectedClips = "";
-            InvalidPaths.noInvalidPaths = "";
-            InvalidPaths.dragAndDrop = "";
-
-            ClipEditing.replacePartOfAll = "";
-            ClipEditing.from = "";
-            ClipEditing.to = "";
-            ClipEditing.apply = "";
-            ClipEditing.warning = "";
-            ClipEditing.replaceIndividual = "";
-            ClipEditing.noClipsSelected = "";
-            ClipEditing.dragAndDrop = "";
-
-            Settings.settings = "";
-            Settings.target = "";
-            Settings.animatorComponent = "";
-            Settings.vrchatAvatar = "";
-            Settings.controllerToUse = "";
-            Settings.layersToUse = "";
-            Settings.avatarToUse = "";
-            Settings.repathWhenRenamed = "";
-            Settings.repathWhenReparented = "";
-            Settings.warnWhenRenamed = "";
-            Settings.warnWhenReparented = "";
-            Settings.runWhenWindowClosed = "";
-            Settings.language = "";
-            controllerOptions[0] = Settings.animatorComponent;
-            controllerOptions[1] = Settings.vrchatAvatar;
         }
     }
 }

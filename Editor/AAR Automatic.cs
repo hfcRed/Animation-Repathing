@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using System;
-using UnityEditor.Animations;
-using System.Text;
+﻿using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text;
+using UnityEditor;
+using UnityEditor.Animations;
+using UnityEngine;
 
 namespace AutoAnimationRepath
 {
@@ -42,7 +39,7 @@ namespace AutoAnimationRepath
         #region Hierarchy Change
         public static void HierarchyChanged()
         {
-            bool shouldRun = AARVariables.isEnabled;
+            bool shouldRun = AARVariables.automaticIsEnabled;
             shouldRun &= AARVariables.activeInBackground || EditorWindow.HasOpenInstances<AAREditor>();
             shouldRun &= AARVariables.renameActive || AARVariables.reparentActive;
 
@@ -217,10 +214,10 @@ namespace AutoAnimationRepath
         private static bool DisplayReparentDialog()
         {
             StringBuilder displayedChanges = new StringBuilder($"Repathing animation properties for:{Environment.NewLine}");
-            
+
             foreach (var s in AARVariables.changedPaths.Keys.Zip(AARVariables.changedPaths.Values, (s1, s2) => $"{s1} to {s2}"))
                 displayedChanges.AppendLine(s);
-            
+
             return EditorUtility.DisplayDialog("Auto Repathing", displayedChanges.ToString(), "Continue", "Cancel");
         }
 
