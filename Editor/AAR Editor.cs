@@ -13,6 +13,7 @@ namespace AutoAnimationRepath
         [MenuItem("hfcRed/Tools/Auto Repath")]
         static void ShowWindow() => GetWindow<AAREditor>().titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
+        public static Vector2 scroll = Vector2.zero;
         public void OnGUI()
         {
             Repaint();
@@ -39,10 +40,9 @@ namespace AutoAnimationRepath
 
         public static void DrawHeader()
         {
-            GUIContent[] content = { new GUIContent(AARStrings.Main.automatic, AARStrings.ToolTips.automatic), new GUIContent(AARStrings.Main.manual, AARStrings.ToolTips.manual) };
-
             using (new SqueezeScope((5, 5, 3), (10, 5, 4)))
             {
+                GUIContent[] content = { new GUIContent(AARStrings.Main.automatic, AARStrings.ToolTips.automatic), new GUIContent(AARStrings.Main.manual, AARStrings.ToolTips.manual) };
                 toolSelection = GUILayout.Toolbar(toolSelection, content, GUILayout.Height(25));
             }
         }
@@ -56,14 +56,14 @@ namespace AutoAnimationRepath
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button(AARStrings.Automatic.credit, "linkLabel"))
                     Application.OpenURL("https://hfcred.carrd.co");
-                if (GUILayout.Button(AARContent.linkIcon, "label", GUILayout.Height(21)))
+                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies")), "label", GUILayout.Height(21)))
                     Application.OpenURL("https://hfcred.carrd.co");
             }
 
             using (new SqueezeScope((5, 5, 3), (5, 5, 4)))
             {
-                string buttonLabel = automaticIsEnabled ? "<color=#4aff93><b>" + AARStrings.Automatic.enabled + "</b></color>" : "<color=#ff5263><b>" + AARStrings.Automatic.disabled + "</b></color>";
-                automaticIsEnabled = GUILayout.Toggle(automaticIsEnabled, buttonLabel, AARStyle.toggleButton, GUILayout.Height(30));
+                GUIContent content = automaticIsEnabled ? new GUIContent("<color=#4aff93><b>" + AARStrings.Automatic.enabled + "</b></color>", AARStrings.ToolTips.toggleButton) : new GUIContent("<color=#ff5263><b>" + AARStrings.Automatic.disabled + "</b></color>", AARStrings.ToolTips.toggleButton);
+                automaticIsEnabled = GUILayout.Toggle(automaticIsEnabled, content, AARStyle.toggleButton, GUILayout.Height(30));
             }
         }
 
@@ -76,7 +76,7 @@ namespace AutoAnimationRepath
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button(AARStrings.Manual.credit, "linkLabel"))
                     Application.OpenURL("https://hfcred.carrd.co");
-                if (GUILayout.Button(AARContent.linkIcon, "label", GUILayout.Height(21)))
+                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies")), "label", GUILayout.Height(21)))
                     Application.OpenURL("https://hfcred.carrd.co");
             }
 
@@ -84,7 +84,8 @@ namespace AutoAnimationRepath
             {
                 using (new SqueezeScope((0, 0, 4)))
                 {
-                    manualToolSelection = GUILayout.Toolbar(manualToolSelection, manualTools, GUILayout.Height(25));
+                    GUIContent[] content = { new GUIContent(AARStrings.Manual.fixPaths, AARStrings.ToolTips.fixPaths), new GUIContent(AARStrings.Manual.editClips, AARStrings.ToolTips.editClips) };
+                    manualToolSelection = GUILayout.Toolbar(manualToolSelection, content, GUILayout.Height(25));
                 }
 
                 if (manualToolSelection == 0)
@@ -132,7 +133,7 @@ namespace AutoAnimationRepath
                                 {
                                     EditorGUI.BeginDisabledGroup(true);
                                 }
-                                if (GUILayout.Button(AARStrings.InvalidPaths.apply, GUILayout.Width(75)))
+                                if (GUILayout.Button(new GUIContent(AARStrings.InvalidPaths.apply, AARStrings.ToolTips.applyValidPath), GUILayout.Width(75)))
                                 {
                                     foreach (AnimationClip clip in sp.foldoutClips)
                                     {
@@ -161,7 +162,7 @@ namespace AutoAnimationRepath
 
                     using (new SqueezeScope((10, 0, 4)))
                     {
-                        if (invalidPathToSharedProperty.Values == null)
+                        if (invalidPathToSharedProperty.Count == 0)
                         {
                             GUILayout.Label(AARStrings.InvalidPaths.noInvalidPaths, AARStyle.invalidPathTip);
                         }
@@ -180,14 +181,14 @@ namespace AutoAnimationRepath
                         {
                             using (new SqueezeScope((0, 0, 3)))
                             {
-                                GUILayout.Label("<color=#ffffff>" + AARStrings.ClipEditing.replacePartOfAll + "</color>", AARStyle.replacePath);
+                                GUILayout.Label(new GUIContent("<color=#ffffff>" + AARStrings.ClipEditing.replacePartOfAll + "</color>", AARStrings.ToolTips.replacePartOfAll), AARStyle.replacePath);
                             }
 
                             using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
                             {
                                 GUILayout.Label("", GUILayout.Width(50));
-                                GUILayout.Label(AARStrings.ClipEditing.from, AARStyle.replaceFromTo);
-                                GUILayout.Label(AARStrings.ClipEditing.to, AARStyle.replaceFromTo);
+                                GUILayout.Label(new GUIContent(AARStrings.ClipEditing.from, AARStrings.ToolTips.replaceFrom), AARStyle.replaceFromTo);
+                                GUILayout.Label(new GUIContent(AARStrings.ClipEditing.to, AARStrings.ToolTips.replaceTo), AARStyle.replaceFromTo);
                                 GUILayout.Label("", GUILayout.Width(130));
                             }
 
@@ -249,7 +250,7 @@ namespace AutoAnimationRepath
                                 {
                                     EditorGUI.BeginDisabledGroup(true);
                                 }
-                                if (GUILayout.Button(AARStrings.ClipEditing.apply, GUILayout.Width(75)))
+                                if (GUILayout.Button(new GUIContent(AARStrings.ClipEditing.apply, AARStrings.ToolTips.applyPartOfAll), GUILayout.Width(75)))
                                 {
                                     foreach (AnimationClip clip in clipsTarget)
                                     {
@@ -285,13 +286,13 @@ namespace AutoAnimationRepath
 
                             using (new SqueezeScope((20, 15, 4)))
                             {
-                                UnityEngine.Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
-                                EditorGUI.DrawRect(new UnityEngine.Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
+                                Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
+                                EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
                             }
 
                             using (new SqueezeScope((0, 10, 4), (0, 0, 3)))
                             {
-                                GUILayout.Label("<color=#ffffff>" + AARStrings.ClipEditing.replaceIndividual + "</color>", AARStyle.replacePath);
+                                GUILayout.Label(new GUIContent("<color=#ffffff>" + AARStrings.ClipEditing.replaceIndividual + "</color>", AARStrings.ToolTips.replaceIndividual), AARStyle.replacePath);
                             }
 
                             foreach (ClipsSharedProperty sp in clipsPathToSharedProperty.Values)
@@ -306,11 +307,11 @@ namespace AutoAnimationRepath
 
                                         if (sp.warning == true)
                                         {
-                                            GUILayout.Label(AARContent.warningIcon, GUILayout.Width(20), GUILayout.Height(20));
+                                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("console.warnicon")), GUILayout.Width(20), GUILayout.Height(20));
                                         }
                                         else if (sp.oldPath.Contains(clipsReplaceFrom))
                                         {
-                                            GUILayout.Label(AARContent.passedIcon, GUILayout.Width(20), GUILayout.Height(20));
+                                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("TestPassed")), GUILayout.Width(20), GUILayout.Height(20));
                                         }
                                         else
                                         {
@@ -350,7 +351,7 @@ namespace AutoAnimationRepath
                                     {
                                         EditorGUI.BeginDisabledGroup(true);
                                     }
-                                    if (GUILayout.Button(AARStrings.ClipEditing.apply, GUILayout.Width(75)))
+                                    if (GUILayout.Button(new GUIContent(AARStrings.ClipEditing.apply, AARStrings.ToolTips.applyIndividual), GUILayout.Width(75)))
                                     {
                                         foreach (AnimationClip clip in sp.foldoutClips)
                                         {
@@ -397,8 +398,8 @@ namespace AutoAnimationRepath
         {
             using (new SqueezeScope((15, 15, 4)))
             {
-                UnityEngine.Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
-                EditorGUI.DrawRect(new UnityEngine.Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
+                Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
+                EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
             }
 
             using (new SqueezeScope((5, 5, 3), (0, 10, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
@@ -418,15 +419,17 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
                     {
-                        GUILayout.Label(AARStrings.Settings.target, GUILayout.Width(150));
-                        controllerSelection = EditorGUILayout.Popup(controllerSelection, controllerOptions);
+                        GUILayout.Label(new GUIContent(AARStrings.Settings.target, AARStrings.ToolTips.target), GUILayout.Width(150));
+
+                        GUIContent[] content = { new GUIContent(AARStrings.Settings.animatorComponent), new GUIContent(AARStrings.Settings.vrchatAvatar) };
+                        controllerSelection = EditorGUILayout.Popup(controllerSelection, content);
                     }
 
                     if (controllerSelection == 0)
                     {
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
-                            GUILayout.Label(AARStrings.Settings.controllerToUse, GUILayout.Width(150));
+                            GUILayout.Label(new GUIContent(AARStrings.Settings.controllerToUse, AARStrings.ToolTips.controllerToUse), GUILayout.Width(150));
                             animator = (Animator)EditorGUILayout.ObjectField(animator, typeof(Animator), true);
                         }
                     }
@@ -434,7 +437,7 @@ namespace AutoAnimationRepath
                     {
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
-                            GUILayout.Label(AARStrings.Settings.avatarToUse, GUILayout.Width(150));
+                            GUILayout.Label(new GUIContent(AARStrings.Settings.avatarToUse, AARStrings.ToolTips.avatarToUse), GUILayout.Width(150));
                             avatar = (GameObject)EditorGUILayout.ObjectField(avatar, typeof(GameObject), true);
                         }
 #if VRC_SDK_VRCSDK3
@@ -442,7 +445,7 @@ namespace AutoAnimationRepath
                         {
                             using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
                             {
-                                GUILayout.Label(AARStrings.Settings.layersToUse, GUILayout.Width(150));
+                                GUILayout.Label(new GUIContent(AARStrings.Settings.layersToUse, AARStrings.ToolTips.layersToUse), GUILayout.Width(150));
                                 PlayableSelection = (Playables)EditorGUILayout.EnumFlagsField(PlayableSelection);
                             }
                         }
@@ -454,22 +457,43 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
                     {
-                        renameActive = GUILayout.Toggle(renameActive, AARStrings.Settings.repathWhenRenamed);
-                        reparentActive = GUILayout.Toggle(reparentActive, AARStrings.Settings.repathWhenReparented);
+                        renameActive = GUILayout.Toggle(renameActive, new GUIContent(AARStrings.Settings.repathWhenRenamed, AARStrings.ToolTips.repathWhenRenamed));
+                        reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(AARStrings.Settings.repathWhenReparented, AARStrings.ToolTips.repathWhenReparented));
                     }
 
                     using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
                     {
-                        renameWarning = GUILayout.Toggle(renameWarning, AARStrings.Settings.warnWhenRenamed);
-                        reparentWarning = GUILayout.Toggle(reparentWarning, AARStrings.Settings.warnWhenReparented);
+                        renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(AARStrings.Settings.warnWhenRenamed, AARStrings.ToolTips.warnWhenRenamed));
+                        reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(AARStrings.Settings.warnWhenReparented, AARStrings.ToolTips.warnWhenReparented));
                     }
                 }
 
                 using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
                 {
-                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
+                    using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
                     {
-                        activeInBackground = GUILayout.Toggle(activeInBackground, AARStrings.Settings.runWhenWindowClosed);
+                        activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(AARStrings.Settings.runWhenWindowClosed, AARStrings.ToolTips.runWhenWindowClosed));
+                    }
+
+                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
+                    {
+                        EditorGUI.BeginChangeCheck();
+                        disableTooltips = GUILayout.Toggle(disableTooltips, new GUIContent(AARStrings.Settings.disableTooltips, AARStrings.ToolTips.disableTooltips));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            if (disableTooltips == true)
+                            {
+                                AARStrings.clearTooltips();
+                            }
+                            else if (languageSelection == 0)
+                            {
+                                AARStrings.loadEnglisch();
+                            }
+                            else
+                            {
+                                AARStrings.loadJapanese();
+                            }
+                        }
                     }
                 }
 
@@ -480,7 +504,8 @@ namespace AutoAnimationRepath
                         GUILayout.Label(AARStrings.Settings.language, GUILayout.Width(150));
 
                         EditorGUI.BeginChangeCheck();
-                        languageSelection = EditorGUILayout.Popup(languageSelection, languageOptions);
+                        GUIContent[] content = { new GUIContent("English"), new GUIContent("日本") };
+                        languageSelection = EditorGUILayout.Popup(languageSelection, content);
                         if (EditorGUI.EndChangeCheck())
                         {
                             if (languageSelection == 0)
@@ -497,14 +522,9 @@ namespace AutoAnimationRepath
             }
         }
 
-        public static void CallMethod(int i)
-        {
-
-        }
-
         public static string DragAndDropGameobject()
         {
-            UnityEngine.Rect r = GUILayoutUtility.GetLastRect();
+            Rect r = GUILayoutUtility.GetLastRect();
             Event e = Event.current;
 
             if (r.Contains(e.mousePosition))
@@ -528,6 +548,20 @@ namespace AutoAnimationRepath
             }
             return (null);
         }
+    }
+
+    public static class AARStyle
+    {
+        public static GUIStyle title = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
+        public static GUIStyle toggleButton = new GUIStyle(GUI.skin.button) { fontSize = 16, richText = true };
+        public static GUIStyle foldout = new GUIStyle(EditorStyles.foldout) { fontSize = 15, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
+        public static GUIStyle settings = new GUIStyle(GUI.skin.label) { fontSize = 20, richText = true };
+        public static GUIStyle invalidPath = new GUIStyle(GUI.skin.box) { fontSize = 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleLeft };
+        public static GUIStyle invalidPathTip = new GUIStyle(GUI.skin.label) { fontSize = 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleCenter };
+        public static GUIStyle customFoldout = new GUIStyle(GUI.skin.button) { fontSize = 11, richText = true };
+        public static GUIStyle resetButton = new GUIStyle(GUI.skin.label) { };
+        public static GUIStyle replaceFromTo = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
+        public static GUIStyle replacePath = new GUIStyle(GUI.skin.box) { fontSize = 15, fontStyle = FontStyle.Bold, stretchWidth = true, alignment = TextAnchor.MiddleCenter, richText = true };
     }
 
     public class SqueezeScope : System.IDisposable
@@ -562,7 +596,6 @@ namespace AutoAnimationRepath
 
             GUILayout.Space(squeezeSettings.width1);
         }
-
 
         public void Dispose()
         {
