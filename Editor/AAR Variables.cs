@@ -128,42 +128,32 @@ namespace AutoAnimationRepath
             EditorPrefs.SetInt("AARPlayableSelection", (int)PlayableSelection);
 
             EditorPrefs.SetString("AARAvatar", avatar == null ? null : avatar.name);
-            EditorPrefs.SetString("AARController", animator == null ? null : animator.gameObject.transform.name);
+            EditorPrefs.SetString("AARController", animator == null ? null : animator.gameObject.name);
         }
 
         public static void LoadData()
         {
-            avatar = GameObject.Find(EditorPrefs.GetString("AARAvatar")) == null ? null : GameObject.Find(EditorPrefs.GetString("AARAvatar"));
-            animator = GameObject.Find(EditorPrefs.GetString("AARController")) == null ? null : GameObject.Find(EditorPrefs.GetString("AARController")).GetComponent(typeof(Animator)) as Animator == null ? null : GameObject.Find(EditorPrefs.GetString("AARController")).GetComponent(typeof(Animator)) as Animator;
-            controller = animator == null ? null : animator.runtimeAnimatorController == null ? null : AssetDatabase.LoadAssetAtPath<AnimatorController>(AssetDatabase.GetAssetPath(animator));
+            automaticIsEnabled = EditorPrefs.GetBool("AAREnabled");
+            renameActive = EditorPrefs.GetBool("AARRenameActive");
+            reparentActive = EditorPrefs.GetBool("AARReparentActive");
+            renameWarning = EditorPrefs.GetBool("AARRenameWarning");
+            reparentWarning = EditorPrefs.GetBool("AARReparentWarning");
+            activeInBackground = EditorPrefs.GetBool("AARRunInBackground");
+            disableTooltips = EditorPrefs.GetBool("AARTooltips");
 
-            /*controllerSelection = EditorPrefs.GetInt("AAR BaseSelection");
-            automaticIsEnabled = EditorPrefs.GetBool("AAR Toggle");
-            renameActive = EditorPrefs.GetBool("AAR RenameActive");
-            reparentActive = EditorPrefs.GetBool("AAR ReparentActive");
-            renameWarning = EditorPrefs.GetBool("AAR RenameWarning");
-            reparentWarning = EditorPrefs.GetBool("AAR ReparentWarning");
-            activeInBackground = EditorPrefs.GetBool("AAR ActiveInBackground");
-            PlayableSelection = (Playables)EditorPrefs.GetInt("AAR PlayableSelection");
+            toolSelection = EditorPrefs.GetInt("AARToolSelection");
+            manualToolSelection = EditorPrefs.GetInt("AARManualToolSelection");
+            controllerSelection = EditorPrefs.GetInt("AARControllerSelection");
+            languageSelection = EditorPrefs.GetInt("AARLanguageSelection");
+            PlayableSelection = (Playables)EditorPrefs.GetInt("AARPlayableSelection");
 
-            string findController = EditorPrefs.GetString("AAR Controller");
-            GameObject animatorHolder = GameObject.Find(findController);
-            if (animatorHolder != null)
-            {
-                animator = animatorHolder.GetComponent(typeof(Animator)) as Animator;
-                controller = animator == null ? null : animator.runtimeAnimatorController as AnimatorController;
-            }
-
-            avatar = GameObject.Find(EditorPrefs.GetString("AAR Avatar"));*/
+            avatar = GameObject.Find(EditorPrefs.GetString("AARAvatar"));
+            animator = GameObject.Find(EditorPrefs.GetString("AARController"))?.GetComponent<Animator>();
+            controller = animator?.runtimeAnimatorController as AnimatorController;
         }
 
         public static void ResetData()
         {
-            controllerSelection = 0;
-
-            animator = null;
-            avatar = null;
-
             automaticIsEnabled = false;
             renameActive = true;
             reparentActive = true;
@@ -171,7 +161,11 @@ namespace AutoAnimationRepath
             reparentWarning = true;
             activeInBackground = false;
 
+            controllerSelection = 0;
             PlayableSelection = Playables.all;
+
+            animator = null;
+            avatar = null;
 
             SaveData();
         }
@@ -278,7 +272,7 @@ namespace AutoAnimationRepath
             Main.automatic = "Automatic";
             Main.manual = "Manual";
 
-            Automatic.title = "Auto Animation Repathing";
+            Automatic.title = "Automatic Animation Repathing";
             Automatic.credit = "Made by hfcRed";
             Automatic.disabled = "Disabled";
             Automatic.enabled = "Enabled";

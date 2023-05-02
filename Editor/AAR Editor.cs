@@ -26,10 +26,7 @@ namespace AutoAnimationRepath
                 case 0: DrawAutomatic(); break;
                 case 1: DrawManual(); break;
             }
-            if (manualToolSelection != 1 || toolSelection == 0)
-            {
-                DrawSettings();
-            }
+            DrawSettings();
 
             GUILayout.EndScrollView();
             if (EditorGUI.EndChangeCheck())
@@ -49,40 +46,45 @@ namespace AutoAnimationRepath
 
         public static void DrawAutomatic()
         {
-            using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (10, 10, 4), (5, 5, 3)))
+            using (new SqueezeScope((5, 5, 3), (10, 5, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
-                GUILayout.Label(AARStrings.Automatic.title, AARStyle.title);
+                using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
+                {
+                    GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("Profiler.Memory")) { tooltip = "" }, GUILayout.Width(20), GUILayout.Height(25));
+                    GUILayout.Label("<color=#ffffff><b>" + AARStrings.Automatic.title + "</b></color>", AARStyle.title);
+                }
+
+                using (new SqueezeScope((15, 0, 4)))
+                {
+                    GUIContent content = automaticIsEnabled ? new GUIContent("<color=#4aff93><b>" + AARStrings.Automatic.enabled + "</b></color>", AARStrings.ToolTips.toggleButton) : new GUIContent("<color=#ff5263><b>" + AARStrings.Automatic.disabled + "</b></color>", AARStrings.ToolTips.toggleButton);
+                    automaticIsEnabled = GUILayout.Toggle(automaticIsEnabled, content, AARStyle.toggleButton, GUILayout.Height(40));
+                }
+
+                /*GUILayout.Label(AARStrings.Automatic.title, AARStyle.title);
 
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button(AARStrings.Automatic.credit, "linkLabel"))
                     Application.OpenURL("https://hfcred.carrd.co");
                 if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies")), "label", GUILayout.Height(21)))
-                    Application.OpenURL("https://hfcred.carrd.co");
-            }
-
-            using (new SqueezeScope((5, 5, 3), (5, 5, 4)))
-            {
-                GUIContent content = automaticIsEnabled ? new GUIContent("<color=#4aff93><b>" + AARStrings.Automatic.enabled + "</b></color>", AARStrings.ToolTips.toggleButton) : new GUIContent("<color=#ff5263><b>" + AARStrings.Automatic.disabled + "</b></color>", AARStrings.ToolTips.toggleButton);
-                automaticIsEnabled = GUILayout.Toggle(automaticIsEnabled, content, AARStyle.toggleButton, GUILayout.Height(30));
+                    Application.OpenURL("https://hfcred.carrd.co");*/
             }
         }
 
         public static void DrawManual()
         {
-            using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (10, 10, 4), (5, 5, 3)))
+            using (new SqueezeScope((5, 5, 3), (10, 5, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
-                GUILayout.Label(AARStrings.Manual.title, AARStyle.title);
+                using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
+                {
+                    GUILayout.Label("", GUILayout.ExpandWidth(true));
 
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button(AARStrings.Manual.credit, "linkLabel"))
-                    Application.OpenURL("https://hfcred.carrd.co");
-                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies")), "label", GUILayout.Height(21)))
-                    Application.OpenURL("https://hfcred.carrd.co");
-            }
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("ViewToolMove")) { tooltip = "" }, GUILayout.Width(20), GUILayout.Height(25));
+                    GUILayout.Label("<color=#ffffff><b>" + AARStrings.Manual.title + "</b></color>", AARStyle.title);
+                }
 
-            using (new SqueezeScope((5, 5, 3), (5, 5, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
-            {
-                using (new SqueezeScope((0, 0, 4)))
+                using (new SqueezeScope((15, 0, 4)))
                 {
                     GUIContent[] content = { new GUIContent(AARStrings.Manual.fixPaths, AARStrings.ToolTips.fixPaths), new GUIContent(AARStrings.Manual.editClips, AARStrings.ToolTips.editClips) };
                     manualToolSelection = GUILayout.Toolbar(manualToolSelection, content, GUILayout.Height(25));
@@ -94,7 +96,7 @@ namespace AutoAnimationRepath
                     {
                         using (new SqueezeScope((5, 0, 4)))
                         {
-                            invalidPathsFoldout = EditorGUILayout.Foldout(invalidPathsFoldout, AARStrings.InvalidPaths.invalidPaths, AARStyle.foldout);
+                            invalidPathsFoldout = EditorGUILayout.Foldout(invalidPathsFoldout, "  " + AARStrings.InvalidPaths.invalidPaths, AARStyle.foldout);
                         }
 
                         GUILayout.FlexibleSpace();
@@ -177,19 +179,21 @@ namespace AutoAnimationRepath
                 {
                     if (clipsSelected.Count != 0)
                     {
-                        using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
+                        using (new SqueezeScope((15, 0, 4)))
                         {
-                            using (new SqueezeScope((0, 0, 3)))
+                            using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 3)))
                             {
-                                GUILayout.Label(new GUIContent("<color=#ffffff>" + AARStrings.ClipEditing.replacePartOfAll + "</color>", AARStrings.ToolTips.replacePartOfAll), AARStyle.replacePath);
+                                GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                                GUILayout.Label(new GUIContent(AARStrings.ClipEditing.replacePartOfAll, AARStrings.ToolTips.replacePartOfAll), AARStyle.replacePath);
                             }
 
                             using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
                             {
-                                GUILayout.Label("", GUILayout.Width(50));
+                                GUILayout.Label("", GUILayout.Width(55));
                                 GUILayout.Label(new GUIContent(AARStrings.ClipEditing.from, AARStrings.ToolTips.replaceFrom), AARStyle.replaceFromTo);
                                 GUILayout.Label(new GUIContent(AARStrings.ClipEditing.to, AARStrings.ToolTips.replaceTo), AARStyle.replaceFromTo);
-                                GUILayout.Label("", GUILayout.Width(130));
+                                GUILayout.Label("", GUILayout.Width(140));
                             }
 
                             bool warning = false;
@@ -229,8 +233,10 @@ namespace AutoAnimationRepath
                                     clipsReplaceTo = string.Empty;
                                 }
 
-                                string buttonLabel = clipsReplaceFoldout ? "<b>v</b>" : "<b>></b>";
-                                clipsReplaceFoldout = GUILayout.Toggle(clipsReplaceFoldout, buttonLabel, AARStyle.customFoldout, GUILayout.Width(25));
+                                GUIContent content = clipsReplaceFoldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
+                                clipsReplaceFoldout = GUILayout.Toggle(clipsReplaceFoldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
+
+                                GUILayout.Space(5);
 
                                 clipsReplaceFrom = EditorGUILayout.TextField(clipsReplaceFrom, GUILayout.MinWidth(1));
                                 string path = DragAndDropGameobject();
@@ -245,6 +251,8 @@ namespace AutoAnimationRepath
                                 {
                                     clipsReplaceTo = path2;
                                 }
+
+                                GUILayout.Space(5);
 
                                 if (clipsReplaceFrom == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
                                 {
@@ -284,15 +292,13 @@ namespace AutoAnimationRepath
                                 }
                             }
 
-                            using (new SqueezeScope((20, 15, 4)))
-                            {
-                                Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
-                                EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
-                            }
+                            DrawDivider(20, 15, 0, 0);
 
-                            using (new SqueezeScope((0, 10, 4), (0, 0, 3)))
+                            using (new SqueezeScope((0, 10, 4), (0, 0, 4, GUI.skin.box), (5, 5, 3)))
                             {
-                                GUILayout.Label(new GUIContent("<color=#ffffff>" + AARStrings.ClipEditing.replaceIndividual + "</color>", AARStrings.ToolTips.replaceIndividual), AARStyle.replacePath);
+                                GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                                GUILayout.Label(new GUIContent(AARStrings.ClipEditing.replaceIndividual, AARStrings.ToolTips.replaceIndividual), AARStyle.replacePath);
                             }
 
                             foreach (ClipsSharedProperty sp in clipsPathToSharedProperty.Values)
@@ -318,13 +324,13 @@ namespace AutoAnimationRepath
                                             GUILayout.Label("", GUILayout.Width(20), GUILayout.Height(20));
                                         }
                                     }
-                                    else if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetIndividual }, AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
+                                    else if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetIndividual), AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
                                     {
                                         sp.newPath = sp.oldPath;
                                     }
 
-                                    string buttonLabel = sp.foldout ? "<b>v</b>" : "<b>></b>";
-                                    sp.foldout = GUILayout.Toggle(sp.foldout, buttonLabel, AARStyle.customFoldout, GUILayout.Width(25));
+                                    GUIContent content = sp.foldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
+                                    sp.foldout = GUILayout.Toggle(sp.foldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
 
                                     if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
                                     {
@@ -335,12 +341,16 @@ namespace AutoAnimationRepath
                                         GUI.contentColor = Color.gray;
                                     }
 
+                                    GUILayout.Space(5);
+
                                     sp.newPath = GUILayout.TextField(sp.newPath, GUILayout.MinWidth(1));
                                     string path = DragAndDropGameobject();
                                     if (path != null)
                                     {
                                         sp.newPath = path;
                                     }
+
+                                    GUILayout.Space(5);
 
                                     if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
                                     {
@@ -396,17 +406,22 @@ namespace AutoAnimationRepath
 
         public static void DrawSettings()
         {
-            using (new SqueezeScope((15, 15, 4)))
-            {
-                Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
-                EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
-            }
+            DrawDivider(18, 15, 5, 5);
 
             using (new SqueezeScope((5, 5, 3), (0, 10, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
-                using (new SqueezeScope((0, 0, 3)))
+
+                using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
-                    GUILayout.Label("<b>" + AARStrings.Settings.settings + "</b>", AARStyle.settings);
+                    GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("SettingsIcon")) { tooltip = "" }, GUILayout.Width(20), GUILayout.Height(30));
+                    GUILayout.Label("<color=#ffffff><b>" + AARStrings.Settings.settings + "</b></color>", AARStyle.settings, GUILayout.Height(30));
+                }
+
+                using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
+                {
+                    GUILayout.Label("General", AARStyle.settings, GUILayout.Height(30));
 
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetSettings }, GUILayout.Height(30), GUILayout.Width(30)))
@@ -415,7 +430,7 @@ namespace AutoAnimationRepath
                     }
                 }
 
-                using (new SqueezeScope((15, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
                 {
                     using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
                     {
@@ -455,27 +470,7 @@ namespace AutoAnimationRepath
 
                 using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
                 {
-                    using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
-                    {
-                        renameActive = GUILayout.Toggle(renameActive, new GUIContent(AARStrings.Settings.repathWhenRenamed, AARStrings.ToolTips.repathWhenRenamed));
-                        reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(AARStrings.Settings.repathWhenReparented, AARStrings.ToolTips.repathWhenReparented));
-                    }
-
-                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
-                    {
-                        renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(AARStrings.Settings.warnWhenRenamed, AARStrings.ToolTips.warnWhenRenamed));
-                        reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(AARStrings.Settings.warnWhenReparented, AARStrings.ToolTips.warnWhenReparented));
-                    }
-                }
-
-                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
-                {
-                    using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
-                    {
-                        activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(AARStrings.Settings.runWhenWindowClosed, AARStrings.ToolTips.runWhenWindowClosed));
-                    }
-
-                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
+                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                     {
                         EditorGUI.BeginChangeCheck();
                         disableTooltips = GUILayout.Toggle(disableTooltips, new GUIContent(AARStrings.Settings.disableTooltips, AARStrings.ToolTips.disableTooltips));
@@ -519,6 +514,37 @@ namespace AutoAnimationRepath
                         }
                     }
                 }
+
+                using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
+                {
+                    GUILayout.Label("Automatic", AARStyle.settings, GUILayout.Height(30));
+
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetSettings }, GUILayout.Height(30), GUILayout.Width(30)))
+                    {
+                        AARSaveData.ResetData();
+                    }
+                }
+
+                using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                {
+                    using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
+                    {
+                        renameActive = GUILayout.Toggle(renameActive, new GUIContent(AARStrings.Settings.repathWhenRenamed, AARStrings.ToolTips.repathWhenRenamed));
+                        reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(AARStrings.Settings.repathWhenReparented, AARStrings.ToolTips.repathWhenReparented));
+                    }
+
+                    using (new SqueezeScope((5, 0, 4), (5, 5, 3)))
+                    {
+                        renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(AARStrings.Settings.warnWhenRenamed, AARStrings.ToolTips.warnWhenRenamed));
+                        reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(AARStrings.Settings.warnWhenReparented, AARStrings.ToolTips.warnWhenReparented));
+                    }
+
+                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
+                    {
+                        activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(AARStrings.Settings.runWhenWindowClosed, AARStrings.ToolTips.runWhenWindowClosed));
+                    }
+                }
             }
         }
 
@@ -548,20 +574,28 @@ namespace AutoAnimationRepath
             }
             return (null);
         }
+
+        public static void DrawDivider(int above, int below, int left, int right)
+        {
+            using (new SqueezeScope((above, below, 4), (left, right, 3)))
+            {
+                Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
+                EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
+            }
+        }
     }
 
     public static class AARStyle
     {
-        public static GUIStyle title = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
+        public static GUIStyle title = new GUIStyle(GUI.skin.label) { fontSize = 20, fontStyle = FontStyle.Bold, richText = true };
         public static GUIStyle toggleButton = new GUIStyle(GUI.skin.button) { fontSize = 16, richText = true };
-        public static GUIStyle foldout = new GUIStyle(EditorStyles.foldout) { fontSize = 15, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
-        public static GUIStyle settings = new GUIStyle(GUI.skin.label) { fontSize = 20, richText = true };
+        public static GUIStyle foldout = new GUIStyle(EditorStyles.foldout) { fontSize = 15, fontStyle = FontStyle.Bold };
+        public static GUIStyle settings = new GUIStyle(GUI.skin.label) { fontSize = 20, fontStyle = FontStyle.Bold, richText = true };
         public static GUIStyle invalidPath = new GUIStyle(GUI.skin.box) { fontSize = 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleLeft };
         public static GUIStyle invalidPathTip = new GUIStyle(GUI.skin.label) { fontSize = 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleCenter };
-        public static GUIStyle customFoldout = new GUIStyle(GUI.skin.button) { fontSize = 11, richText = true };
         public static GUIStyle resetButton = new GUIStyle(GUI.skin.label) { };
         public static GUIStyle replaceFromTo = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
-        public static GUIStyle replacePath = new GUIStyle(GUI.skin.box) { fontSize = 15, fontStyle = FontStyle.Bold, stretchWidth = true, alignment = TextAnchor.MiddleCenter, richText = true };
+        public static GUIStyle replacePath = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
     }
 
     public class SqueezeScope : System.IDisposable
