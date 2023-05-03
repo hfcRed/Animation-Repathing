@@ -99,7 +99,14 @@ namespace AutoAnimationRepath
     {
         static AARSaveData()
         {
-            LoadData();
+            if (!EditorPrefs.HasKey("AARFirstStartup"))
+            {
+                ResetGeneralData();
+                ResetAutomaticData();
+                EditorPrefs.SetBool("AARFirstStartup", true);
+            }
+
+            EditorApplication.delayCall += () => { LoadData(); };
 
             if (languageSelection == 0)
             {
@@ -152,20 +159,23 @@ namespace AutoAnimationRepath
             controller = animator?.runtimeAnimatorController as AnimatorController;
         }
 
-        public static void ResetData()
+        public static void ResetGeneralData()
         {
-            automaticIsEnabled = false;
+            controllerSelection = 0;
+            PlayableSelection = Playables.all;
+            animator = null;
+            avatar = null;
+
+            SaveData();
+        }
+
+        public static void ResetAutomaticData()
+        {
             renameActive = true;
             reparentActive = true;
             renameWarning = true;
             reparentWarning = true;
             activeInBackground = false;
-
-            controllerSelection = 0;
-            PlayableSelection = Playables.all;
-
-            animator = null;
-            avatar = null;
 
             SaveData();
         }
@@ -183,7 +193,6 @@ namespace AutoAnimationRepath
         public static class Automatic
         {
             public static string title;
-            public static string credit;
             public static string disabled;
             public static string enabled;
         }
@@ -191,7 +200,6 @@ namespace AutoAnimationRepath
         public static class Manual
         {
             public static string title;
-            public static string credit;
             public static string fixPaths;
             public static string editClips;
         }
@@ -220,12 +228,14 @@ namespace AutoAnimationRepath
         public static class Settings
         {
             public static string settings;
+            public static string general;
             public static string target;
             public static string animatorComponent;
             public static string vrchatAvatar;
             public static string controllerToUse;
             public static string layersToUse;
             public static string avatarToUse;
+            public static string automatic;
             public static string repathWhenRenamed;
             public static string repathWhenReparented;
             public static string warnWhenRenamed;
@@ -233,6 +243,7 @@ namespace AutoAnimationRepath
             public static string runWhenWindowClosed;
             public static string disableTooltips;
             public static string language;
+            public static string credit;
         }
 
         public static class ToolTips
@@ -273,12 +284,10 @@ namespace AutoAnimationRepath
             Main.manual = "Manual";
 
             Automatic.title = "Automatic Animation Repathing";
-            Automatic.credit = "Made by hfcRed";
             Automatic.disabled = "Disabled";
             Automatic.enabled = "Enabled";
 
             Manual.title = "Manual Animation Repathing";
-            Manual.credit = "Made by hfcRed";
             Manual.fixPaths = "Fix Invalid Paths";
             Manual.editClips = "Edit Animation Clips";
 
@@ -298,12 +307,14 @@ namespace AutoAnimationRepath
             ClipEditing.dragAndDrop = "You can drag and drop GameObjects into the text fields";
 
             Settings.settings = "Settings";
+            Settings.general = "General";
             Settings.target = "Target";
             Settings.animatorComponent = "Animator Component";
             Settings.vrchatAvatar = "VRChat Avatar";
             Settings.controllerToUse = "Controller to use";
             Settings.layersToUse = "Layers to use";
             Settings.avatarToUse = "Avatar to use";
+            Settings.automatic = "Automatic";
             Settings.repathWhenRenamed = "Repath when renamed";
             Settings.repathWhenReparented = "Repath when reparented";
             Settings.warnWhenRenamed = "Warn when renamed";
@@ -311,6 +322,7 @@ namespace AutoAnimationRepath
             Settings.runWhenWindowClosed = "Run when window is closed";
             Settings.disableTooltips = "Disable tooltips";
             Settings.language = "Language";
+            Settings.credit = "Made by hfcRed";
 
             ToolTips.automatic = "Automatically change Animation Paths when something in the hierarchy gets changed";
             ToolTips.manual = "Manually change Animation Paths by hand";
@@ -328,7 +340,7 @@ namespace AutoAnimationRepath
             ToolTips.replaceIndividual = "Replace an entire Animation Path in every selected Animation Clip with a new one";
             ToolTips.resetIndividual = "Restore original Animation Path";
             ToolTips.applyIndividual = "Replace the old Animation Path with the specified Path. Path can not be empty or the same as the old Path";
-            ToolTips.resetSettings = "Reset all settings to their default values";
+            ToolTips.resetSettings = "Reset settings to their default values";
             ToolTips.target = "The object the tool should target. Can be set to either target the Animator Controller inside of the Animator Component of a Gameobject or target all Animator Controllers on a VRChat Avatar";
             ToolTips.controllerToUse = "The Gameobject which holds the Animator Component with the target Animator Controller";
             ToolTips.avatarToUse = "The VRChat Avatar which holds the target Animator Controllers";

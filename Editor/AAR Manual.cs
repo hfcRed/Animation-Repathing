@@ -28,7 +28,7 @@ namespace AutoAnimationRepath
                     foreach (EditorCurveBinding curve in curves)
                     {
                         object animatedObject = 0;
-                        animatedObject = AnimationUtility.GetAnimatedObject(AARAutomatic.GetRoot().gameObject, curve);
+                        animatedObject = AnimationUtility.GetAnimatedObject(animator.gameObject, curve);
 
                         if (animatedObject == null && invalidPathToSharedProperty.TryGetValue(curve.path, out InvalidSharedProperty sp))
                         {
@@ -54,29 +54,25 @@ namespace AutoAnimationRepath
 
             public static void RenameInvalidPaths(AnimationClip clip, string oldPath, string newPath)
             {
-                try
+                AssetDatabase.StartAssetEditing();
+
+                Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                foreach (EditorCurveBinding x in curves)
                 {
-                    AssetDatabase.StartAssetEditing();
+                    object animatedObject = 0;
+                    EditorCurveBinding binding = x;
+                    AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
 
-                    Array curves = AnimationUtility.GetCurveBindings(clip);
+                    animatedObject = AnimationUtility.GetAnimatedObject(AARAutomatic.GetRoot().gameObject, binding);
 
-                    foreach (EditorCurveBinding x in curves)
+                    if (animatedObject == null && binding.path.Contains(oldPath))
                     {
-                        object animatedObject = 0;
-                        EditorCurveBinding binding = x;
-                        AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
-
-                        animatedObject = AnimationUtility.GetAnimatedObject(AARAutomatic.GetRoot().gameObject, binding);
-
-                        if (animatedObject == null && binding.path.Contains(oldPath))
-                        {
-                            AnimationUtility.SetEditorCurve(clip, binding, null);
-                            binding.path = newPath;
-                            AnimationUtility.SetEditorCurve(clip, binding, curve);
-                        }
+                        AnimationUtility.SetEditorCurve(clip, binding, null);
+                        binding.path = newPath;
+                        AnimationUtility.SetEditorCurve(clip, binding, curve);
                     }
                 }
-                finally { AssetDatabase.StopAssetEditing(); ScanInvalidPaths(); }
             }
         }
 
@@ -119,33 +115,27 @@ namespace AutoAnimationRepath
 
             public static void RenameClipPaths(AnimationClip clip, bool replaceEntire, string oldPath, string newPath)
             {
-                try
+                Array curves = AnimationUtility.GetCurveBindings(clip);
+
+                foreach (EditorCurveBinding x in curves)
                 {
-                    AssetDatabase.StartAssetEditing();
+                    EditorCurveBinding binding = x;
+                    AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
 
-                    Array curves = AnimationUtility.GetCurveBindings(clip);
-
-                    foreach (EditorCurveBinding x in curves)
+                    if (replaceEntire == false && binding.path.Contains(oldPath))
                     {
-                        EditorCurveBinding binding = x;
-                        AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
+                        AnimationUtility.SetEditorCurve(clip, binding, null);
+                        binding.path = binding.path.Replace(oldPath, newPath);
+                        AnimationUtility.SetEditorCurve(clip, binding, curve);
+                    }
 
-                        if (replaceEntire == false && binding.path.Contains(oldPath))
-                        {
-                            AnimationUtility.SetEditorCurve(clip, binding, null);
-                            binding.path = binding.path.Replace(oldPath, newPath);
-                            AnimationUtility.SetEditorCurve(clip, binding, curve);
-                        }
-
-                        if (replaceEntire == true && binding.path == oldPath)
-                        {
-                            AnimationUtility.SetEditorCurve(clip, binding, null);
-                            binding.path = newPath;
-                            AnimationUtility.SetEditorCurve(clip, binding, curve);
-                        }
+                    if (replaceEntire == true && binding.path == oldPath)
+                    {
+                        AnimationUtility.SetEditorCurve(clip, binding, null);
+                        binding.path = newPath;
+                        AnimationUtility.SetEditorCurve(clip, binding, curve);
                     }
                 }
-                finally { AssetDatabase.StopAssetEditing(); GetClipPaths(); }
             }
         }
     }

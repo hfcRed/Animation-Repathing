@@ -11,12 +11,13 @@ namespace AutoAnimationRepath
     public class AAREditor : EditorWindow
     {
         [MenuItem("hfcRed/Tools/Auto Repath")]
-        static void ShowWindow() => GetWindow<AAREditor>().titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
+        static void ShowWindow() => GetWindow<AAREditor>("").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
         public void OnGUI()
         {
             Repaint();
+
             EditorGUI.BeginChangeCheck();
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(position.width));
 
@@ -52,7 +53,7 @@ namespace AutoAnimationRepath
                 {
                     GUILayout.Label("", GUILayout.ExpandWidth(true));
 
-                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("Profiler.Memory")) { tooltip = "" }, GUILayout.Width(20), GUILayout.Height(25));
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("Profiler.Memory").image, ""), GUILayout.Width(20), GUILayout.Height(25));
                     GUILayout.Label("<color=#ffffff><b>" + AARStrings.Automatic.title + "</b></color>", AARStyle.title);
                 }
 
@@ -61,14 +62,6 @@ namespace AutoAnimationRepath
                     GUIContent content = automaticIsEnabled ? new GUIContent("<color=#4aff93><b>" + AARStrings.Automatic.enabled + "</b></color>", AARStrings.ToolTips.toggleButton) : new GUIContent("<color=#ff5263><b>" + AARStrings.Automatic.disabled + "</b></color>", AARStrings.ToolTips.toggleButton);
                     automaticIsEnabled = GUILayout.Toggle(automaticIsEnabled, content, AARStyle.toggleButton, GUILayout.Height(40));
                 }
-
-                /*GUILayout.Label(AARStrings.Automatic.title, AARStyle.title);
-
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button(AARStrings.Automatic.credit, "linkLabel"))
-                    Application.OpenURL("https://hfcred.carrd.co");
-                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies")), "label", GUILayout.Height(21)))
-                    Application.OpenURL("https://hfcred.carrd.co");*/
             }
         }
 
@@ -80,7 +73,7 @@ namespace AutoAnimationRepath
                 {
                     GUILayout.Label("", GUILayout.ExpandWidth(true));
 
-                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("ViewToolMove")) { tooltip = "" }, GUILayout.Width(20), GUILayout.Height(25));
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("ViewToolMove").image, ""), GUILayout.Width(20), GUILayout.Height(25));
                     GUILayout.Label("<color=#ffffff><b>" + AARStrings.Manual.title + "</b></color>", AARStyle.title);
                 }
 
@@ -100,7 +93,7 @@ namespace AutoAnimationRepath
                         }
 
                         GUILayout.FlexibleSpace();
-                        if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetInvalidPaths }, GUILayout.Height(30), GUILayout.Width(30)))
+                        if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetInvalidPaths), GUILayout.Height(30), GUILayout.Width(30)))
                         {
                             AARManual.InvalidPaths.ScanInvalidPaths();
                         }
@@ -119,7 +112,7 @@ namespace AutoAnimationRepath
 
                             using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
                             {
-                                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetInvalidPath }, AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
+                                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetInvalidPath), AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
                                 {
                                     sp.newPath = sp.oldPath;
                                 }
@@ -137,10 +130,16 @@ namespace AutoAnimationRepath
                                 }
                                 if (GUILayout.Button(new GUIContent(AARStrings.InvalidPaths.apply, AARStrings.ToolTips.applyValidPath), GUILayout.Width(75)))
                                 {
-                                    foreach (AnimationClip clip in sp.foldoutClips)
+                                    try
                                     {
-                                        AARManual.InvalidPaths.RenameInvalidPaths(clip, sp.oldPath, sp.newPath);
+                                        AssetDatabase.StartAssetEditing();
+
+                                        foreach (AnimationClip clip in sp.foldoutClips)
+                                        {
+                                            AARManual.InvalidPaths.RenameInvalidPaths(clip, sp.oldPath, sp.newPath);
+                                        }
                                     }
+                                    finally { AssetDatabase.StopAssetEditing(); AARManual.InvalidPaths.ScanInvalidPaths(); }
                                 }
                                 EditorGUI.EndDisabledGroup();
                             }
@@ -162,15 +161,21 @@ namespace AutoAnimationRepath
                         }
                     }
 
-                    using (new SqueezeScope((10, 0, 4)))
+                    using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
                     {
                         if (invalidPathToSharedProperty.Count == 0)
                         {
-                            GUILayout.Label(AARStrings.InvalidPaths.noInvalidPaths, AARStyle.invalidPathTip);
+                            GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("TestPassed").image, ""), GUILayout.Width(20), GUILayout.Height(21));
+                            GUILayout.Label(AARStrings.InvalidPaths.noInvalidPaths, AARStyle.invalidPathTip, GUILayout.Height(20));
                         }
                         else
                         {
-                            GUILayout.Label(AARStrings.InvalidPaths.dragAndDrop, AARStyle.invalidPathTip);
+                            GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("GameObject Icon").image, ""), GUILayout.Width(20), GUILayout.Height(21));
+                            GUILayout.Label(AARStrings.InvalidPaths.dragAndDrop, AARStyle.invalidPathTip, GUILayout.Height(20));
                         }
                     }
                 }
@@ -227,7 +232,7 @@ namespace AutoAnimationRepath
                                     }
                                 }
 
-                                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetPartOfAll }, AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
+                                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetPartOfAll), AARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
                                 {
                                     clipsReplaceFrom = string.Empty;
                                     clipsReplaceTo = string.Empty;
@@ -260,11 +265,16 @@ namespace AutoAnimationRepath
                                 }
                                 if (GUILayout.Button(new GUIContent(AARStrings.ClipEditing.apply, AARStrings.ToolTips.applyPartOfAll), GUILayout.Width(75)))
                                 {
-                                    foreach (AnimationClip clip in clipsTarget)
+                                    try
                                     {
-                                        AARManual.ClipEditing.RenameClipPaths(clip, false, clipsReplaceFrom, clipsReplaceTo);
-                                    }
+                                        AssetDatabase.StartAssetEditing();
 
+                                        foreach (AnimationClip clip in clipsTarget)
+                                        {
+                                            AARManual.ClipEditing.RenameClipPaths(clip, false, clipsReplaceFrom, clipsReplaceTo);
+                                        }
+                                    }
+                                    finally { AssetDatabase.StopAssetEditing(); AARManual.ClipEditing.GetClipPaths(); }
                                 }
                                 EditorGUI.EndDisabledGroup();
 
@@ -363,10 +373,16 @@ namespace AutoAnimationRepath
                                     }
                                     if (GUILayout.Button(new GUIContent(AARStrings.ClipEditing.apply, AARStrings.ToolTips.applyIndividual), GUILayout.Width(75)))
                                     {
-                                        foreach (AnimationClip clip in sp.foldoutClips)
+                                        try
                                         {
-                                            AARManual.ClipEditing.RenameClipPaths(clip, true, sp.oldPath, sp.newPath);
+                                            AssetDatabase.StartAssetEditing();
+
+                                            foreach (AnimationClip clip in sp.foldoutClips)
+                                            {
+                                                AARManual.ClipEditing.RenameClipPaths(clip, true, sp.oldPath, sp.newPath);
+                                            }
                                         }
+                                        finally { AssetDatabase.StopAssetEditing(); AARManual.ClipEditing.GetClipPaths(); }
                                     }
                                     EditorGUI.EndDisabledGroup();
 
@@ -389,15 +405,21 @@ namespace AutoAnimationRepath
                         }
                     }
 
-                    using (new SqueezeScope((10, 0, 4)))
+                    using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
                     {
                         if (clipsSelected.Count == 0)
                         {
-                            GUILayout.Label(AARStrings.ClipEditing.noClipsSelected, AARStyle.invalidPathTip);
+                            GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("AnimationClip Icon").image, ""), GUILayout.Width(20), GUILayout.Height(21));
+                            GUILayout.Label(AARStrings.ClipEditing.noClipsSelected, AARStyle.invalidPathTip, GUILayout.Height(20));
                         }
                         else
                         {
-                            GUILayout.Label(AARStrings.ClipEditing.dragAndDrop, AARStyle.invalidPathTip);
+                            GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("GameObject Icon").image, ""), GUILayout.Width(20), GUILayout.Height(21));
+                            GUILayout.Label(AARStrings.ClipEditing.dragAndDrop, AARStyle.invalidPathTip, GUILayout.Height(20));
                         }
                     }
                 }
@@ -415,18 +437,18 @@ namespace AutoAnimationRepath
                 {
                     GUILayout.Label("", GUILayout.ExpandWidth(true));
 
-                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("SettingsIcon")) { tooltip = "" }, GUILayout.Width(20), GUILayout.Height(30));
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("SettingsIcon").image, ""), GUILayout.Width(20), GUILayout.Height(30));
                     GUILayout.Label("<color=#ffffff><b>" + AARStrings.Settings.settings + "</b></color>", AARStyle.settings, GUILayout.Height(30));
                 }
 
                 using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
                 {
-                    GUILayout.Label("General", AARStyle.settings, GUILayout.Height(30));
+                    GUILayout.Label(AARStrings.Settings.general, AARStyle.settings, GUILayout.Height(30));
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetSettings }, GUILayout.Height(30), GUILayout.Width(30)))
+                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetSettings), GUILayout.Height(30), GUILayout.Width(30)))
                     {
-                        AARSaveData.ResetData();
+                        AARSaveData.ResetGeneralData();
                     }
                 }
 
@@ -517,12 +539,12 @@ namespace AutoAnimationRepath
 
                 using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
                 {
-                    GUILayout.Label("Automatic", AARStyle.settings, GUILayout.Height(30));
+                    GUILayout.Label(AARStrings.Settings.automatic, AARStyle.settings, GUILayout.Height(30));
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh")) { tooltip = AARStrings.ToolTips.resetSettings }, GUILayout.Height(30), GUILayout.Width(30)))
+                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetSettings), GUILayout.Height(30), GUILayout.Width(30)))
                     {
-                        AARSaveData.ResetData();
+                        AARSaveData.ResetAutomaticData();
                     }
                 }
 
@@ -544,6 +566,26 @@ namespace AutoAnimationRepath
                     {
                         activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(AARStrings.Settings.runWhenWindowClosed, AARStrings.ToolTips.runWhenWindowClosed));
                     }
+                }
+
+                using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
+                {
+                    GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Width(20), GUILayout.Height(21)))
+                        Application.OpenURL("https://hfcred.carrd.co");
+                    if (GUILayout.Button(AARStrings.Settings.credit, new GUIStyle(EditorStyles.linkLabel), GUILayout.Height(20)))
+                        Application.OpenURL("https://hfcred.carrd.co");
+
+                    Rect r = GUILayoutUtility.GetLastRect();
+                    Event e = Event.current;
+
+                    if (r.Contains(e.mousePosition))
+                    {
+                        EditorGUI.DrawRect(new Rect(r.x, r.y + 17, r.width, 1), new Color(0.49f, 0.678f, 0.957f));
+                    }
+
+                    GUILayout.Label("", GUILayout.ExpandWidth(true));
                 }
             }
         }
@@ -592,7 +634,7 @@ namespace AutoAnimationRepath
         public static GUIStyle foldout = new GUIStyle(EditorStyles.foldout) { fontSize = 15, fontStyle = FontStyle.Bold };
         public static GUIStyle settings = new GUIStyle(GUI.skin.label) { fontSize = 20, fontStyle = FontStyle.Bold, richText = true };
         public static GUIStyle invalidPath = new GUIStyle(GUI.skin.box) { fontSize = 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleLeft };
-        public static GUIStyle invalidPathTip = new GUIStyle(GUI.skin.label) { fontSize = 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleCenter };
+        public static GUIStyle invalidPathTip = new GUIStyle(GUI.skin.label) { fontSize = 12, richText = true };
         public static GUIStyle resetButton = new GUIStyle(GUI.skin.label) { };
         public static GUIStyle replaceFromTo = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
         public static GUIStyle replacePath = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
