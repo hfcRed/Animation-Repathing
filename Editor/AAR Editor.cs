@@ -10,8 +10,8 @@ namespace AutoAnimationRepath
 {
     public class AAREditor : EditorWindow
     {
-        [MenuItem("hfcRed/Tools/Auto Repath")]
-        static void ShowWindow() => GetWindow<AAREditor>("").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
+        [MenuItem("hfcRed/Tools/Animation Repathing")]
+        static void ShowWindow() => GetWindow<AAREditor>("Animation Repathing").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
         public void OnGUI()
@@ -85,25 +85,28 @@ namespace AutoAnimationRepath
 
                 if (manualToolSelection == 0)
                 {
-                    using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
+                    using (new SqueezeScope((15, 0, 4)))
                     {
-                        using (new SqueezeScope((5, 0, 4)))
+                        using (new SqueezeScope((0, 5, 4), (0, 0, 4, GUI.skin.box), (5, 5, 3)))
                         {
-                            invalidPathsFoldout = EditorGUILayout.Foldout(invalidPathsFoldout, "  " + AARStrings.InvalidPaths.invalidPaths, AARStyle.foldout);
+                            GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                            GUILayout.Label(new GUIContent(AARStrings.InvalidPaths.invalidPaths), AARStyle.foldout);
                         }
 
-                        GUILayout.FlexibleSpace();
-                        if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetInvalidPaths), GUILayout.Height(30), GUILayout.Width(30)))
+                        if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetInvalidPaths), GUILayout.Height(25)))
                         {
                             AARManual.InvalidPaths.ScanInvalidPaths();
                         }
                     }
                 }
 
-                if (invalidPathsFoldout && manualToolSelection == 0)
+                if (manualToolSelection == 0)
                 {
-                    foreach (InvalidSharedProperty sp in invalidPathToSharedProperty.Values)
+                    for (int i = 0; i < invalidPathToSharedProperty.Values.Count; i++)
                     {
+                        InvalidSharedProperty sp = invalidPathToSharedProperty.Values.ElementAt(i);
+
                         string str = sp.oldPath;
 
                         using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
@@ -207,8 +210,10 @@ namespace AutoAnimationRepath
 
                             using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
                             {
-                                foreach (ClipsSharedProperty sp in clipsPathToSharedProperty.Values)
+                                for (int i = 0; i < clipsPathToSharedProperty.Values.Count; i++)
                                 {
+                                    ClipsSharedProperty sp = clipsPathToSharedProperty.Values.ElementAt(i);
+
                                     sp.warning = false;
 
                                     if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
@@ -428,7 +433,7 @@ namespace AutoAnimationRepath
 
         public static void DrawSettings()
         {
-            DrawDivider(18, 15, 5, 5);
+            DrawDivider(23, 20, 5, 5);
 
             using (new SqueezeScope((5, 5, 3), (0, 10, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
@@ -579,7 +584,6 @@ namespace AutoAnimationRepath
 
                     Rect r = GUILayoutUtility.GetLastRect();
                     Event e = Event.current;
-
                     if (r.Contains(e.mousePosition))
                     {
                         EditorGUI.DrawRect(new Rect(r.x, r.y + 17, r.width, 1), new Color(0.49f, 0.678f, 0.957f));
@@ -631,7 +635,7 @@ namespace AutoAnimationRepath
     {
         public static GUIStyle title = new GUIStyle(GUI.skin.label) { fontSize = 20, fontStyle = FontStyle.Bold, richText = true };
         public static GUIStyle toggleButton = new GUIStyle(GUI.skin.button) { fontSize = 16, richText = true };
-        public static GUIStyle foldout = new GUIStyle(EditorStyles.foldout) { fontSize = 15, fontStyle = FontStyle.Bold };
+        public static GUIStyle foldout = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
         public static GUIStyle settings = new GUIStyle(GUI.skin.label) { fontSize = 20, fontStyle = FontStyle.Bold, richText = true };
         public static GUIStyle invalidPath = new GUIStyle(GUI.skin.box) { fontSize = 12, richText = true, stretchWidth = true, alignment = TextAnchor.MiddleLeft };
         public static GUIStyle invalidPathTip = new GUIStyle(GUI.skin.label) { fontSize = 12, richText = true };

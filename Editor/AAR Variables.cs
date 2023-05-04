@@ -32,7 +32,6 @@ namespace AutoAnimationRepath
         public static List<InvalidSharedProperty> invalidSharedProperties = new List<InvalidSharedProperty>();
         public static Dictionary<string, InvalidSharedProperty> invalidPathToSharedProperty = new Dictionary<string, InvalidSharedProperty>();
         public static int invalidPosition;
-        public static bool invalidPathsFoldout = true;
 
         public class ClipsSharedProperty
         {

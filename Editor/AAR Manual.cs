@@ -49,7 +49,6 @@ namespace AutoAnimationRepath
                         }
                     }
                 }
-                invalidPathsFoldout = true;
             }
 
             public static void RenameInvalidPaths(AnimationClip clip, string oldPath, string newPath)
