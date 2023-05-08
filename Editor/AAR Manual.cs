@@ -27,8 +27,8 @@ namespace AutoAnimationRepath
 
                     foreach (EditorCurveBinding curve in curves)
                     {
-                        object animatedObject = 0;
-                        animatedObject = AnimationUtility.GetAnimatedObject(animator.gameObject, curve);
+                        object animatedObject;
+                        animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot(), curve);
 
                         if (animatedObject == null && invalidPathToSharedProperty.TryGetValue(curve.path, out InvalidSharedProperty sp))
                         {
@@ -53,17 +53,14 @@ namespace AutoAnimationRepath
 
             public static void RenameInvalidPaths(AnimationClip clip, string oldPath, string newPath)
             {
-                AssetDatabase.StartAssetEditing();
-
                 Array curves = AnimationUtility.GetCurveBindings(clip);
 
                 foreach (EditorCurveBinding x in curves)
                 {
-                    object animatedObject = 0;
+                    object animatedObject;
                     EditorCurveBinding binding = x;
                     AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
-
-                    animatedObject = AnimationUtility.GetAnimatedObject(AARAutomatic.GetRoot().gameObject, binding);
+                    animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot(), binding);
 
                     if (animatedObject == null && binding.path.Contains(oldPath))
                     {
@@ -136,6 +133,12 @@ namespace AutoAnimationRepath
                     }
                 }
             }
+        }
+
+        public static GameObject GetRoot()
+        {
+            return controllerSelection == 0 ?
+            animator == null ? null : animator.gameObject : avatar == null ? null : avatar.gameObject;
         }
     }
 }

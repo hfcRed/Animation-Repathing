@@ -4,6 +4,7 @@ using System.Text;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using static AutoAnimationRepath.AARVariables;
 
 namespace AutoAnimationRepath
 {
@@ -13,14 +14,10 @@ namespace AutoAnimationRepath
         static AARAutomatic()
         {
             EditorApplication.hierarchyChanged -= HierarchyChanged;
-            //Selection.selectionChanged -= SelectionChanged;
-
             EditorApplication.hierarchyChanged += HierarchyChanged;
-            //Selection.selectionChanged += SelectionChanged;
         }
 
         /*
-        #region Selection Change
         //Run when selection has changed
         public static void SelectionChanged()
         {
@@ -33,37 +30,35 @@ namespace AutoAnimationRepath
             oldPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, animator.transform);
             removeLength = oldPath.Length;
         }
-        #endregion
         */
 
-        #region Hierarchy Change
         public static void HierarchyChanged()
         {
-            bool shouldRun = AARVariables.automaticIsEnabled;
-            shouldRun &= AARVariables.activeInBackground || EditorWindow.HasOpenInstances<AAREditor>();
-            shouldRun &= AARVariables.renameActive || AARVariables.reparentActive;
+            bool shouldRun = automaticIsEnabled;
+            shouldRun &= activeInBackground || EditorWindow.HasOpenInstances<AAREditor>();
+            shouldRun &= renameActive || reparentActive;
 
             var root = GetRoot();
             shouldRun &= root;
 
             //temporary condition for current method of targetting a controller
-            AARVariables.controller = AARVariables.animator.runtimeAnimatorController as AnimatorController;
-            shouldRun &= AARVariables.controllerSelection == 0 && AARVariables.controller;
+            controller = animator?.runtimeAnimatorController as AnimatorController;
+            shouldRun &= controllerSelection == 0 && controller;
             if (!shouldRun) return;
 
-            AARVariables.changedPaths.Clear();
-            for (int i = AARVariables.hierarchyTransforms.Count - 1; i >= 0; i--)
+            changedPaths.Clear();
+            for (int i = hierarchyTransforms.Count - 1; i >= 0; i--)
             {
-                var ht = AARVariables.hierarchyTransforms[i];
+                var ht = hierarchyTransforms[i];
                 if (ht.target == null || !ht.target.IsChildOf(root))
                 {
-                    AARVariables.hierarchyTransforms.RemoveAt(i);
+                    hierarchyTransforms.RemoveAt(i);
                     continue;
                 }
 
                 var currentPath = AnimationUtility.CalculateTransformPath(ht.target, root);
                 if (ht.path != currentPath)
-                    try { AARVariables.changedPaths.Add(ht.path, currentPath); }
+                    try { changedPaths.Add(ht.path, currentPath); }
                     catch
                     {
                         //ignore error
@@ -74,9 +69,9 @@ namespace AutoAnimationRepath
                 ht.path = currentPath;
             }
 
-            if (AARVariables.changedPaths.Count == 0) return;
-            if (!AARVariables.reparentWarning || DisplayReparentDialog())
-                RepathParent(AARVariables.controller);
+            if (changedPaths.Count == 0) return;
+            if (!reparentWarning || DisplayReparentDialog())
+                RepathParent(controller);
 
             /*
             if (isEnabled && Selection.activeTransform != null && Selection.activeTransform.IsChildOf(animator.transform))
@@ -107,7 +102,6 @@ namespace AutoAnimationRepath
             }
         */
         }
-        #endregion
 
         public static void RepathParent(AnimatorController target)
         {
@@ -115,14 +109,14 @@ namespace AutoAnimationRepath
             {
                 AssetDatabase.StartAssetEditing();
 
-                foreach (AnimationClip clip in AARVariables.controller.animationClips)
+                foreach (AnimationClip clip in controller.animationClips)
                 {
                     EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                     EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
                     void HandleBinding(EditorCurveBinding b, bool isObjectCurve)
                     {
-                        if (!AARVariables.changedPaths.TryGetValue(b.path, out string newPath)) return;
+                        if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
                         if (isObjectCurve)
                         {
                             ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, b);
@@ -215,7 +209,7 @@ namespace AutoAnimationRepath
         {
             StringBuilder displayedChanges = new StringBuilder($"Repathing animation properties for:{Environment.NewLine}");
 
-            foreach (var s in AARVariables.changedPaths.Keys.Zip(AARVariables.changedPaths.Values, (s1, s2) => $"{s1} to {s2}"))
+            foreach (var s in changedPaths.Keys.Zip(changedPaths.Values, (s1, s2) => $"{s1} to {s2}"))
                 displayedChanges.AppendLine(s);
 
             return EditorUtility.DisplayDialog("Auto Repathing", displayedChanges.ToString(), "Continue", "Cancel");
@@ -223,7 +217,7 @@ namespace AutoAnimationRepath
 
         public static void OnRootChanged()
         {
-            AARVariables.hierarchyTransforms.Clear();
+            hierarchyTransforms.Clear();
 
             Transform root = GetRoot();
             if (!root) return;
@@ -232,13 +226,15 @@ namespace AutoAnimationRepath
             for (int i = 1; i < allChildren.Length; i++)
             {
                 var t = allChildren[i];
-                AARVariables.hierarchyTransforms.Add(new HierarchyTransform(t, root));
+                hierarchyTransforms.Add(new HierarchyTransform(t, root));
             }
         }
 
-        public static Transform GetRoot() => AARVariables.controllerSelection == 0 ?
-            AARVariables.animator == null ? null : AARVariables.animator.transform :
-            AARVariables.avatar == null ? null : AARVariables.avatar.transform;
+        public static Transform GetRoot()
+        {
+            return controllerSelection == 0 ?
+            animator == null ? null : animator.transform : avatar == null ? null : avatar.transform;
+        }
 
         public class HierarchyTransform
         {

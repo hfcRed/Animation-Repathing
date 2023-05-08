@@ -207,7 +207,6 @@ namespace AutoAnimationRepath
         {
             public static string invalidPaths;
             public static string apply;
-            public static string affectedClips;
             public static string noInvalidPaths;
             public static string dragAndDrop;
         }
@@ -292,7 +291,6 @@ namespace AutoAnimationRepath
 
             InvalidPaths.invalidPaths = "Invalid Paths";
             InvalidPaths.apply = "Apply";
-            InvalidPaths.affectedClips = "Affected Clips";
             InvalidPaths.noInvalidPaths = "You have no Invalid Paths in your controller";
             InvalidPaths.dragAndDrop = "You can drag and drop GameObjects into the text fields";
 
