@@ -15,7 +15,7 @@ namespace AutoAnimationRepath
         public static bool reparentWarning = true;
         public static bool activeInBackground = false;
         public static bool disableTooltips = false;
-
+                
         public static int toolSelection;
         public static int manualToolSelection;
         public static int controllerSelection;
