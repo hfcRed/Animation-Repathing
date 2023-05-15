@@ -230,12 +230,6 @@ namespace AutoAnimationRepath
             }
         }
 
-        public static Transform GetRoot()
-        {
-            return controllerSelection == 0 ?
-            animator == null ? null : animator.transform : avatar == null ? null : avatar.transform;
-        }
-
         public class HierarchyTransform
         {
             public Transform target;

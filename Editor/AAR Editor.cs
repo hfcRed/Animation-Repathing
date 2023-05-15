@@ -624,10 +624,13 @@ namespace AutoAnimationRepath
                     }
                 }
 
+
                 if (e.type == EventType.DragPerform)
                 {
                     var go = draggedObjects.First();
-                    string p = animator == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, animator.transform);
+                    string p = controllerSelection == 0 ?
+                    animator == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, animator.transform) :
+                    avatar == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, avatar.transform);
                     return (p);
                 }
             }
