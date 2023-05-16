@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEditor;
@@ -17,20 +18,17 @@ namespace AutoAnimationRepath
             EditorApplication.hierarchyChanged += HierarchyChanged;
         }
 
-        /*
-        //Run when selection has changed
-        public static void SelectionChanged()
+        public class HierarchyTransform
         {
-            if ((!activeInBackground && !EditorWindow.HasOpenInstances<AAREditor>()) || !isEnabled) return;
-            if (Selection.activeGameObject == null || Selection.activeTransform.parent == null)
-                return;
-            
-            oldParent = Selection.activeTransform.parent;
-            oldName = Selection.activeGameObject.name;
-            oldPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, animator.transform);
-            removeLength = oldPath.Length;
+            public Transform target;
+            public string path;
+
+            public HierarchyTransform(Transform t, Transform root)
+            {
+                target = t;
+                path = AnimationUtility.CalculateTransformPath(t, root);
+            }
         }
-        */
 
         public static void HierarchyChanged()
         {
@@ -41,9 +39,8 @@ namespace AutoAnimationRepath
             var root = GetRoot();
             shouldRun &= root;
 
-            //temporary condition for current method of targetting a controller
-            controller = animator?.runtimeAnimatorController as AnimatorController;
-            shouldRun &= controllerSelection == 0 && controller;
+            List<AnimatorController> controllers = GetControllers();
+            shouldRun &= controllers.Count > 0;
             if (!shouldRun) return;
 
             changedPaths.Clear();
@@ -70,37 +67,26 @@ namespace AutoAnimationRepath
             }
 
             if (changedPaths.Count == 0) return;
-            if (!reparentWarning || DisplayReparentDialog())
-                RepathParent(controller);
 
-            /*
-            if (isEnabled && Selection.activeTransform != null && Selection.activeTransform.IsChildOf(animator.transform))
+            if (warnOnlyIfUsed && ScanAnimators())
             {
-                newName = Selection.activeTransform.name;
-                newParent = Selection.activeTransform.parent;
-                selectedTransform = Selection.activeTransform;
-
-                if (reparentActive && newParent != null && oldParent != null)
+                foreach (AnimatorController a in controllers)
                 {
-                    if (!reparentWarning) RepathParent();
-                    else if (EditorUtility.DisplayDialog("Auto Repathing", "Repathing animation properties for " + selectedTransform.name + " to " + selectedTransform.parent.name, "Continue", "Cancel"))
-                    {
-                        RepathParent();
-                    }
-                }
-
-                if (renameActive && oldName != newName && oldName != null)
-                {
-                    if (!renameWarning) RepathName();
-                    else if (EditorUtility.DisplayDialog("Auto Repathing", "Repathing animation properties from " + oldName + " to " + selectedTransform.name, "Continue", "Cancel"))
-                    {
-                        RepathName();
-                    }
-
-
+                    RepathParent(a);
                 }
             }
-        */
+            else if (!warnOnlyIfUsed && (!reparentWarning || DisplayReparentDialog()))
+            {
+                foreach (AnimatorController a in controllers)
+                {
+                    RepathParent(a);
+                }
+            }
+        }
+
+        public static bool ScanAnimators()
+        {
+            return true;
         }
 
         public static void RepathParent(AnimatorController target)
@@ -109,7 +95,7 @@ namespace AutoAnimationRepath
             {
                 AssetDatabase.StartAssetEditing();
 
-                foreach (AnimationClip clip in controller.animationClips)
+                foreach (AnimationClip clip in target.animationClips)
                 {
                     EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                     EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
@@ -130,80 +116,15 @@ namespace AutoAnimationRepath
                             AnimationUtility.SetEditorCurve(clip, b, null);
                             b.path = newPath;
                             AnimationUtility.SetEditorCurve(clip, b, floatCurve);
-
                         }
-
-
                     }
 
                     foreach (var fc in floatCurves) HandleBinding(fc, false);
                     foreach (var oc in objectCurves) HandleBinding(oc, true);
-
-                    /*
-                    foreach (EditorCurveBinding b in floatCurves)
-                    {
-                        EditorCurveBinding binding = b;
-                        AnimationCurve Curve = AnimationUtility.GetEditorCurve(clip, binding);
-                        
-                        if (binding.path.Contains(oldPath) && binding.path != fullPath)
-                        {
-                            string OldPathCut = binding.path.Remove(0, removeLength);
-                            fullPath = newPath + OldPathCut;
-
-                            AnimationUtility.SetEditorCurve(clip, binding, null);
-                            binding.path = fullPath;
-                            AnimationUtility.SetEditorCurve(clip, binding, Curve);
-                        }
-                    }
-                */
                 }
             }
             finally { AssetDatabase.StopAssetEditing(); }
-            //CONTIUE
-
-            /*
-            if (baseSelection == 0 && controller != null && oldPath != null)
-            {
-                newPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, animator.transform);
-
-                try
-                {
-                    AssetDatabase.StartAssetEditing();
-                    
-                    foreach (AnimationClip clip in controller.animationClips)
-                    {
-                        Array curves = AnimationUtility.GetCurveBindings(clip);
-
-                        foreach (EditorCurveBinding b in curves)
-                        {
-                            EditorCurveBinding binding = b;
-                            AnimationCurve Curve = AnimationUtility.GetEditorCurve(clip, binding);
-
-                            if (binding.path.Contains(oldPath) && binding.path != fullPath)
-                            {
-                                string OldPathCut = binding.path.Remove(0, removeLength);
-                                fullPath = newPath + OldPathCut;
-
-                                AnimationUtility.SetEditorCurve(clip, binding, null);
-                                binding.path = fullPath;
-                                AnimationUtility.SetEditorCurve(clip, binding, Curve);
-                            }
-                        }
-                    }                   
-                }
-                finally
-                {
-                    AssetDatabase.StopAssetEditing();
-                }
-            }          
-            oldParent = newParent;
-            oldPath = AnimationUtility.CalculateTransformPath(Selection.activeTransform, animator.transform);
-            removeLength = oldPath.Length;
-            fullPath = null;
-        */
         }
-
-        //public static void RepathName() => oldName = newName;
 
         private static bool DisplayReparentDialog()
         {
@@ -227,18 +148,6 @@ namespace AutoAnimationRepath
             {
                 var t = allChildren[i];
                 hierarchyTransforms.Add(new HierarchyTransform(t, root));
-            }
-        }
-
-        public class HierarchyTransform
-        {
-            public Transform target;
-            public string path;
-
-            public HierarchyTransform(Transform t, Transform root)
-            {
-                target = t;
-                path = AnimationUtility.CalculateTransformPath(t, root);
             }
         }
     }

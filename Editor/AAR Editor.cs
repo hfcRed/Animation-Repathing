@@ -1,7 +1,8 @@
-﻿using Boo.Lang;
+﻿using System.Collections.Generic;
 using System;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using static AutoAnimationRepath.AARVariables;
@@ -104,7 +105,10 @@ namespace AutoAnimationRepath
 
                 if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetInvalidPaths), GUILayout.Height(25)))
                 {
-                    AARManual.InvalidPaths.ScanInvalidPaths();
+                    List<AnimatorController> animators = GetControllers();
+
+                    foreach (AnimatorController a in animators)
+                        AARManual.InvalidPaths.ScanInvalidPaths(a);
                 }
             }
 
@@ -151,7 +155,12 @@ namespace AutoAnimationRepath
                                 AARManual.InvalidPaths.RenameInvalidPaths(clip, sp.oldPath, sp.newPath);
                             }
                         }
-                        finally { AssetDatabase.StopAssetEditing(); AARManual.InvalidPaths.ScanInvalidPaths(); }
+                        finally { AssetDatabase.StopAssetEditing(); }
+
+                        List<AnimatorController> animators = GetControllers();
+
+                        foreach (AnimatorController a in animators)
+                            AARManual.InvalidPaths.ScanInvalidPaths(a);
                     }
                     EditorGUI.EndDisabledGroup();
                 }

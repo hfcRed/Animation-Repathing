@@ -12,6 +12,7 @@ namespace AutoAnimationRepath
         public static bool renameActive = true;
         public static bool reparentActive = true;
         public static bool renameWarning = true;
+        public static bool warnOnlyIfUsed = false;
         public static bool reparentWarning = true;
         public static bool activeInBackground = false;
         public static bool disableTooltips = false;
@@ -51,7 +52,6 @@ namespace AutoAnimationRepath
 
         public static readonly List<AARAutomatic.HierarchyTransform> hierarchyTransforms = new List<AARAutomatic.HierarchyTransform>();
         public static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
-        public static AnimatorController controller;
         public static Animator _animator;
         public static GameObject _avatar;
         public static Animator animator
@@ -99,6 +99,12 @@ namespace AutoAnimationRepath
             animator == null ? null : animator.transform : avatar == null ? null : avatar.transform;
         }
 
+        private static T EnsureNull<T>(T obj) where T : UnityEngine.Object
+        {
+            if (obj == null) obj = null;
+            return obj;
+        }
+
         public static List<AnimatorController> GetControllers()
         {
             List<AnimatorController> targetControllers = new List<AnimatorController>();
@@ -119,35 +125,35 @@ namespace AutoAnimationRepath
                         switch (playable)
                         {
                             case Playables.Base:
-                                if (descriptor.baseAnimationLayers[0].animatorController != null)
+                                if (EnsureNull(descriptor.baseAnimationLayers[0].animatorController) != null)
                                     targetControllers.Add(descriptor.baseAnimationLayers[0].animatorController as AnimatorController);
                                 break;
                             case Playables.Additive:
-                                if (descriptor.baseAnimationLayers[1].animatorController != null)
+                                if (EnsureNull(descriptor.baseAnimationLayers[1].animatorController) != null)
                                     targetControllers.Add(descriptor.baseAnimationLayers[1].animatorController as AnimatorController);
                                 break;
                             case Playables.Gesture:
-                                if (descriptor.baseAnimationLayers[2].animatorController != null)
+                                if (EnsureNull(descriptor.baseAnimationLayers[2].animatorController) != null)
                                     targetControllers.Add(descriptor.baseAnimationLayers[2].animatorController as AnimatorController);
                                 break;
                             case Playables.Action:
-                                if (descriptor.baseAnimationLayers[3].animatorController != null)
+                                if (EnsureNull(descriptor.baseAnimationLayers[3].animatorController) != null)
                                     targetControllers.Add(descriptor.baseAnimationLayers[3].animatorController as AnimatorController);
                                 break;
                             case Playables.FX:
-                                if (descriptor.baseAnimationLayers[4].animatorController != null)
+                                if (EnsureNull(descriptor.baseAnimationLayers[4].animatorController) != null)
                                     targetControllers.Add(descriptor.baseAnimationLayers[4].animatorController as AnimatorController);
                                 break;
                             case Playables.Sitting:
-                                if (descriptor.specialAnimationLayers[0].animatorController != null)
+                                if (EnsureNull(descriptor.specialAnimationLayers[0].animatorController) != null)
                                     targetControllers.Add(descriptor.specialAnimationLayers[0].animatorController as AnimatorController);
                                 break;
                             case Playables.TPose:
-                                if (descriptor.specialAnimationLayers[1].animatorController != null)
+                                if (EnsureNull(descriptor.specialAnimationLayers[1].animatorController) != null)
                                     targetControllers.Add(descriptor.specialAnimationLayers[1].animatorController as AnimatorController);
                                 break;
                             case Playables.IKPose:
-                                if (descriptor.specialAnimationLayers[2].animatorController != null)
+                                if (EnsureNull(descriptor.specialAnimationLayers[2].animatorController) != null)
                                     targetControllers.Add(descriptor.specialAnimationLayers[2].animatorController as AnimatorController);
                                 break;
                         }
