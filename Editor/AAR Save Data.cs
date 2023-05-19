@@ -86,6 +86,7 @@ namespace AutoAnimationRepath
             renameWarning = true;
             reparentWarning = true;
             activeInBackground = false;
+            warnOnlyIfUsed = true;
 
             SaveData();
         }

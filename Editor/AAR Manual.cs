@@ -57,33 +57,26 @@ namespace AutoAnimationRepath
                 EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                 EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                foreach (EditorCurveBinding x in floatCurves)
+                foreach (EditorCurveBinding binding in floatCurves) ChangeBindings(binding, false);
+                foreach (EditorCurveBinding binding in objectCurves) ChangeBindings(binding, true);
+
+                void ChangeBindings(EditorCurveBinding binding, bool isObjectCurve)
                 {
                     object animatedObject;
-                    EditorCurveBinding binding = x;
-                    AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
                     animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
-
-                    if (animatedObject == null && binding.path.Contains(oldPath))
+                    if (isObjectCurve)
                     {
-                        AnimationUtility.SetEditorCurve(clip, binding, null);
+                        ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
+                        AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
                         binding.path = newPath;
-                        AnimationUtility.SetEditorCurve(clip, binding, curve);
+                        AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
                     }
-                }
-
-                foreach (EditorCurveBinding x in objectCurves)
-                {
-                    object animatedObject;
-                    EditorCurveBinding binding = x;
-                    AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
-                    animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
-
-                    if (animatedObject == null && binding.path.Contains(oldPath))
+                    else
                     {
+                        AnimationCurve floatCurve = AnimationUtility.GetEditorCurve(clip, binding);
                         AnimationUtility.SetEditorCurve(clip, binding, null);
                         binding.path = newPath;
-                        AnimationUtility.SetEditorCurve(clip, binding, curve);
+                        AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
                     }
                 }
             }
@@ -153,43 +146,46 @@ namespace AutoAnimationRepath
                 EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                 EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                foreach (EditorCurveBinding x in floatCurves)
+                foreach (EditorCurveBinding binding in floatCurves) ChangeBindings(binding, false);
+                foreach (EditorCurveBinding binding in objectCurves) ChangeBindings(binding, true);
+
+                void ChangeBindings(EditorCurveBinding binding, bool isObjectCurve)
                 {
-                    EditorCurveBinding binding = x;
-                    AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
-
-                    if (replaceEntire == false && binding.path.Contains(oldPath))
+                    if (isObjectCurve)
                     {
-                        AnimationUtility.SetEditorCurve(clip, binding, null);
-                        binding.path = binding.path.Replace(oldPath, newPath);
-                        AnimationUtility.SetEditorCurve(clip, binding, curve);
+                        ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
+
+                        if (!replaceEntire && binding.path.Contains(oldPath))
+                        {
+                            AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
+                            binding.path = binding.path.Replace(oldPath, newPath);
+                            AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+                        }
+
+                        if (replaceEntire && binding.path == oldPath)
+                        {
+                            AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
+                            binding.path = newPath;
+                            AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+                        }
                     }
-
-                    if (replaceEntire == true && binding.path == oldPath)
+                    else
                     {
-                        AnimationUtility.SetEditorCurve(clip, binding, null);
-                        binding.path = newPath;
-                        AnimationUtility.SetEditorCurve(clip, binding, curve);
-                    }
-                }
+                        AnimationCurve floatCurve = AnimationUtility.GetEditorCurve(clip, binding);
 
-                foreach (EditorCurveBinding x in objectCurves)
-                {
-                    EditorCurveBinding binding = x;
-                    AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
+                        if (!replaceEntire && binding.path.Contains(oldPath))
+                        {
+                            AnimationUtility.SetEditorCurve(clip, binding, null);
+                            binding.path = binding.path.Replace(oldPath, newPath);
+                            AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+                        }
 
-                    if (replaceEntire == false && binding.path.Contains(oldPath))
-                    {
-                        AnimationUtility.SetEditorCurve(clip, binding, null);
-                        binding.path = binding.path.Replace(oldPath, newPath);
-                        AnimationUtility.SetEditorCurve(clip, binding, curve);
-                    }
-
-                    if (replaceEntire == true && binding.path == oldPath)
-                    {
-                        AnimationUtility.SetEditorCurve(clip, binding, null);
-                        binding.path = newPath;
-                        AnimationUtility.SetEditorCurve(clip, binding, curve);
+                        if (replaceEntire && binding.path == oldPath)
+                        {
+                            AnimationUtility.SetEditorCurve(clip, binding, null);
+                            binding.path = newPath;
+                            AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+                        }
                     }
                 }
             }

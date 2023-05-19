@@ -68,7 +68,7 @@ namespace AutoAnimationRepath
 
             if (changedPaths.Count == 0) return;
 
-            if (warnOnlyIfUsed && ScanAnimators())
+            if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || DisplayReparentDialog()))
             {
                 foreach (AnimatorController a in controllers)
                 {
@@ -86,7 +86,30 @@ namespace AutoAnimationRepath
 
         public static bool ScanAnimators()
         {
-            return true;
+            List<AnimatorController> controllers = GetControllers();
+            bool returnValue = false;
+
+            foreach (AnimatorController animator in controllers)
+            {
+                foreach (AnimationClip clip in animator.animationClips)
+                {
+                    EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
+                    EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
+
+                    foreach (var fc in floatCurves) CheckBindings(fc, false);
+                    foreach (var oc in objectCurves) CheckBindings(oc, true);
+
+                    void CheckBindings(EditorCurveBinding binding, bool isObjectCurve)
+                    {
+                        if (changedPaths.TryGetValue(binding.path, out string newPath))
+                        {
+                            returnValue = true;
+                        }
+                    }
+                }
+            }
+
+            return returnValue;
         }
 
         public static void RepathParent(AnimatorController target)
