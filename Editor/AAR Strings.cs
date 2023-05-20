@@ -53,15 +53,27 @@
             public static string controllerToUse;
             public static string layersToUse;
             public static string avatarToUse;
+            public static string disableTooltips;
+            public static string language;
             public static string automatic;
             public static string repathWhenRenamed;
             public static string repathWhenReparented;
             public static string warnWhenRenamed;
             public static string warnWhenReparented;
             public static string runWhenWindowClosed;
-            public static string disableTooltips;
-            public static string language;
+            public static string warnOnlyIfUsed;
+            public static string warning;
             public static string credit;
+        }
+
+        public static class Popup
+        {
+            public static string title;
+            public static string message;
+            public static string to;
+            public static string continuee;
+            public static string cancel;
+
         }
 
         public static class ToolTips
@@ -85,14 +97,15 @@
             public static string resetSettings;
             public static string target;
             public static string controllerToUse;
-            public static string avatarToUse;
             public static string layersToUse;
+            public static string avatarToUse;
+            public static string disableTooltips;
             public static string repathWhenRenamed;
             public static string repathWhenReparented;
             public static string warnWhenRenamed;
             public static string warnWhenReparented;
             public static string runWhenWindowClosed;
-            public static string disableTooltips;
+            public static string warnOnlyIfUsed;
         }
 
         public static void loadEnglisch()
@@ -128,18 +141,26 @@
             Settings.target = "Target";
             Settings.animatorComponent = "Animator Component";
             Settings.vrchatAvatar = "VRChat Avatar";
-            Settings.controllerToUse = "Controller to use";
+            Settings.controllerToUse = "Animator to use";
             Settings.layersToUse = "Layers to use";
             Settings.avatarToUse = "Avatar to use";
-            Settings.automatic = "Automatic";
-            Settings.repathWhenRenamed = "Repath when renamed";
-            Settings.repathWhenReparented = "Repath when reparented";
-            Settings.warnWhenRenamed = "Warn when renamed";
-            Settings.warnWhenReparented = "Warn when reparented";
-            Settings.runWhenWindowClosed = "Run when window is closed";
-            Settings.disableTooltips = "Disable tooltips";
+            Settings.disableTooltips = " Disable tooltips";
             Settings.language = "Language";
+            Settings.automatic = "Automatic";
+            Settings.repathWhenRenamed = " Repath when renamed";
+            Settings.repathWhenReparented = " Repath when reparented";
+            Settings.warnWhenRenamed = " Warn when renamed";
+            Settings.warnWhenReparented = " Warn when reparented";
+            Settings.runWhenWindowClosed = " Run when window is closed";
+            Settings.warnOnlyIfUsed = " Warn only if used";
+            Settings.warning = "This setting might cause slight lag when working with big Animator Controllers";
             Settings.credit = "Made by hfcRed";
+
+            Popup.title = "Animation Repathing";
+            Popup.message = "Change Animation Paths from";
+            Popup.to = " to ";
+            Popup.continuee = "Continue";
+            Popup.cancel = "Cancel";
 
             ToolTips.automatic = "Automatically change Animation Paths when something in the hierarchy gets changed";
             ToolTips.manual = "Manually change Animation Paths by hand";
@@ -160,19 +181,109 @@
             ToolTips.resetSettings = "Reset settings to their default values";
             ToolTips.target = "The object the tool should target. Can be set to either target the Animator Controller inside of the Animator Component of a Gameobject or target all Animator Controllers on a VRChat Avatar";
             ToolTips.controllerToUse = "The Gameobject which holds the Animator Component with the target Animator Controller";
-            ToolTips.avatarToUse = "The VRChat Avatar which holds the target Animator Controllers";
             ToolTips.layersToUse = "All of the Animator Controllers on the VRChat Avatar that the tool should target";
+            ToolTips.avatarToUse = "The VRChat Avatar which holds the target Animator Controllers";
+            ToolTips.disableTooltips = "Hide all Tooltips?";
             ToolTips.repathWhenRenamed = "Should the tool automatically change the Animation Paths if a Gameobject is renamed in the Hierarchy?";
             ToolTips.repathWhenReparented = "Should the tool automatically change the Animations Paths if a Gameobject is moved to a different spot in the Hierarchy?";
             ToolTips.warnWhenRenamed = "Should the tool show a pop-up message if a Gameobject is renamed in the Hierarchy?";
             ToolTips.warnWhenReparented = "Should the tool show a pop-up message if a Gameobject is moved to a different spot in the Hierarchy?";
             ToolTips.runWhenWindowClosed = "Should the tool still work even if the window has been closed?";
-            ToolTips.disableTooltips = "Hide all Tooltips?";
+            ToolTips.warnOnlyIfUsed = "Should the tool only warn you if the affected GameObject is used in your Animator Controllers?";
+
+            if (AARVariables.disableTooltips)
+            {
+                clearTooltips();
+            }
         }
 
         public static void loadJapanese()
         {
+            Main.windowName = "";
+            Main.automatic = "";
+            Main.manual = "";
 
+            Automatic.title = "";
+            Automatic.disabled = "";
+            Automatic.enabled = "";
+
+            Manual.title = "";
+            Manual.fixPaths = "";
+            Manual.editClips = "";
+
+            InvalidPaths.invalidPaths = "";
+            InvalidPaths.apply = "";
+            InvalidPaths.noInvalidPaths = "";
+            InvalidPaths.dragAndDrop = "";
+
+            ClipEditing.replacePartOfAll = "";
+            ClipEditing.from = "";
+            ClipEditing.to = "";
+            ClipEditing.apply = "";
+            ClipEditing.warning = "";
+            ClipEditing.replaceIndividual = "";
+            ClipEditing.noClipsSelected = "";
+            ClipEditing.dragAndDrop = "";
+
+            Settings.settings = "";
+            Settings.general = "";
+            Settings.target = "";
+            Settings.animatorComponent = "";
+            Settings.vrchatAvatar = "";
+            Settings.controllerToUse = "";
+            Settings.layersToUse = "";
+            Settings.avatarToUse = "";
+            Settings.disableTooltips = "";
+            Settings.language = "";
+            Settings.automatic = "";
+            Settings.repathWhenRenamed = "";
+            Settings.repathWhenReparented = "";
+            Settings.warnWhenRenamed = "";
+            Settings.warnWhenReparented = "";
+            Settings.runWhenWindowClosed = "";
+            Settings.warnOnlyIfUsed = "";
+            Settings.warning = "";
+            Settings.credit = "";
+
+            Popup.title = "";
+            Popup.message = "";
+            Popup.to = "";
+            Popup.continuee = "";
+            Popup.cancel = "";
+
+            ToolTips.automatic = "";
+            ToolTips.manual = "";
+            ToolTips.toggleButton = "";
+            ToolTips.fixPaths = "";
+            ToolTips.editClips = "";
+            ToolTips.resetInvalidPaths = "";
+            ToolTips.resetInvalidPath = "";
+            ToolTips.applyValidPath = "";
+            ToolTips.replacePartOfAll = "";
+            ToolTips.resetPartOfAll = "";
+            ToolTips.replaceFrom = "";
+            ToolTips.replaceTo = "";
+            ToolTips.applyPartOfAll = "";
+            ToolTips.replaceIndividual = "";
+            ToolTips.resetIndividual = "";
+            ToolTips.applyIndividual = "";
+            ToolTips.resetSettings = "";
+            ToolTips.target = "";
+            ToolTips.controllerToUse = "";
+            ToolTips.layersToUse = "";
+            ToolTips.avatarToUse = "";
+            ToolTips.disableTooltips = "";
+            ToolTips.repathWhenRenamed = "";
+            ToolTips.repathWhenReparented = "";
+            ToolTips.warnWhenRenamed = "";
+            ToolTips.warnWhenReparented = "";
+            ToolTips.runWhenWindowClosed = "";
+            ToolTips.warnOnlyIfUsed = "";
+
+            if (AARVariables.disableTooltips)
+            {
+                clearTooltips();
+            }
         }
 
         public static void clearTooltips()

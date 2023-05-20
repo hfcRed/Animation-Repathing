@@ -333,8 +333,10 @@ namespace AutoAnimationRepath
                         GUILayout.Label(new GUIContent(AARStrings.ClipEditing.replaceIndividual, AARStrings.ToolTips.replaceIndividual), AARStyle.replacePath);
                     }
 
-                    foreach (ClipsSharedProperty sp in clipsPathToSharedProperty.Values)
+                    for (int i = 0; i < clipsPathToSharedProperty.Values.Count; i++)
                     {
+                        ClipsSharedProperty sp = clipsPathToSharedProperty.Values.ElementAt(i);
+
                         string str = sp.oldPath;
 
                         using (new SqueezeScope((0, 0, 4), (0, 0, 3)))
@@ -518,18 +520,11 @@ namespace AutoAnimationRepath
                         disableTooltips = GUILayout.Toggle(disableTooltips, new GUIContent(AARStrings.Settings.disableTooltips, AARStrings.ToolTips.disableTooltips));
                         if (EditorGUI.EndChangeCheck())
                         {
-                            if (disableTooltips == true)
+                            if (disableTooltips)
                             {
                                 AARStrings.clearTooltips();
                             }
-                            else if (languageSelection == 0)
-                            {
-                                AARStrings.loadEnglisch();
-                            }
-                            else
-                            {
-                                AARStrings.loadJapanese();
-                            }
+                            else if (languageSelection == 0) AARStrings.loadEnglisch(); else AARStrings.loadJapanese();
                         }
                     }
                 }
@@ -545,14 +540,7 @@ namespace AutoAnimationRepath
                         languageSelection = EditorGUILayout.Popup(languageSelection, content);
                         if (EditorGUI.EndChangeCheck())
                         {
-                            if (languageSelection == 0)
-                            {
-                                AARStrings.loadEnglisch();
-                            }
-                            else
-                            {
-                                AARStrings.loadJapanese();
-                            }
+                            if (languageSelection == 0) AARStrings.loadEnglisch(); else AARStrings.loadJapanese();
                         }
                     }
                 }
@@ -576,13 +564,34 @@ namespace AutoAnimationRepath
                         reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(AARStrings.Settings.repathWhenReparented, AARStrings.ToolTips.repathWhenReparented));
                     }
 
-                    using (new SqueezeScope((5, 0, 4), (5, 5, 3)))
+                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
                     {
                         renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(AARStrings.Settings.warnWhenRenamed, AARStrings.ToolTips.warnWhenRenamed));
                         reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(AARStrings.Settings.warnWhenReparented, AARStrings.ToolTips.warnWhenReparented));
                     }
+                }
 
-                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
+                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                {
+                    using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
+                    {
+                        warnOnlyIfUsed = GUILayout.Toggle(warnOnlyIfUsed, new GUIContent(AARStrings.Settings.warnOnlyIfUsed, AARStrings.ToolTips.warnOnlyIfUsed));
+                    }
+
+                    using (new SqueezeScope((0, 5, 4), (5, 5, 3)))
+                    {
+                        GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("d_console.infoicon.inactive.sml").image, ""), GUILayout.Height(20), GUILayout.Width(20));
+
+                        Color c = GUI.color;
+                        GUI.color = new Color(0.75f, 0.75f, 0.75f);
+                        GUILayout.Label(AARStrings.Settings.warning, new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20));
+                        GUI.color = c;
+                    }
+                }
+
+                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+                {
+                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                     {
                         activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(AARStrings.Settings.runWhenWindowClosed, AARStrings.ToolTips.runWhenWindowClosed));
                     }

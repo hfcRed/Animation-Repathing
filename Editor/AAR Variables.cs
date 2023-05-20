@@ -92,18 +92,22 @@ namespace AutoAnimationRepath
         }
         public static Playables PlayableSelection = Playables.all;
 
+        /// <summary>
+        /// Uses the currently selected target from the settings and
+        /// returns either the Transform of the Animator Component
+        /// OR the Transform of the Avatar. 
+        /// </summary>
         public static Transform GetRoot()
         {
             return controllerSelection == 0 ?
             animator == null ? null : animator.transform : avatar == null ? null : avatar.transform;
         }
 
-        private static T EnsureNull<T>(T obj) where T : UnityEngine.Object
-        {
-            if (obj == null) obj = null;
-            return obj;
-        }
-
+        /// <summary>
+        /// Uses the currently selected target from the settings and
+        /// returns either the Animator Controller from the Animator Component
+        /// OR the Animator Controllers from the selected layers on an Avatar. 
+        /// </summary>
         public static List<AnimatorController> GetControllers()
         {
             List<AnimatorController> targetControllers = new List<AnimatorController>();
@@ -161,6 +165,12 @@ namespace AutoAnimationRepath
 #endif
             }
             return targetControllers;
+        }
+
+        private static T EnsureNull<T>(T obj) where T : UnityEngine.Object
+        {
+            if (obj == null) obj = null;
+            return obj;
         }
     }
 }

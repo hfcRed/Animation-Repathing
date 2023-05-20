@@ -72,18 +72,22 @@ namespace AutoAnimationRepath
             {
                 foreach (AnimatorController a in controllers)
                 {
-                    RepathParent(a);
+                    RepathAnimations(a);
                 }
             }
             else if (!warnOnlyIfUsed && (!reparentWarning || DisplayReparentDialog()))
             {
                 foreach (AnimatorController a in controllers)
                 {
-                    RepathParent(a);
+                    RepathAnimations(a);
                 }
             }
         }
 
+        /// <summary>
+        /// Returns true if any of the hierarchy changes affect an Animation Clip
+        /// in either the Animator Component OR Avatar currently targeted in the settings.
+        /// </summary>
         public static bool ScanAnimators()
         {
             List<AnimatorController> controllers = GetControllers();
@@ -112,7 +116,11 @@ namespace AutoAnimationRepath
             return returnValue;
         }
 
-        public static void RepathParent(AnimatorController target)
+        /// <summary>
+        /// Loops through all Animation Clips in an Animator Controller
+        /// and changes every animation path which contains the old hierarchy path to the new hierarchy path.
+        /// </summary>
+        public static void RepathAnimations(AnimatorController target)
         {
             try
             {
@@ -122,6 +130,9 @@ namespace AutoAnimationRepath
                 {
                     EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                     EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
+
+                    foreach (var fc in floatCurves) HandleBinding(fc, false);
+                    foreach (var oc in objectCurves) HandleBinding(oc, true);
 
                     void HandleBinding(EditorCurveBinding b, bool isObjectCurve)
                     {
@@ -141,22 +152,26 @@ namespace AutoAnimationRepath
                             AnimationUtility.SetEditorCurve(clip, b, floatCurve);
                         }
                     }
-
-                    foreach (var fc in floatCurves) HandleBinding(fc, false);
-                    foreach (var oc in objectCurves) HandleBinding(oc, true);
                 }
             }
             finally { AssetDatabase.StopAssetEditing(); }
         }
 
+        /// <summary>
+        /// Creates a window popup listing all hierarchy changes.
+        /// Returns true or false depending on if the user wants to continue or cancel.
+        /// </summary>
         private static bool DisplayReparentDialog()
         {
-            StringBuilder displayedChanges = new StringBuilder($"Repathing animation properties for:{Environment.NewLine}");
+            StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.message + $":{Environment.NewLine}");
 
-            foreach (var s in changedPaths.Keys.Zip(changedPaths.Values, (s1, s2) => $"{s1} to {s2}"))
+            foreach (var s in changedPaths.Keys.Zip(changedPaths.Values, (s1, s2) => $"\"{s1}\"" + AARStrings.Popup.to + $"\"{s2}\""))
+            {
+                displayedChanges.AppendLine("");
                 displayedChanges.AppendLine(s);
+            }
 
-            return EditorUtility.DisplayDialog("Auto Repathing", displayedChanges.ToString(), "Continue", "Cancel");
+            return EditorUtility.DisplayDialog(AARStrings.Popup.title, displayedChanges.ToString(), AARStrings.Popup.continuee, AARStrings.Popup.cancel);
         }
 
         public static void OnRootChanged()

@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 using static AutoAnimationRepath.AARVariables;
 
@@ -11,62 +12,61 @@ namespace AutoAnimationRepath
         {
             if (!EditorPrefs.HasKey("AARFirstStartup"))
             {
+                EditorPrefs.SetInt("AARFirstStartup", 1);
+            }
+
+            if (!PlayerPrefs.HasKey("AARFirstProjectStartup"))
+            {
                 ResetGeneralData();
                 ResetAutomaticData();
-                EditorPrefs.SetBool("AARFirstStartup", true);
+                PlayerPrefs.SetInt("AARFirstProjectStartup", 1);
             }
 
             EditorApplication.delayCall += () => { LoadData(); };
-
-            if (languageSelection == 0)
-            {
-                AARStrings.loadEnglisch();
-            }
-            else
-            {
-                AARStrings.loadJapanese();
-            }
         }
 
         public static void SaveData()
         {
-            EditorPrefs.SetBool("AAREnabled", automaticIsEnabled);
-            EditorPrefs.SetBool("AARRenameActive", renameActive);
-            EditorPrefs.SetBool("AARReparentActive", reparentActive);
-            EditorPrefs.SetBool("AARRenameWarning", renameWarning);
-            EditorPrefs.SetBool("AARReparentWarning", reparentWarning);
-            EditorPrefs.SetBool("AARRunInBackground", activeInBackground);
-            EditorPrefs.SetBool("AARTooltips", disableTooltips);
+            PlayerPrefs.SetInt("AAREnabled", automaticIsEnabled ? 1 : 0);
+            PlayerPrefs.SetInt("AARRenameActive", renameActive ? 1 : 0);
+            PlayerPrefs.SetInt("AARReparentActive", reparentActive ? 1 : 0);
+            PlayerPrefs.SetInt("AARRenameWarning", renameWarning ? 1 : 0);
+            PlayerPrefs.SetInt("AARReparentWarning", reparentWarning ? 1 : 0);
+            PlayerPrefs.SetInt("AARRunInBackground", activeInBackground ? 1 : 0);
+            PlayerPrefs.SetInt("AARTooltips", disableTooltips ? 1 : 0);
+            PlayerPrefs.SetInt("AARWarnOnlyIfUsed", warnOnlyIfUsed ? 1 : 0);
 
-            EditorPrefs.SetInt("AARToolSelection", toolSelection);
-            EditorPrefs.SetInt("AARManualToolSelection", manualToolSelection);
-            EditorPrefs.SetInt("AARControllerSelection", controllerSelection);
-            EditorPrefs.SetInt("AARLanguageSelection", languageSelection);
-            EditorPrefs.SetInt("AARPlayableSelection", (int)PlayableSelection);
+            PlayerPrefs.SetInt("AARToolSelection", toolSelection);
+            PlayerPrefs.SetInt("AARManualToolSelection", manualToolSelection);
+            PlayerPrefs.SetInt("AARControllerSelection", controllerSelection);
+            PlayerPrefs.SetInt("AARLanguageSelection", languageSelection);
+            PlayerPrefs.SetInt("AARPlayableSelection", (int)PlayableSelection);
 
-            EditorPrefs.SetString("AARAvatar", avatar == null ? null : avatar.name);
-            EditorPrefs.SetString("AARController", animator == null ? null : animator.gameObject.name);
+            PlayerPrefs.SetString("AARAvatar", avatar == null ? null : avatar.name);
+            PlayerPrefs.SetString("AARController", animator == null ? null : animator.gameObject.name);
         }
 
         public static void LoadData()
         {
-            automaticIsEnabled = EditorPrefs.GetBool("AAREnabled");
-            renameActive = EditorPrefs.GetBool("AARRenameActive");
-            reparentActive = EditorPrefs.GetBool("AARReparentActive");
-            renameWarning = EditorPrefs.GetBool("AARRenameWarning");
-            reparentWarning = EditorPrefs.GetBool("AARReparentWarning");
-            activeInBackground = EditorPrefs.GetBool("AARRunInBackground");
-            disableTooltips = EditorPrefs.GetBool("AARTooltips");
+            automaticIsEnabled = PlayerPrefs.GetInt("AAREnabled") != 0;
+            renameActive = PlayerPrefs.GetInt("AARRenameActive") != 0;
+            reparentActive = PlayerPrefs.GetInt("AARReparentActive") != 0;
+            renameWarning = PlayerPrefs.GetInt("AARRenameWarning") != 0;
+            reparentWarning = PlayerPrefs.GetInt("AARReparentWarning") != 0;
+            activeInBackground = PlayerPrefs.GetInt("AARRunInBackground") != 0;
+            disableTooltips = PlayerPrefs.GetInt("AARTooltips") != 0;
+            warnOnlyIfUsed = PlayerPrefs.GetInt("AARWarnOnlyIfUsed") != 0;
 
-            toolSelection = EditorPrefs.GetInt("AARToolSelection");
-            manualToolSelection = EditorPrefs.GetInt("AARManualToolSelection");
-            controllerSelection = EditorPrefs.GetInt("AARControllerSelection");
-            languageSelection = EditorPrefs.GetInt("AARLanguageSelection");
-            PlayableSelection = (Playables)EditorPrefs.GetInt("AARPlayableSelection");
+            toolSelection = PlayerPrefs.GetInt("AARToolSelection");
+            manualToolSelection = PlayerPrefs.GetInt("AARManualToolSelection");
+            controllerSelection = PlayerPrefs.GetInt("AARControllerSelection");
+            languageSelection = PlayerPrefs.GetInt("AARLanguageSelection");
+            PlayableSelection = (Playables)PlayerPrefs.GetInt("AARPlayableSelection");
 
-            avatar = GameObject.Find(EditorPrefs.GetString("AARAvatar"));
-            animator = GameObject.Find(EditorPrefs.GetString("AARController"))?.GetComponent<Animator>();
-            //controller = animator?.runtimeAnimatorController as AnimatorController;
+            avatar = GameObject.Find(PlayerPrefs.GetString("AARAvatar"));
+            animator = GameObject.Find(PlayerPrefs.GetString("AARController"))?.GetComponent<Animator>();
+
+            if (languageSelection == 0) AARStrings.loadEnglisch(); else AARStrings.loadJapanese();
         }
 
         public static void ResetGeneralData()
