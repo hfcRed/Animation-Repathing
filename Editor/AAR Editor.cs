@@ -9,9 +9,10 @@ using static AutoAnimationRepath.AARVariables;
 
 namespace AutoAnimationRepath
 {
+    [InitializeOnLoad]
     public class AAREditor : EditorWindow
     {
-        [MenuItem("hfcRed/Tools/Animation Repathing")]
+        [MenuItem("Window/hfcRed/Tools/Animation Repathing")]
         static void ShowWindow() => GetWindow<AAREditor>("Animation Repathing").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;

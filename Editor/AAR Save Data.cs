@@ -75,7 +75,6 @@ namespace AutoAnimationRepath
             PlayableSelection = Playables.all;
             animator = null;
             avatar = null;
-
             SaveData();
         }
 
