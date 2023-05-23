@@ -14,8 +14,10 @@ Animation Repathing allows you to:
 * Directly edit the animation paths inside of selected animation clips
 * Target Playable Layers on VRChat Avatars
 
-## [![Generic badge](https://img.shields.io/badge/-Download_Unitypackage_​_​_​_​-success?style=flat)](https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation_Repathing.unitypackage)
+​
 
-## [![Generic badge](https://img.shields.io/badge/-Add_To_Creator_Companion​-informational?style=flat)](https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation_Repathing.unitypackage)
+[![Generic badge](https://img.shields.io/badge/-Download_Unitypackage_​_​_​_​-success?style=flat)](https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation_Repathing.unitypackage)
+
+[![Generic badge](https://img.shields.io/badge/-Add_To_Creator_Companion​-informational?style=flat)](https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation_Repathing.unitypackage)
 
 ___
