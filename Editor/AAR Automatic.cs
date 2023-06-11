@@ -68,14 +68,14 @@ namespace AutoAnimationRepath
 
             if (changedPaths.Count == 0) return;
 
-            if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || DisplayReparentDialog()))
+            if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || EditorUtility.DisplayDialog(AARStrings.Popup.title, AARStrings.Popup.message, AARStrings.Popup.continuee, AARStrings.Popup.cancel)))
             {
                 foreach (AnimatorController a in controllers)
                 {
                     RepathAnimations(a);
                 }
             }
-            else if (!warnOnlyIfUsed && (!reparentWarning || DisplayReparentDialog()))
+            else if (!warnOnlyIfUsed && (!reparentWarning || EditorUtility.DisplayDialog(AARStrings.Popup.title, AARStrings.Popup.message, AARStrings.Popup.continuee, AARStrings.Popup.cancel)))
             {
                 foreach (AnimatorController a in controllers)
                 {
@@ -125,6 +125,7 @@ namespace AutoAnimationRepath
             try
             {
                 AssetDatabase.StartAssetEditing();
+                StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.debug);
 
                 foreach (AnimationClip clip in target.animationClips)
                 {
@@ -139,6 +140,10 @@ namespace AutoAnimationRepath
                         if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
                         if (isObjectCurve)
                         {
+                            string s = b.path + AARStrings.Popup.to + newPath;
+                            displayedChanges.AppendLine("");
+                            displayedChanges.AppendLine(s);
+
                             ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, b);
                             AnimationUtility.SetObjectReferenceCurve(clip, b, null);
                             b.path = newPath;
@@ -146,6 +151,10 @@ namespace AutoAnimationRepath
                         }
                         else
                         {
+                            string s = b.path + AARStrings.Popup.to + newPath;
+                            displayedChanges.AppendLine("");
+                            displayedChanges.AppendLine(s);
+
                             AnimationCurve floatCurve = isObjectCurve ? null : AnimationUtility.GetEditorCurve(clip, b);
                             AnimationUtility.SetEditorCurve(clip, b, null);
                             b.path = newPath;
@@ -153,6 +162,7 @@ namespace AutoAnimationRepath
                         }
                     }
                 }
+                Debug.Log(displayedChanges.ToString());
             }
             finally { AssetDatabase.StopAssetEditing(); }
         }
@@ -161,7 +171,7 @@ namespace AutoAnimationRepath
         /// Creates a window popup listing all hierarchy changes.
         /// Returns true or false depending on if the user wants to continue or cancel.
         /// </summary>
-        private static bool DisplayReparentDialog()
+        /*private static bool DisplayReparentDialog()
         {
             StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.message + $":{Environment.NewLine}");
 
@@ -170,9 +180,8 @@ namespace AutoAnimationRepath
                 displayedChanges.AppendLine("");
                 displayedChanges.AppendLine(s);
             }
-
             return EditorUtility.DisplayDialog(AARStrings.Popup.title, displayedChanges.ToString(), AARStrings.Popup.continuee, AARStrings.Popup.cancel);
-        }
+        }*/
 
         public static void OnRootChanged()
         {

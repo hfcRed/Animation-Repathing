@@ -1,4 +1,6 @@
-﻿namespace AutoAnimationRepath
+﻿using System.Runtime.CompilerServices;
+
+namespace AutoAnimationRepath
 {
     public static class AARStrings
     {
@@ -73,7 +75,7 @@
             public static string to;
             public static string continuee;
             public static string cancel;
-
+            public static string debug;
         }
 
         public static class ToolTips
@@ -157,10 +159,11 @@
             Settings.credit = "Made by hfcRed";
 
             Popup.title = "Animation Repathing";
-            Popup.message = "Change Animation Paths from";
-            Popup.to = " to ";
-            Popup.continuee = "Continue";
-            Popup.cancel = "Cancel";
+            Popup.message = "Hierarchy changes detected, would you like to repath your animations?";
+            Popup.to = "  ==>  ";
+            Popup.continuee = "Yes";
+            Popup.cancel = "No";
+            Popup.debug = "Animation Repathing:";
 
             ToolTips.automatic = "Automatically change Animation Paths when something in the hierarchy gets changed";
             ToolTips.manual = "Manually change Animation Paths by hand";
@@ -250,6 +253,7 @@
             Popup.to = "";
             Popup.continuee = "";
             Popup.cancel = "";
+            Popup.debug = "";
 
             ToolTips.automatic = "";
             ToolTips.manual = "";
