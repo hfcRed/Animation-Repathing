@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -70,17 +71,21 @@ namespace AutoAnimationRepath
 
             if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || EditorUtility.DisplayDialog(AARStrings.Popup.title, AARStrings.Popup.message, AARStrings.Popup.continuee, AARStrings.Popup.cancel)))
             {
+                StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.debug);
                 foreach (AnimatorController a in controllers)
                 {
-                    RepathAnimations(a);
+                    RepathAnimations(a, displayedChanges);
                 }
+                Debug.Log(displayedChanges);
             }
             else if (!warnOnlyIfUsed && (!reparentWarning || EditorUtility.DisplayDialog(AARStrings.Popup.title, AARStrings.Popup.message, AARStrings.Popup.continuee, AARStrings.Popup.cancel)))
             {
+                StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.debug);
                 foreach (AnimatorController a in controllers)
                 {
-                    RepathAnimations(a);
+                    RepathAnimations(a, displayedChanges);
                 }
+                Debug.Log(displayedChanges);
             }
         }
 
@@ -120,12 +125,11 @@ namespace AutoAnimationRepath
         /// Loops through all Animation Clips in an Animator Controller
         /// and changes every animation path which contains the old hierarchy path to the new hierarchy path.
         /// </summary>
-        public static void RepathAnimations(AnimatorController target)
+        public static void RepathAnimations(AnimatorController target, StringBuilder displayedChanges)
         {
             try
             {
                 AssetDatabase.StartAssetEditing();
-                StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.debug);
 
                 foreach (AnimationClip clip in target.animationClips)
                 {
@@ -162,26 +166,9 @@ namespace AutoAnimationRepath
                         }
                     }
                 }
-                Debug.Log(displayedChanges.ToString());
             }
             finally { AssetDatabase.StopAssetEditing(); }
         }
-
-        /// <summary>
-        /// Creates a window popup listing all hierarchy changes.
-        /// Returns true or false depending on if the user wants to continue or cancel.
-        /// </summary>
-        /*private static bool DisplayReparentDialog()
-        {
-            StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.message + $":{Environment.NewLine}");
-
-            foreach (var s in changedPaths.Keys.Zip(changedPaths.Values, (s1, s2) => $"\"{s1}\"" + AARStrings.Popup.to + $"\"{s2}\""))
-            {
-                displayedChanges.AppendLine("");
-                displayedChanges.AppendLine(s);
-            }
-            return EditorUtility.DisplayDialog(AARStrings.Popup.title, displayedChanges.ToString(), AARStrings.Popup.continuee, AARStrings.Popup.cancel);
-        }*/
 
         public static void OnRootChanged()
         {
@@ -190,7 +177,7 @@ namespace AutoAnimationRepath
             Transform root = GetRoot();
             if (!root) return;
 
-            var allChildren = root.GetComponentsInChildren<Transform>();
+            var allChildren = root.GetComponentsInChildren<Transform>(true);
             for (int i = 1; i < allChildren.Length; i++)
             {
                 var t = allChildren[i];
