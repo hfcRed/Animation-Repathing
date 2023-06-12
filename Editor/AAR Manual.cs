@@ -52,7 +52,7 @@ namespace AutoAnimationRepath
                 }
             }
 
-            public static void RenameInvalidPaths(AnimationClip clip, string oldPath, string newPath)
+            public static void RenameInvalidPaths(AnimationClip clip, string newPath)
             {
                 EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                 EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);

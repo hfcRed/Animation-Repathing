@@ -13,7 +13,7 @@ namespace AutoAnimationRepath
     public class AAREditor : EditorWindow
     {
         [MenuItem("hfcRed/Tools/Animation Repathing")]
-        static void ShowWindow() => GetWindow<AAREditor>("Animation Repathing").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
+        public static void ShowWindow() => GetWindow<AAREditor>("Animation Repathing").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
         public void OnGUI()
@@ -153,7 +153,7 @@ namespace AutoAnimationRepath
 
                             foreach (AnimationClip clip in sp.foldoutClips)
                             {
-                                AARManual.InvalidPaths.RenameInvalidPaths(clip, sp.oldPath, sp.newPath);
+                                AARManual.InvalidPaths.RenameInvalidPaths(clip, sp.newPath);
                             }
                         }
                         finally { AssetDatabase.StopAssetEditing(); }
@@ -490,7 +490,7 @@ namespace AutoAnimationRepath
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
                             GUILayout.Label(new GUIContent(AARStrings.Settings.controllerToUse, AARStrings.ToolTips.controllerToUse), GUILayout.Width(150));
-                            animator = (Animator)EditorGUILayout.ObjectField(animator, typeof(Animator), true);
+                            AARVariables.Animator = (Animator)EditorGUILayout.ObjectField(AARVariables.Animator, typeof(Animator), true);
                         }
                     }
                     else
@@ -498,10 +498,10 @@ namespace AutoAnimationRepath
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
                             GUILayout.Label(new GUIContent(AARStrings.Settings.avatarToUse, AARStrings.ToolTips.avatarToUse), GUILayout.Width(150));
-                            avatar = (GameObject)EditorGUILayout.ObjectField(avatar, typeof(GameObject), true);
+                            AARVariables.Avatar = (GameObject)EditorGUILayout.ObjectField(AARVariables.Avatar, typeof(GameObject), true);
                         }
 #if VRC_SDK_VRCSDK3
-                        if (avatar != null && avatar.GetComponent<VRCAvatarDescriptor>() != null)
+                        if (AARVariables.Avatar != null && AARVariables.Avatar.GetComponent<VRCAvatarDescriptor>() != null)
                         {
                             using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
                             {
@@ -523,9 +523,9 @@ namespace AutoAnimationRepath
                         {
                             if (disableTooltips)
                             {
-                                AARStrings.clearTooltips();
+                                AARStrings.ClearTooltips();
                             }
-                            else if (languageSelection == 0) AARStrings.loadEnglisch(); else AARStrings.loadJapanese();
+                            else if (languageSelection == 0) AARStrings.LoadEnglisch(); else AARStrings.LoadJapanese();
                         }
                     }
                 }
@@ -541,7 +541,7 @@ namespace AutoAnimationRepath
                         languageSelection = EditorGUILayout.Popup(languageSelection, content);
                         if (EditorGUI.EndChangeCheck())
                         {
-                            if (languageSelection == 0) AARStrings.loadEnglisch(); else AARStrings.loadJapanese();
+                            if (languageSelection == 0) AARStrings.LoadEnglisch(); else AARStrings.LoadJapanese();
                         }
                     }
                 }
@@ -650,8 +650,8 @@ namespace AutoAnimationRepath
                 {
                     var go = draggedObjects.First();
                     string p = controllerSelection == 0 ?
-                    animator == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, animator.transform) :
-                    avatar == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, avatar.transform);
+                    AARVariables.Animator == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, AARVariables.Animator.transform) :
+                    AARVariables.Avatar == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, AARVariables.Avatar.transform);
                     return (p);
                 }
             }
@@ -674,7 +674,7 @@ namespace AutoAnimationRepath
 
     public class SqueezeScope : System.IDisposable
     {
-        private SqueezeSettings[] settings;
+        private readonly SqueezeSettings[] settings;
         //0 = none
         //1 = Horizontal
         //2 = Vertical

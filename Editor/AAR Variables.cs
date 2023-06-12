@@ -53,7 +53,7 @@ namespace AutoAnimationRepath
         public static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
         public static Animator _animator;
         public static GameObject _avatar;
-        public static Animator animator
+        public static Animator Animator
         {
             get => _animator;
             set
@@ -65,7 +65,7 @@ namespace AutoAnimationRepath
                 }
             }
         }
-        public static GameObject avatar
+        public static GameObject Avatar
         {
             get => _avatar;
             set
@@ -100,7 +100,7 @@ namespace AutoAnimationRepath
         public static Transform GetRoot()
         {
             return controllerSelection == 0 ?
-            animator == null ? null : animator.transform : avatar == null ? null : avatar.transform;
+            Animator?.transform : Avatar?.transform;
         }
 
         /// <summary>
@@ -112,14 +112,14 @@ namespace AutoAnimationRepath
         {
             List<AnimatorController> targetControllers = new List<AnimatorController>();
 
-            if (controllerSelection == 0 && animator != null)
+            if (controllerSelection == 0 && Animator != null)
             {
-                targetControllers.Add(animator?.runtimeAnimatorController as AnimatorController);
+                targetControllers.Add(Animator?.runtimeAnimatorController as AnimatorController);
             }
-            else if (controllerSelection == 1 && avatar != null && avatar.GetComponent<VRCAvatarDescriptor>() != null)
+            else if (controllerSelection == 1 && Avatar != null && Avatar.GetComponent<VRCAvatarDescriptor>() != null)
             {
 #if VRC_SDK_VRCSDK3
-                VRCAvatarDescriptor descriptor = avatar.GetComponent<VRCAvatarDescriptor>();
+                VRCAvatarDescriptor descriptor = Avatar.GetComponent<VRCAvatarDescriptor>();
 
                 foreach (Playables playable in Enum.GetValues(typeof(Playables)))
                 {

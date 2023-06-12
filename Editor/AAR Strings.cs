@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace AutoAnimationRepath
+﻿namespace AutoAnimationRepath
 {
     public static class AARStrings
     {
@@ -110,7 +108,7 @@ namespace AutoAnimationRepath
             public static string warnOnlyIfUsed;
         }
 
-        public static void loadEnglisch()
+        public static void LoadEnglisch()
         {
             Main.windowName = "Animation Repathing";
             Main.automatic = "Automatic";
@@ -196,11 +194,11 @@ namespace AutoAnimationRepath
 
             if (AARVariables.disableTooltips)
             {
-                clearTooltips();
+                ClearTooltips();
             }
         }
 
-        public static void loadJapanese()
+        public static void LoadJapanese()
         {
             Main.windowName = "";
             Main.automatic = "";
@@ -286,11 +284,11 @@ namespace AutoAnimationRepath
 
             if (AARVariables.disableTooltips)
             {
-                clearTooltips();
+                ClearTooltips();
             }
         }
 
-        public static void clearTooltips()
+        public static void ClearTooltips()
         {
             ToolTips.automatic = "";
             ToolTips.manual = "";

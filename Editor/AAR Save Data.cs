@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using static AutoAnimationRepath.AARVariables;
 
@@ -42,8 +41,8 @@ namespace AutoAnimationRepath
             PlayerPrefs.SetInt("AARLanguageSelection", languageSelection);
             PlayerPrefs.SetInt("AARPlayableSelection", (int)PlayableSelection);
 
-            PlayerPrefs.SetString("AARAvatar", avatar == null ? null : avatar.name);
-            PlayerPrefs.SetString("AARController", animator == null ? null : animator.gameObject.name);
+            PlayerPrefs.SetString("AARAvatar", AARVariables.Avatar?.name);
+            PlayerPrefs.SetString("AARController", AARVariables.Animator?.gameObject.name);
         }
 
         public static void LoadData()
@@ -63,18 +62,18 @@ namespace AutoAnimationRepath
             languageSelection = PlayerPrefs.GetInt("AARLanguageSelection");
             PlayableSelection = (Playables)PlayerPrefs.GetInt("AARPlayableSelection");
 
-            avatar = GameObject.Find(PlayerPrefs.GetString("AARAvatar"));
-            animator = GameObject.Find(PlayerPrefs.GetString("AARController"))?.GetComponent<Animator>();
+            AARVariables.Avatar = GameObject.Find(PlayerPrefs.GetString("AARAvatar"));
+            AARVariables.Animator = GameObject.Find(PlayerPrefs.GetString("AARController"))?.GetComponent<Animator>();
 
-            if (languageSelection == 0) AARStrings.loadEnglisch(); else AARStrings.loadJapanese();
+            if (languageSelection == 0) AARStrings.LoadEnglisch(); else AARStrings.LoadJapanese();
         }
 
         public static void ResetGeneralData()
         {
             controllerSelection = 0;
             PlayableSelection = Playables.all;
-            animator = null;
-            avatar = null;
+            AARVariables.Animator = null;
+            AARVariables.Avatar = null;
             SaveData();
         }
 

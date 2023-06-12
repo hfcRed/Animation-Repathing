@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -105,10 +102,10 @@ namespace AutoAnimationRepath
                     EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                     EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                    foreach (var fc in floatCurves) CheckBindings(fc, false);
-                    foreach (var oc in objectCurves) CheckBindings(oc, true);
+                    foreach (var fc in floatCurves) CheckBindings(fc);
+                    foreach (var oc in objectCurves) CheckBindings(oc);
 
-                    void CheckBindings(EditorCurveBinding binding, bool isObjectCurve)
+                    void CheckBindings(EditorCurveBinding binding)
                     {
                         if (changedPaths.TryGetValue(binding.path, out string newPath))
                         {
