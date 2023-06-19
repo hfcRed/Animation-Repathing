@@ -47,10 +47,14 @@ namespace AutoAnimationRepath
                 var client = new UnityWebRequest(downloadURL);
 
                 client.downloadHandler = new DownloadHandlerFile(outPath);
-                client.SendWebRequest().completed += AO =>
+                client.SendWebRequest().completed += AA =>
                 {
                     AssetDatabase.ImportAsset(outPath);
                     AssetDatabase.ImportPackage(outPath, true);
+                    AssetDatabase.importPackageStarted += AB =>
+                    {
+                        AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath("235e4dc8aed3ccb4d810a6b68c176559"));
+                    };
                     AssetDatabase.DeleteAsset(outPath);
                     client.Dispose();
                 };
