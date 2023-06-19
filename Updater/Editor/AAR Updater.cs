@@ -53,9 +53,17 @@ namespace AutoAnimationRepath
                     AssetDatabase.ImportPackage(outPath, true);
                     AssetDatabase.importPackageStarted += AB =>
                     {
-                        AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath("235e4dc8aed3ccb4d810a6b68c176559"));
+                        string[] toDelete = AssetDatabase.FindAssets("", new string[] { AssetDatabase.GUIDToAssetPath("235e4dc8aed3ccb4d810a6b68c176559") });
+                        foreach (string s in toDelete)
+                        {
+                            if (s != null)
+                            {
+                                var path = AssetDatabase.GUIDToAssetPath(s);
+                                AssetDatabase.DeleteAsset(path);
+                            }
+                        }
                     };
-                    AssetDatabase.DeleteAsset(outPath);
+                    if (outPath != null) AssetDatabase.DeleteAsset(outPath);
                     client.Dispose();
                 };
             }
