@@ -467,12 +467,12 @@ namespace AutoAnimationRepath
 
                 if (availableUpdate)
                 {
-                    using (new SqueezeScope((10, -5, 4), (5, 5, 3)))
+                    using (new SqueezeScope((10, -5, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                     {
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label("New Version Available!");
+                        GUILayout.Label("New Version Available!", GUILayout.Height(25));
                         GUILayout.Space(10);
-                        if (GUILayout.Button("Update " + currentVersion + " => " + newestVersion))
+                        if (GUILayout.Button("Update " + currentVersion + " => " + newestVersion, GUILayout.Height(25)))
                         {
                             AARUpdater.UpdateTool();
                         }
