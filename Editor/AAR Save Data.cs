@@ -66,6 +66,8 @@ namespace AutoAnimationRepath
             AARVariables.Animator = GameObject.Find(PlayerPrefs.GetString("AARController"))?.GetComponent<Animator>();
 
             if (languageSelection == 0) AARStrings.LoadEnglisch(); else AARStrings.LoadJapanese();
+
+            availableUpdate = AARUpdater.CheckForNewVersion();
         }
 
         public static void ResetGeneralData()
@@ -87,6 +89,11 @@ namespace AutoAnimationRepath
             warnOnlyIfUsed = true;
 
             SaveData();
+        }
+
+        public static string CheckVersion()
+        {
+            return null;
         }
     }
 }

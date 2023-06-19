@@ -8,6 +8,9 @@ namespace AutoAnimationRepath
 {
     public class AARVariables
     {
+        public static string currentVersion;
+        public static string newestVersion;
+        public static bool availableUpdate;
         public static bool automaticIsEnabled;
         public static int toolSelection;
         public static int manualToolSelection;

@@ -16,6 +16,7 @@ namespace AutoAnimationRepath
         public static void ShowWindow() => GetWindow<AAREditor>("Animation Repathing").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
+
         public void OnGUI()
         {
             Repaint();
@@ -53,10 +54,10 @@ namespace AutoAnimationRepath
             {
                 using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("Profiler.Memory").image, ""), GUILayout.Width(20), GUILayout.Height(25));
                     GUILayout.Label("<color=#ffffff><b>" + AARStrings.Automatic.title + "</b></color>", AARStyle.title);
+                    GUILayout.FlexibleSpace();
                 }
 
                 using (new SqueezeScope((15, 0, 4)))
@@ -73,10 +74,10 @@ namespace AutoAnimationRepath
             {
                 using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("ViewToolMove").image, ""), GUILayout.Width(20), GUILayout.Height(25));
                     GUILayout.Label("<color=#ffffff><b>" + AARStrings.Manual.title + "</b></color>", AARStyle.title);
+                    GUILayout.FlexibleSpace();
                 }
 
                 using (new SqueezeScope((15, 0, 4)))
@@ -99,9 +100,9 @@ namespace AutoAnimationRepath
             {
                 using (new SqueezeScope((0, 5, 4), (0, 0, 4, GUI.skin.box), (5, 5, 3)))
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(AARStrings.InvalidPaths.invalidPaths), AARStyle.foldout);
+                    GUILayout.FlexibleSpace();
                 }
 
                 if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, AARStrings.ToolTips.resetInvalidPaths), GUILayout.Height(25)))
@@ -186,17 +187,17 @@ namespace AutoAnimationRepath
             {
                 if (invalidPathToSharedProperty.Count == 0)
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("TestPassed").image, ""), GUILayout.Width(20), GUILayout.Height(21));
                     GUILayout.Label(AARStrings.InvalidPaths.noInvalidPaths, AARStyle.invalidPathTip, GUILayout.Height(20));
+                    GUILayout.FlexibleSpace();
                 }
                 else
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("GameObject Icon").image, ""), GUILayout.Width(20), GUILayout.Height(21));
                     GUILayout.Label(AARStrings.InvalidPaths.dragAndDrop, AARStyle.invalidPathTip, GUILayout.Height(20));
+                    GUILayout.FlexibleSpace();
                 }
             }
         }
@@ -209,9 +210,9 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 3)))
                     {
-                        GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                        GUILayout.FlexibleSpace();
                         GUILayout.Label(new GUIContent(AARStrings.ClipEditing.replacePartOfAll, AARStrings.ToolTips.replacePartOfAll), AARStyle.replacePath);
+                        GUILayout.FlexibleSpace();
                     }
 
                     using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
@@ -329,9 +330,9 @@ namespace AutoAnimationRepath
 
                     using (new SqueezeScope((0, 10, 4), (0, 0, 4, GUI.skin.box), (5, 5, 3)))
                     {
-                        GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                        GUILayout.FlexibleSpace();
                         GUILayout.Label(new GUIContent(AARStrings.ClipEditing.replaceIndividual, AARStrings.ToolTips.replaceIndividual), AARStyle.replacePath);
+                        GUILayout.FlexibleSpace();
                     }
 
                     for (int i = 0; i < clipsPathToSharedProperty.Values.Count; i++)
@@ -434,17 +435,17 @@ namespace AutoAnimationRepath
             {
                 if (clipsSelected.Count == 0)
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("AnimationClip Icon").image, ""), GUILayout.Width(20), GUILayout.Height(21));
                     GUILayout.Label(AARStrings.ClipEditing.noClipsSelected, AARStyle.invalidPathTip, GUILayout.Height(20));
+                    GUILayout.FlexibleSpace();
                 }
                 else
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("GameObject Icon").image, ""), GUILayout.Width(20), GUILayout.Height(21));
                     GUILayout.Label(AARStrings.ClipEditing.dragAndDrop, AARStyle.invalidPathTip, GUILayout.Height(20));
+                    GUILayout.FlexibleSpace();
                 }
             }
         }
@@ -458,10 +459,25 @@ namespace AutoAnimationRepath
 
                 using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
-
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("SettingsIcon").image, ""), GUILayout.Width(20), GUILayout.Height(30));
                     GUILayout.Label("<color=#ffffff><b>" + AARStrings.Settings.settings + "</b></color>", AARStyle.settings, GUILayout.Height(30));
+                    GUILayout.FlexibleSpace();
+                }
+
+                if (availableUpdate)
+                {
+                    using (new SqueezeScope((10, -5, 4), (5, 5, 3)))
+                    {
+                        GUILayout.FlexibleSpace();
+                        GUILayout.Label("New Version Available!");
+                        GUILayout.Space(10);
+                        if (GUILayout.Button("Update " + currentVersion + " => " + newestVersion))
+                        {
+                            AARUpdater.UpdateTool();
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
                 }
 
                 using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
@@ -600,7 +616,7 @@ namespace AutoAnimationRepath
 
                 using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
                 {
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
+                    GUILayout.FlexibleSpace();
 
                     if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Width(20), GUILayout.Height(21)))
                         Application.OpenURL("https://hfcred.carrd.co");
@@ -614,7 +630,7 @@ namespace AutoAnimationRepath
                         EditorGUI.DrawRect(new Rect(r.x, r.y + 17, r.width, 1), new Color(0.49f, 0.678f, 0.957f));
                     }
 
-                    GUILayout.Label("", GUILayout.ExpandWidth(true));
+                    GUILayout.FlexibleSpace();
                 }
             }
         }
