@@ -472,7 +472,7 @@ namespace AutoAnimationRepath
                         GUILayout.FlexibleSpace();
                         GUILayout.Label("New Version Available!", GUILayout.Height(25));
                         GUILayout.Space(10);
-                        if (GUILayout.Button("Update " + currentVersion + " => " + newestVersion, GUILayout.Height(25)))
+                        if (GUILayout.Button("Update  " + currentVersion + " ==> " + newestVersion, GUILayout.Height(25)))
                         {
                             AARUpdater.UpdateTool();
                         }
@@ -614,7 +614,7 @@ namespace AutoAnimationRepath
                     }
                 }
 
-                using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
+                using (new SqueezeScope((10, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
                     GUILayout.FlexibleSpace();
 
@@ -629,6 +629,18 @@ namespace AutoAnimationRepath
                     {
                         EditorGUI.DrawRect(new Rect(r.x, r.y + 17, r.width, 1), new Color(0.49f, 0.678f, 0.957f));
                     }
+
+                    GUILayout.FlexibleSpace();
+                }
+
+                using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
+                {
+                    GUILayout.FlexibleSpace();
+
+                    Color c = GUI.color;
+                    GUI.color = new Color(0.75f, 0.75f, 0.75f);
+                    GUILayout.Label(currentVersion);
+                    GUI.color = c;
 
                     GUILayout.FlexibleSpace();
                 }
