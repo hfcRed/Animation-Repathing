@@ -6,6 +6,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using static AutoAnimationRepath.AARVariables;
+using System.Text;
 
 namespace AutoAnimationRepath
 {
@@ -135,12 +136,16 @@ namespace AutoAnimationRepath
                     GUIContent content = sp.foldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
                     sp.foldout = GUILayout.Toggle(sp.foldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
 
+                    GUILayout.Space(5);
+
                     sp.newPath = GUILayout.TextField(sp.newPath, GUILayout.MinWidth(1));
                     string path = DragAndDropGameobject();
                     if (path != null)
                     {
                         sp.newPath = path;
                     }
+
+                    GUILayout.Space(5);
 
                     if (sp.newPath == string.Empty || sp.newPath == sp.oldPath)
                     {
@@ -283,7 +288,7 @@ namespace AutoAnimationRepath
 
                         GUILayout.Space(5);
 
-                        if (clipsReplaceFrom == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
+                        if (clipsReplaceFrom == string.Empty || clipsReplaceTo == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
                         {
                             EditorGUI.BeginDisabledGroup(true);
                         }
@@ -368,18 +373,43 @@ namespace AutoAnimationRepath
                             GUIContent content = sp.foldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
                             sp.foldout = GUILayout.Toggle(sp.foldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
 
-                            if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
+                            if (clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
                             {
-                                GUI.contentColor = Color.green;
+                                string[] s = sp.oldPath.Split(new string[] { clipsReplaceFrom }, StringSplitOptions.None);
+                                StringBuilder stringBuilder = new StringBuilder();
+
+                                for (int ii = 0; ii < s.Length; ii++)
+                                {
+                                    if (ii != 0)
+                                    {
+                                        if (s.Length < 3)
+                                        {
+                                            stringBuilder.Append("<color=#00ffff><b>");
+                                        }
+                                        else stringBuilder.Append("<color=#ff0000><b>");
+                                        stringBuilder.Append(clipsReplaceFrom);
+                                        stringBuilder.Append("</b></color>");
+                                    }
+
+                                    stringBuilder.Append("<color=#00FF00>");
+                                    stringBuilder.Append(s[ii]);
+                                    stringBuilder.Append("</color>");
+                                }
+
+                                sp.newPath = stringBuilder.ToString();
                             }
-                            else if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
+                            else if (clipsReplaceFrom != string.Empty)
                             {
                                 GUI.contentColor = Color.gray;
+                            }
+                            else if (sp.newPath.Contains("</color>"))
+                            {
+                                sp.newPath = sp.oldPath;
                             }
 
                             GUILayout.Space(5);
 
-                            sp.newPath = GUILayout.TextField(sp.newPath, GUILayout.MinWidth(1));
+                            sp.newPath = GUILayout.TextField(sp.newPath, new GUIStyle(GUI.skin.textField) { richText = true }, GUILayout.MinWidth(1));
                             string path = DragAndDropGameobject();
                             if (path != null)
                             {
@@ -388,12 +418,12 @@ namespace AutoAnimationRepath
 
                             GUILayout.Space(5);
 
-                            if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
+                            if (clipsReplaceFrom != string.Empty)
                             {
                                 GUI.contentColor = Color.white;
                             }
 
-                            if (sp.newPath == string.Empty || sp.newPath == sp.oldPath)
+                            if (sp.newPath == string.Empty || sp.newPath == sp.oldPath || clipsReplaceFrom != string.Empty)
                             {
                                 EditorGUI.BeginDisabledGroup(true);
                             }

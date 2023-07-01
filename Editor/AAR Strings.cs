@@ -131,7 +131,7 @@
             ClipEditing.from = "From";
             ClipEditing.to = "To";
             ClipEditing.apply = "Apply";
-            ClipEditing.warning = "One or more Paths contain the input string multiple times within it. Pressing apply replaces all instances of the string within the Paths!";
+            ClipEditing.warning = "One or more Paths contains the input string multiple times within it. Pressing apply replaces all instances of the input within the Paths!";
             ClipEditing.replaceIndividual = "Replace Paths individually";
             ClipEditing.noClipsSelected = "No Animation Clips selected";
             ClipEditing.dragAndDrop = "You can drag and drop GameObjects into the text fields";

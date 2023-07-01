@@ -14,10 +14,8 @@ namespace AutoAnimationRepath
         {
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    return client.DownloadString(versionURL);
-                }
+                var client = new System.Net.WebClient();
+                return client.DownloadString(versionURL);
             }
             catch (System.Net.WebException e)
             {
@@ -38,14 +36,16 @@ namespace AutoAnimationRepath
         public static void UpdateTool()
         {
             string outPath = "Assets/out.unitypackage";
-            var client = new UnityWebRequest(downloadURL);
 
-            client.downloadHandler = new DownloadHandlerFile(outPath);
+            var client = new UnityWebRequest(downloadURL)
+            {
+                downloadHandler = new DownloadHandlerFile(outPath)
+            };
             client.SendWebRequest().completed += AA =>
             {
                 AssetDatabase.ImportAsset(outPath);
                 AssetDatabase.ImportPackage(outPath, true);
-                if (outPath != null) AssetDatabase.DeleteAsset(outPath);
+                AssetDatabase.DeleteAsset(outPath);
                 client.Dispose();
             };
         }
