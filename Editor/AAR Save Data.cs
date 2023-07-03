@@ -1,6 +1,6 @@
-﻿using UnityEditor;
+﻿using static AutoAnimationRepath.AARVariables;
+using UnityEditor;
 using UnityEngine;
-using static AutoAnimationRepath.AARVariables;
 
 namespace AutoAnimationRepath
 {

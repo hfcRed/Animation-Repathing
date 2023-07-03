@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using static AutoAnimationRepath.AARVariables;
+using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
-using static AutoAnimationRepath.AARVariables;
 
 namespace AutoAnimationRepath
 {

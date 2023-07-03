@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor.Animations;
 using UnityEngine;
-using System;
 using VRC.SDK3.Avatars.Components;
 
 namespace AutoAnimationRepath

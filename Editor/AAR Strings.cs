@@ -64,6 +64,7 @@
             public static string warnOnlyIfUsed;
             public static string warning;
             public static string credit;
+            public static string docs;
         }
 
         public static class Popup
@@ -111,16 +112,16 @@
         public static void LoadEnglisch()
         {
             Main.windowName = "Animation Repathing";
-            Main.automatic = "Automatic";
-            Main.manual = "Manual";
+            Main.automatic = " Automatic";
+            Main.manual = " Manual";
 
             Automatic.title = "Automatic Animation Repathing";
             Automatic.disabled = "Disabled";
             Automatic.enabled = "Enabled";
 
             Manual.title = "Manual Animation Repathing";
-            Manual.fixPaths = "Fix Invalid Paths";
-            Manual.editClips = "Edit Animation Clips";
+            Manual.fixPaths = " Fix Invalid Paths";
+            Manual.editClips = " Edit Animation Clips";
 
             InvalidPaths.invalidPaths = "Invalid Paths";
             InvalidPaths.apply = "Apply";
@@ -131,7 +132,7 @@
             ClipEditing.from = "From";
             ClipEditing.to = "To";
             ClipEditing.apply = "Apply";
-            ClipEditing.warning = "One or more Paths contains the input string multiple times within it. Pressing apply replaces all instances of the input within the Paths!";
+            ClipEditing.warning = "One or more Paths contain the input string multiple times within them. Pressing apply replaces all instances of the input within the Paths!";
             ClipEditing.replaceIndividual = "Replace Paths individually";
             ClipEditing.noClipsSelected = "No Animation Clips selected";
             ClipEditing.dragAndDrop = "You can drag and drop GameObjects into the text fields";
@@ -155,6 +156,7 @@
             Settings.warnOnlyIfUsed = " Warn only if used";
             Settings.warning = "This setting might cause slight lag when working with big Animator Controllers";
             Settings.credit = "Made by hfcRed";
+            Settings.docs = "Documentation";
 
             Popup.title = "Animation Repathing";
             Popup.message = "Hierarchy changes detected, would you like to repath your animations?";
@@ -245,6 +247,7 @@
             Settings.warnOnlyIfUsed = "";
             Settings.warning = "";
             Settings.credit = "";
+            Settings.docs = "";
 
             Popup.title = "";
             Popup.message = "";

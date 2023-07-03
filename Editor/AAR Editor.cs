@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using static AutoAnimationRepath.AARVariables;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
-using static AutoAnimationRepath.AARVariables;
-using System.Text;
 
 namespace AutoAnimationRepath
 {
@@ -45,6 +45,8 @@ namespace AutoAnimationRepath
             using (new SqueezeScope((5, 5, 3), (10, 5, 4)))
             {
                 GUIContent[] content = { new GUIContent(AARStrings.Main.automatic, AARStrings.ToolTips.automatic), new GUIContent(AARStrings.Main.manual, AARStrings.ToolTips.manual) };
+                content[0].image = EditorGUIUtility.IconContent("Profiler.Memory").image;
+                content[1].image = EditorGUIUtility.IconContent("ViewToolMove").image;
                 toolSelection = GUILayout.Toolbar(toolSelection, content, GUILayout.Height(25));
             }
         }
@@ -84,6 +86,8 @@ namespace AutoAnimationRepath
                 using (new SqueezeScope((15, 0, 4)))
                 {
                     GUIContent[] content = { new GUIContent(AARStrings.Manual.fixPaths, AARStrings.ToolTips.fixPaths), new GUIContent(AARStrings.Manual.editClips, AARStrings.ToolTips.editClips) };
+                    content[0].image = EditorGUIUtility.IconContent("winbtn_mac_min").image;
+                    content[1].image = EditorGUIUtility.IconContent("Motion Icon").image;
                     manualToolSelection = GUILayout.Toolbar(manualToolSelection, content, GUILayout.Height(25));
                 }
 
@@ -644,20 +648,42 @@ namespace AutoAnimationRepath
                     }
                 }
 
-                using (new SqueezeScope((10, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
+                using (new SqueezeScope((15, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
                     GUILayout.FlexibleSpace();
 
-                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("UnityEditor.FindDependencies").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Width(20), GUILayout.Height(21)))
+                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Width(20), GUILayout.Height(20)))
+                    {
                         Application.OpenURL("https://hfcred.carrd.co");
+                    }
                     if (GUILayout.Button(AARStrings.Settings.credit, new GUIStyle(EditorStyles.linkLabel), GUILayout.Height(20)))
+                    {
                         Application.OpenURL("https://hfcred.carrd.co");
+                    }
 
                     Rect r = GUILayoutUtility.GetLastRect();
                     Event e = Event.current;
                     if (r.Contains(e.mousePosition))
                     {
-                        EditorGUI.DrawRect(new Rect(r.x, r.y + 17, r.width, 1), new Color(0.49f, 0.678f, 0.957f));
+                        EditorGUI.DrawRect(new Rect(r.x + 1, r.y + 17, r.width, 1), new Color(0.49f, 0.678f, 0.957f));
+                    }
+
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TextAsset Icon").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Width(20), GUILayout.Height(20)))
+                    {
+                        Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
+                    }
+                    if (GUILayout.Button("Documentation", new GUIStyle(EditorStyles.linkLabel), GUILayout.Height(20)))
+                    {
+                        Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
+                    }
+
+                    Rect r2 = GUILayoutUtility.GetLastRect();
+                    Event e2 = Event.current;
+                    if (r2.Contains(e2.mousePosition))
+                    {
+                        EditorGUI.DrawRect(new Rect(r2.x + 1, r2.y + 17, r2.width, 1), new Color(0.49f, 0.678f, 0.957f));
                     }
 
                     GUILayout.FlexibleSpace();
@@ -677,6 +703,9 @@ namespace AutoAnimationRepath
             }
         }
 
+        /// <summary>
+        /// Draws a straight horizontal line which can be used as a divider. Parameters are used for margins.
+        /// </summary>
         public static void DrawDivider(int above, int below, int left, int right)
         {
             using (new SqueezeScope((above, below, 4), (left, right, 3)))
@@ -686,6 +715,13 @@ namespace AutoAnimationRepath
             }
         }
 
+        /// <summary>
+        /// Uses the previous rectangle to calculate the animation path of a GameObject that the user is dragging.
+        /// </summary>
+        /// <returns>
+        /// String of the hierarchy path from the Avatar root or Animator GameObject to the dragged GameObject.
+        /// Returns null if the Avatar, Animator or GameObject is null. 
+        /// </returns>
         public static string DragAndDropGameobject()
         {
             Rect r = GUILayoutUtility.GetLastRect();
@@ -730,7 +766,7 @@ namespace AutoAnimationRepath
         public static GUIStyle replacePath = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold };
     }
 
-    public class SqueezeScope : System.IDisposable
+    public class SqueezeScope : IDisposable
     {
         private readonly SqueezeSettings[] settings;
         //0 = none
@@ -741,6 +777,11 @@ namespace AutoAnimationRepath
 
         public SqueezeScope(SqueezeSettings input) : this(new[] { input }) { }
 
+        /// <summary>
+        /// Method for creating a new horizontal or vertical scope with space applied before and after.
+        /// Takes three inputs, first determines space before, second determines space after and third determines the scope type.
+        /// Inputs can be stacked. Example: using (new SqueezeScope((10, 10, 4), (5, 5, 3))) {  }
+        /// </summary>
         public SqueezeScope(params SqueezeSettings[] input)
         {
             settings = input;
