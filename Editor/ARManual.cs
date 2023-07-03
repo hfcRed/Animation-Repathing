@@ -1,4 +1,4 @@
-﻿using static AutoAnimationRepath.AARVariables;
+﻿using static AutoAnimationRepath.ARVariables;
 using System;
 using System.Linq;
 using UnityEditor;
@@ -8,9 +8,9 @@ using UnityEngine;
 namespace AutoAnimationRepath
 {
     [InitializeOnLoad]
-    public class AARManual
+    public class ARManual
     {
-        static AARManual()
+        static ARManual()
         {
             Selection.selectionChanged += ClipEditing.GetClipPaths;
         }

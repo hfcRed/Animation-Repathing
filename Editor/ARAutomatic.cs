@@ -1,4 +1,4 @@
-﻿using static AutoAnimationRepath.AARVariables;
+﻿using static AutoAnimationRepath.ARVariables;
 using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
@@ -8,9 +8,9 @@ using UnityEngine;
 namespace AutoAnimationRepath
 {
     [InitializeOnLoad]
-    public class AARAutomatic
+    public class ARAutomatic
     {
-        static AARAutomatic()
+        static ARAutomatic()
         {
             EditorApplication.hierarchyChanged -= HierarchyChanged;
             EditorApplication.hierarchyChanged += HierarchyChanged;
@@ -31,7 +31,7 @@ namespace AutoAnimationRepath
         public static void HierarchyChanged()
         {
             bool shouldRun = automaticIsEnabled;
-            shouldRun &= activeInBackground || EditorWindow.HasOpenInstances<AAREditor>();
+            shouldRun &= activeInBackground || EditorWindow.HasOpenInstances<AREditor>();
             shouldRun &= renameActive || reparentActive;
 
             var root = GetRoot();
@@ -66,18 +66,18 @@ namespace AutoAnimationRepath
 
             if (changedPaths.Count == 0) return;
 
-            if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || EditorUtility.DisplayDialog(AARStrings.Popup.title, AARStrings.Popup.message, AARStrings.Popup.continuee, AARStrings.Popup.cancel)))
+            if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
             {
-                StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.debug);
+                StringBuilder displayedChanges = new StringBuilder(ARStrings.Popup.debug);
                 foreach (AnimatorController a in controllers)
                 {
                     RepathAnimations(a, displayedChanges);
                 }
                 Debug.Log(displayedChanges);
             }
-            else if (!warnOnlyIfUsed && (!reparentWarning || EditorUtility.DisplayDialog(AARStrings.Popup.title, AARStrings.Popup.message, AARStrings.Popup.continuee, AARStrings.Popup.cancel)))
+            else if (!warnOnlyIfUsed && (!reparentWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
             {
-                StringBuilder displayedChanges = new StringBuilder(AARStrings.Popup.debug);
+                StringBuilder displayedChanges = new StringBuilder(ARStrings.Popup.debug);
                 foreach (AnimatorController a in controllers)
                 {
                     RepathAnimations(a, displayedChanges);
@@ -141,7 +141,7 @@ namespace AutoAnimationRepath
                         if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
                         if (isObjectCurve)
                         {
-                            string s = b.path + AARStrings.Popup.to + newPath;
+                            string s = b.path + ARStrings.Popup.to + newPath;
                             displayedChanges.AppendLine("");
                             displayedChanges.AppendLine(s);
 
@@ -152,7 +152,7 @@ namespace AutoAnimationRepath
                         }
                         else
                         {
-                            string s = b.path + AARStrings.Popup.to + newPath;
+                            string s = b.path + ARStrings.Popup.to + newPath;
                             displayedChanges.AppendLine("");
                             displayedChanges.AppendLine(s);
 

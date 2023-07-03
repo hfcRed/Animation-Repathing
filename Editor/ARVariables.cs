@@ -6,7 +6,7 @@ using VRC.SDK3.Avatars.Components;
 
 namespace AutoAnimationRepath
 {
-    public class AARVariables
+    public class ARVariables
     {
         public static string currentVersion;
         public static string newestVersion;
@@ -52,7 +52,7 @@ namespace AutoAnimationRepath
         public static string clipsReplaceTo = string.Empty;
         public static bool clipsReplaceFoldout;
 
-        public static readonly List<AARAutomatic.HierarchyTransform> hierarchyTransforms = new List<AARAutomatic.HierarchyTransform>();
+        public static readonly List<ARAutomatic.HierarchyTransform> hierarchyTransforms = new List<ARAutomatic.HierarchyTransform>();
         public static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
         public static Animator _animator;
         public static GameObject _avatar;
@@ -64,7 +64,7 @@ namespace AutoAnimationRepath
                 if (_animator != value)
                 {
                     _animator = value;
-                    AARAutomatic.OnRootChanged();
+                    ARAutomatic.OnRootChanged();
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace AutoAnimationRepath
                 if (_avatar != value)
                 {
                     _avatar = value;
-                    AARAutomatic.OnRootChanged();
+                    ARAutomatic.OnRootChanged();
                 }
             }
         }

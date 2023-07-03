@@ -1,11 +1,11 @@
-using static AutoAnimationRepath.AARVariables;
+using static AutoAnimationRepath.ARVariables;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace AutoAnimationRepath
 {
-    public class AARUpdater
+    public class ARUpdater
     {
         public static string versionURL = "https://raw.githubusercontent.com/hfcRed/Animation-Repathing/main/version.txt";
         public static string downloadURL = "https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation_Repathing.unitypackage";

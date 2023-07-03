@@ -1,6 +1,6 @@
 ﻿namespace AutoAnimationRepath
 {
-    public static class AARStrings
+    public static class ARStrings
     {
         public static class Main
         {
@@ -194,7 +194,7 @@
             ToolTips.runWhenWindowClosed = "Should the tool still work even if the window has been closed?";
             ToolTips.warnOnlyIfUsed = "Should the tool only warn you if the affected GameObject is used in your Animator Controllers?";
 
-            if (AARVariables.disableTooltips)
+            if (ARVariables.disableTooltips)
             {
                 ClearTooltips();
             }
@@ -285,7 +285,7 @@
             ToolTips.runWhenWindowClosed = "";
             ToolTips.warnOnlyIfUsed = "";
 
-            if (AARVariables.disableTooltips)
+            if (ARVariables.disableTooltips)
             {
                 ClearTooltips();
             }
