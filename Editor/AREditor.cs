@@ -18,6 +18,12 @@ namespace AutoAnimationRepath
 
         public static Vector2 scroll = Vector2.zero;
 
+        public string GetScriptPath()
+        {
+            var script = MonoScript.FromScriptableObject(this);
+            return AssetDatabase.GetAssetPath(script);
+        }
+
         public void OnGUI()
         {
             Repaint();
