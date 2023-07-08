@@ -1,10 +1,9 @@
 using static AutoAnimationRepath.ARVariables;
+using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.IO;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace AutoAnimationRepath
 {
@@ -57,11 +56,12 @@ namespace AutoAnimationRepath
 
         public static void GetAssetsToDelete()
         {
+            assetsToDelete.Clear();
+            metasToDelete.Clear();
+
             var editor = ScriptableObject.CreateInstance<AREditor>();
             string path = editor.GetScriptPath();
 
-            assetsToDelete.Clear();
-            metasToDelete.Clear();
             string folderPath = Path.GetDirectoryName(path);
             string[] assetGUID = AssetDatabase.FindAssets("", new[] { folderPath });
 
@@ -70,6 +70,7 @@ namespace AutoAnimationRepath
                 string ext = Path.GetExtension(AssetDatabase.GUIDToAssetPath(s));
                 string oldPath = AssetDatabase.GUIDToAssetPath(s);
                 File.Move(oldPath, folderPath + "/ARToDelete" + s + ext);
+
                 assetsToDelete.Add(folderPath + "/ARToDelete" + s + ext);
                 metasToDelete.Add(oldPath + ".meta");
             }

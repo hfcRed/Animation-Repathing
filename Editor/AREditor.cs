@@ -496,7 +496,6 @@ namespace AutoAnimationRepath
 
             using (new SqueezeScope((5, 5, 3), (0, 10, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
-
                 using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
                     GUILayout.FlexibleSpace();
@@ -535,7 +534,7 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
                     {
-                        GUILayout.Label(new GUIContent(ARStrings.Settings.target, ARStrings.ToolTips.target), GUILayout.Width(150));
+                        GUILayout.Label(new GUIContent(ARStrings.Settings.target, ARStrings.ToolTips.target), GUILayout.MinWidth(100));
 
                         GUIContent[] content = { new GUIContent(ARStrings.Settings.animatorComponent), new GUIContent(ARStrings.Settings.vrchatAvatar) };
                         controllerSelection = EditorGUILayout.Popup(controllerSelection, content);
@@ -545,7 +544,7 @@ namespace AutoAnimationRepath
                     {
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
-                            GUILayout.Label(new GUIContent(ARStrings.Settings.controllerToUse, ARStrings.ToolTips.controllerToUse), GUILayout.Width(150));
+                            GUILayout.Label(new GUIContent(ARStrings.Settings.controllerToUse, ARStrings.ToolTips.controllerToUse), GUILayout.MinWidth(100));
                             ARVariables.Animator = (Animator)EditorGUILayout.ObjectField(ARVariables.Animator, typeof(Animator), true);
                         }
                     }
@@ -553,7 +552,7 @@ namespace AutoAnimationRepath
                     {
                         using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
                         {
-                            GUILayout.Label(new GUIContent(ARStrings.Settings.avatarToUse, ARStrings.ToolTips.avatarToUse), GUILayout.Width(150));
+                            GUILayout.Label(new GUIContent(ARStrings.Settings.avatarToUse, ARStrings.ToolTips.avatarToUse), GUILayout.MinWidth(100));
                             ARVariables.Avatar = (GameObject)EditorGUILayout.ObjectField(ARVariables.Avatar, typeof(GameObject), true);
                         }
 #if VRC_SDK_VRCSDK3
@@ -561,7 +560,7 @@ namespace AutoAnimationRepath
                         {
                             using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
                             {
-                                GUILayout.Label(new GUIContent(ARStrings.Settings.layersToUse, ARStrings.ToolTips.layersToUse), GUILayout.Width(150));
+                                GUILayout.Label(new GUIContent(ARStrings.Settings.layersToUse, ARStrings.ToolTips.layersToUse), GUILayout.MinWidth(100));
                                 PlayableSelection = (Playables)EditorGUILayout.EnumFlagsField(PlayableSelection);
                             }
                         }
@@ -590,7 +589,7 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                     {
-                        GUILayout.Label(ARStrings.Settings.language, GUILayout.Width(150));
+                        GUILayout.Label(ARStrings.Settings.language, GUILayout.MinWidth(100));
 
                         EditorGUI.BeginChangeCheck();
                         GUIContent[] content = { new GUIContent("English"), new GUIContent("日本") };
@@ -617,13 +616,13 @@ namespace AutoAnimationRepath
                 {
                     using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
                     {
-                        renameActive = GUILayout.Toggle(renameActive, new GUIContent(ARStrings.Settings.repathWhenRenamed, ARStrings.ToolTips.repathWhenRenamed));
+                        renameActive = GUILayout.Toggle(renameActive, new GUIContent(ARStrings.Settings.repathWhenRenamed, ARStrings.ToolTips.repathWhenRenamed), GUILayout.MinWidth(100));
                         reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(ARStrings.Settings.repathWhenReparented, ARStrings.ToolTips.repathWhenReparented));
                     }
 
                     using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
                     {
-                        renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(ARStrings.Settings.warnWhenRenamed, ARStrings.ToolTips.warnWhenRenamed));
+                        renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(ARStrings.Settings.warnWhenRenamed, ARStrings.ToolTips.warnWhenRenamed), GUILayout.MinWidth(100));
                         reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(ARStrings.Settings.warnWhenReparented, ARStrings.ToolTips.warnWhenReparented));
                     }
                 }
@@ -641,7 +640,7 @@ namespace AutoAnimationRepath
 
                         Color c = GUI.color;
                         GUI.color = new Color(0.75f, 0.75f, 0.75f);
-                        GUILayout.Label(ARStrings.Settings.warning, new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20));
+                        GUILayout.Label(ARStrings.Settings.warning, new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20), GUILayout.Width(EditorGUIUtility.currentViewWidth / 1.4f));
                         GUI.color = c;
                     }
                 }
@@ -657,41 +656,15 @@ namespace AutoAnimationRepath
                 using (new SqueezeScope((15, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
                     GUILayout.FlexibleSpace();
-
-                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Width(20), GUILayout.Height(20)))
-                    {
-                        Application.OpenURL("https://hfcred.carrd.co");
-                    }
-                    if (GUILayout.Button(ARStrings.Settings.credit, new GUIStyle(EditorStyles.linkLabel), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.credit, EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.4f), GUILayout.Height(20)))
                     {
                         Application.OpenURL("https://hfcred.carrd.co");
                     }
 
-                    Rect r = GUILayoutUtility.GetLastRect();
-                    Event e = Event.current;
-                    if (r.Contains(e.mousePosition))
-                    {
-                        EditorGUI.DrawRect(new Rect(r.x + 1, r.y + 17, r.width, 1), new Color(0.49f, 0.678f, 0.957f));
-                    }
-
-                    GUILayout.FlexibleSpace();
-
-                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TextAsset Icon").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Width(20), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.docs, EditorGUIUtility.IconContent("TextAsset Icon").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.4f), GUILayout.Height(20)))
                     {
                         Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
                     }
-                    if (GUILayout.Button(ARStrings.Settings.docs, new GUIStyle(EditorStyles.linkLabel), GUILayout.Height(20)))
-                    {
-                        Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
-                    }
-
-                    Rect r2 = GUILayoutUtility.GetLastRect();
-                    Event e2 = Event.current;
-                    if (r2.Contains(e2.mousePosition))
-                    {
-                        EditorGUI.DrawRect(new Rect(r2.x + 1, r2.y + 17, r2.width, 1), new Color(0.49f, 0.678f, 0.957f));
-                    }
-
                     GUILayout.FlexibleSpace();
                 }
 

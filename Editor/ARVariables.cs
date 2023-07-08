@@ -58,7 +58,10 @@ namespace AutoAnimationRepath
         public static GameObject _avatar;
         public static Animator Animator
         {
-            get => _animator;
+            get
+            {
+                return EnsureNull(_animator);
+            }
             set
             {
                 if (_animator != value)
@@ -70,7 +73,10 @@ namespace AutoAnimationRepath
         }
         public static GameObject Avatar
         {
-            get => _avatar;
+            get
+            {
+                return EnsureNull(_avatar);
+            }
             set
             {
                 if (_avatar != value)
