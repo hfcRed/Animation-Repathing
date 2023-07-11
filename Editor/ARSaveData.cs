@@ -76,7 +76,6 @@ namespace AutoAnimationRepath
             PlayableSelection = Playables.all;
             ARVariables.Animator = null;
             ARVariables.Avatar = null;
-            Debug.Log("");
             SaveData();
         }
 
