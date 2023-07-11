@@ -169,7 +169,7 @@ namespace AutoAnimationRepath
 
                             foreach (AnimationClip clip in sp.foldoutClips)
                             {
-                                ARManual.InvalidPaths.RenameInvalidPaths(clip, sp.newPath);
+                                ARManual.InvalidPaths.RenameInvalidPaths(clip, sp.oldPath, sp.newPath);
                             }
                         }
                         finally { AssetDatabase.StopAssetEditing(); }

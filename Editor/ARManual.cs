@@ -52,7 +52,7 @@ namespace AutoAnimationRepath
                 }
             }
 
-            public static void RenameInvalidPaths(AnimationClip clip, string newPath)
+            public static void RenameInvalidPaths(AnimationClip clip, string oldPath, string newPath)
             {
                 EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                 EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
@@ -64,14 +64,14 @@ namespace AutoAnimationRepath
                 {
                     object animatedObject;
                     animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
-                    if (isObjectCurve)
+                    if (isObjectCurve && binding.path == oldPath)
                     {
                         ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
                         AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
                         binding.path = newPath;
                         AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
                     }
-                    else
+                    else if (binding.path == oldPath)
                     {
                         AnimationCurve floatCurve = AnimationUtility.GetEditorCurve(clip, binding);
                         AnimationUtility.SetEditorCurve(clip, binding, null);
