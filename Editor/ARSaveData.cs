@@ -67,6 +67,7 @@ namespace AutoAnimationRepath
 
             if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
 
+            ARAutomatic.OnRootChanged();
             availableUpdate = ARUpdater.CheckForNewVersion();
         }
 
