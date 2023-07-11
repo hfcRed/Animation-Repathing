@@ -67,7 +67,7 @@ namespace AutoAnimationRepath
 
             if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
 
-            ARAutomatic.OnRootChanged();
+            ARAutomatic.GetAllChildren();
             availableUpdate = ARUpdater.CheckForNewVersion();
         }
 
@@ -89,11 +89,6 @@ namespace AutoAnimationRepath
             activeInBackground = false;
             warnOnlyIfUsed = true;
             SaveData();
-        }
-
-        public static string CheckVersion()
-        {
-            return null;
         }
     }
 }

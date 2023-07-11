@@ -4,6 +4,7 @@ using System.Text;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using System.Linq;
 
 namespace AutoAnimationRepath
 {
@@ -28,6 +29,21 @@ namespace AutoAnimationRepath
             }
         }
 
+        public static void GetAllChildren()
+        {
+            hierarchyTransforms.Clear();
+
+            Transform root = GetRoot();
+            if (!root) return;
+
+            var allChildren = root.GetComponentsInChildren<Transform>(true);
+            for (int i = 1; i < allChildren.Length; i++)
+            {
+                var t = allChildren[i];
+                hierarchyTransforms.Add(new HierarchyTransform(t, root));
+            }
+        }
+
         public static void HierarchyChanged()
         {
             bool shouldRun = automaticIsEnabled;
@@ -41,6 +57,17 @@ namespace AutoAnimationRepath
             shouldRun &= controllers.Count > 0;
             if (!shouldRun) return;
 
+            var childCount = root.GetComponentsInChildren<Transform>(true).Where(x => x != root).ToList();
+            if (childCount.Count != hierarchyTransforms.Count)
+            {
+                List<HierarchyTransform> compare = new List<HierarchyTransform>();
+                foreach (Transform t in childCount)
+                {
+                    compare.Add(new HierarchyTransform(t, root));
+                }
+                hierarchyTransforms.AddRange(compare.Where(x => !hierarchyTransforms.Contains(x)));
+            }
+
             changedPaths.Clear();
             for (int i = hierarchyTransforms.Count - 1; i >= 0; i--)
             {
@@ -53,13 +80,18 @@ namespace AutoAnimationRepath
 
                 var currentPath = AnimationUtility.CalculateTransformPath(ht.target, root);
                 if (ht.path != currentPath)
-                    try { changedPaths.Add(ht.path, currentPath); }
+                {
+                    try
+                    {
+                        changedPaths.Add(ht.path, currentPath);
+                    }
                     catch
                     {
                         //ignore error
                         //only errors if key already exists
                         //i.e: two hierarchy transforms with the same name
                     }
+                }
 
                 ht.path = currentPath;
             }
@@ -165,21 +197,6 @@ namespace AutoAnimationRepath
                 }
             }
             finally { AssetDatabase.StopAssetEditing(); }
-        }
-
-        public static void OnRootChanged()
-        {
-            hierarchyTransforms.Clear();
-
-            Transform root = GetRoot();
-            if (!root) return;
-
-            var allChildren = root.GetComponentsInChildren<Transform>(true);
-            for (int i = 1; i < allChildren.Length; i++)
-            {
-                var t = allChildren[i];
-                hierarchyTransforms.Add(new HierarchyTransform(t, root));
-            }
         }
     }
 }

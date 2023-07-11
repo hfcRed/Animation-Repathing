@@ -67,7 +67,7 @@ namespace AutoAnimationRepath
                 if (_animator != value)
                 {
                     _animator = value;
-                    ARAutomatic.OnRootChanged();
+                    ARAutomatic.GetAllChildren();
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace AutoAnimationRepath
                 if (_avatar != value)
                 {
                     _avatar = value;
-                    ARAutomatic.OnRootChanged();
+                    ARAutomatic.GetAllChildren();
                 }
             }
         }

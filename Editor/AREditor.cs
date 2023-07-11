@@ -121,7 +121,9 @@ namespace AutoAnimationRepath
                     List<AnimatorController> animators = GetControllers();
 
                     foreach (AnimatorController a in animators)
+                    {
                         ARManual.InvalidPaths.ScanInvalidPaths(a);
+                    }
                 }
             }
 

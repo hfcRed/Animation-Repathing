@@ -12,6 +12,7 @@ namespace AutoAnimationRepath
     {
         static ARManual()
         {
+            Selection.selectionChanged -= ClipEditing.GetClipPaths;
             Selection.selectionChanged += ClipEditing.GetClipPaths;
         }
 
@@ -24,14 +25,18 @@ namespace AutoAnimationRepath
 
                 foreach (AnimationClip clip in controller.animationClips)
                 {
-                    Array curves = AnimationUtility.GetCurveBindings(clip);
+                    EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
+                    EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                    foreach (EditorCurveBinding curve in curves)
+                    foreach (EditorCurveBinding binding in floatCurves) GetValues(binding);
+                    foreach (EditorCurveBinding binding in objectCurves) GetValues(binding);
+
+                    void GetValues(EditorCurveBinding binding)
                     {
                         object animatedObject;
-                        animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, curve);
+                        animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
 
-                        if (animatedObject == null && invalidPathToSharedProperty.TryGetValue(curve.path, out InvalidSharedProperty sp))
+                        if (animatedObject == null && invalidPathToSharedProperty.TryGetValue(binding.path, out InvalidSharedProperty sp))
                         {
                             if (!sp.foldoutClips.Contains(clip))
                             {
@@ -42,9 +47,9 @@ namespace AutoAnimationRepath
                         else if (animatedObject == null)
                         {
                             InvalidSharedProperty sp2 = new InvalidSharedProperty();
-                            invalidPathToSharedProperty.Add(curve.path, sp2);
-                            sp2.oldPath = curve.path;
-                            sp2.newPath = curve.path;
+                            invalidPathToSharedProperty.Add(binding.path, sp2);
+                            sp2.oldPath = binding.path;
+                            sp2.newPath = binding.path;
                             sp2.foldoutClips.Add(clip);
                             sp2.count++;
                         }
@@ -64,6 +69,7 @@ namespace AutoAnimationRepath
                 {
                     object animatedObject;
                     animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
+
                     if (isObjectCurve && binding.path == oldPath)
                     {
                         ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
@@ -97,30 +103,12 @@ namespace AutoAnimationRepath
                     EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
                     EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                    foreach (EditorCurveBinding curve in floatCurves)
-                    {
-                        if (clipsPathToSharedProperty.TryGetValue(curve.path, out ClipsSharedProperty sp))
-                        {
-                            if (!sp.foldoutClips.Contains(clip))
-                            {
-                                sp.foldoutClips.Add(clip);
-                            }
-                            sp.count++;
-                        }
-                        else
-                        {
-                            ClipsSharedProperty sp2 = new ClipsSharedProperty();
-                            clipsPathToSharedProperty.Add(curve.path, sp2);
-                            sp2.oldPath = curve.path;
-                            sp2.newPath = curve.path;
-                            sp2.foldoutClips.Add(clip);
-                            sp2.count++;
-                        }
-                    }
+                    foreach (EditorCurveBinding binding in floatCurves) GetValues(binding);
+                    foreach (EditorCurveBinding binding in objectCurves) GetValues(binding);
 
-                    foreach (EditorCurveBinding curve in objectCurves)
+                    void GetValues(EditorCurveBinding binding)
                     {
-                        if (clipsPathToSharedProperty.TryGetValue(curve.path, out ClipsSharedProperty sp))
+                        if (clipsPathToSharedProperty.TryGetValue(binding.path, out ClipsSharedProperty sp))
                         {
                             if (!sp.foldoutClips.Contains(clip))
                             {
@@ -131,9 +119,9 @@ namespace AutoAnimationRepath
                         else
                         {
                             ClipsSharedProperty sp2 = new ClipsSharedProperty();
-                            clipsPathToSharedProperty.Add(curve.path, sp2);
-                            sp2.oldPath = curve.path;
-                            sp2.newPath = curve.path;
+                            clipsPathToSharedProperty.Add(binding.path, sp2);
+                            sp2.oldPath = binding.path;
+                            sp2.newPath = binding.path;
                             sp2.foldoutClips.Add(clip);
                             sp2.count++;
                         }
