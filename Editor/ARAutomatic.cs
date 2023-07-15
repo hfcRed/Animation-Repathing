@@ -1,10 +1,10 @@
 ﻿using static AutoAnimationRepath.ARVariables;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
-using System.Linq;
 
 namespace AutoAnimationRepath
 {
@@ -54,6 +54,7 @@ namespace AutoAnimationRepath
             shouldRun &= root;
 
             List<AnimatorController> controllers = GetControllers();
+            shouldRun &= controllers != null;
             shouldRun &= controllers.Count > 0;
             if (!shouldRun) return;
 
@@ -100,21 +101,11 @@ namespace AutoAnimationRepath
 
             if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
             {
-                StringBuilder displayedChanges = new StringBuilder(ARStrings.Popup.debug);
-                foreach (AnimatorController a in controllers)
-                {
-                    RepathAnimations(a, displayedChanges);
-                }
-                Debug.Log(displayedChanges);
+                RepathAnimations(controllers.ToArray());
             }
             else if (!warnOnlyIfUsed && (!reparentWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
             {
-                StringBuilder displayedChanges = new StringBuilder(ARStrings.Popup.debug);
-                foreach (AnimatorController a in controllers)
-                {
-                    RepathAnimations(a, displayedChanges);
-                }
-                Debug.Log(displayedChanges);
+                RepathAnimations(controllers.ToArray());
             }
         }
 
@@ -154,49 +145,52 @@ namespace AutoAnimationRepath
         /// Loops through all Animation Clips in an Animator Controller
         /// and changes every animation path which contains the old hierarchy path to the new hierarchy path.
         /// </summary>
-        public static void RepathAnimations(AnimatorController target, StringBuilder displayedChanges)
+        public static void RepathAnimations(AnimatorController[] targets)
         {
+            StringBuilder displayedChanges = new StringBuilder(ARStrings.Popup.debug);
             try
             {
                 AssetDatabase.StartAssetEditing();
 
-                foreach (AnimationClip clip in target.animationClips)
+                foreach (AnimatorController target in targets)
                 {
-                    EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
-                    EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
-
-                    foreach (var fc in floatCurves) HandleBinding(fc, false);
-                    foreach (var oc in objectCurves) HandleBinding(oc, true);
-
-                    void HandleBinding(EditorCurveBinding b, bool isObjectCurve)
+                    foreach (AnimationClip clip in target.animationClips)
                     {
-                        if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
-                        if (isObjectCurve)
-                        {
-                            string s = b.path + ARStrings.Popup.to + newPath;
-                            displayedChanges.AppendLine("");
-                            displayedChanges.AppendLine(s);
+                        EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
+                        EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                            ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, b);
-                            AnimationUtility.SetObjectReferenceCurve(clip, b, null);
-                            b.path = newPath;
-                            AnimationUtility.SetObjectReferenceCurve(clip, b, objectCurve);
-                        }
-                        else
-                        {
-                            string s = b.path + ARStrings.Popup.to + newPath;
-                            displayedChanges.AppendLine("");
-                            displayedChanges.AppendLine(s);
+                        foreach (var fc in floatCurves) HandleBinding(fc, false);
+                        foreach (var oc in objectCurves) HandleBinding(oc, true);
 
-                            AnimationCurve floatCurve = isObjectCurve ? null : AnimationUtility.GetEditorCurve(clip, b);
-                            AnimationUtility.SetEditorCurve(clip, b, null);
-                            b.path = newPath;
-                            AnimationUtility.SetEditorCurve(clip, b, floatCurve);
+                        void HandleBinding(EditorCurveBinding b, bool isObjectCurve)
+                        {
+                            if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
+                            if (isObjectCurve)
+                            {
+                                ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, b);
+                                AnimationUtility.SetObjectReferenceCurve(clip, b, null);
+                                b.path = newPath;
+                                AnimationUtility.SetObjectReferenceCurve(clip, b, objectCurve);
+                            }
+                            else
+                            {
+                                AnimationCurve floatCurve = isObjectCurve ? null : AnimationUtility.GetEditorCurve(clip, b);
+                                AnimationUtility.SetEditorCurve(clip, b, null);
+                                b.path = newPath;
+                                AnimationUtility.SetEditorCurve(clip, b, floatCurve);
+                            }
+
+                            if (!displayedChanges.ToString().Contains(b.path))
+                            {
+                                string s = b.path + ARStrings.Popup.to + newPath;
+                                displayedChanges.AppendLine("");
+                                displayedChanges.AppendLine(s);
+                            }
                         }
                     }
                 }
             }
-            finally { AssetDatabase.StopAssetEditing(); }
+            finally { AssetDatabase.StopAssetEditing(); Debug.Log(displayedChanges); }
         }
     }
 }

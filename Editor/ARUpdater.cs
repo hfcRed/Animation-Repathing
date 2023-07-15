@@ -49,8 +49,8 @@ namespace AutoAnimationRepath
                 GetAssetsToDelete();
                 AssetDatabase.ImportAsset(outputPath);
                 AssetDatabase.ImportPackage(outputPath, false);
-                DeleteAssets();
                 client.Dispose();
+                DeleteAssets();
             };
         }
 

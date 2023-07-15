@@ -1,5 +1,4 @@
 ﻿using static AutoAnimationRepath.ARVariables;
-using System;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -18,73 +17,85 @@ namespace AutoAnimationRepath
 
         public static class InvalidPaths
         {
-            public static void ScanInvalidPaths(AnimatorController controller)
+            public static void ScanInvalidPaths(AnimatorController[] controllers)
             {
                 invalidSharedProperties.Clear();
                 invalidPathToSharedProperty.Clear();
 
-                foreach (AnimationClip clip in controller.animationClips)
+                foreach (AnimatorController controller in controllers)
                 {
-                    EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
-                    EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
-
-                    foreach (EditorCurveBinding binding in floatCurves) GetValues(binding);
-                    foreach (EditorCurveBinding binding in objectCurves) GetValues(binding);
-
-                    void GetValues(EditorCurveBinding binding)
+                    foreach (AnimationClip clip in controller.animationClips)
                     {
-                        object animatedObject;
-                        animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
+                        EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
+                        EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                        if (animatedObject == null && invalidPathToSharedProperty.TryGetValue(binding.path, out InvalidSharedProperty sp))
+                        foreach (EditorCurveBinding binding in floatCurves) GetValues(binding);
+                        foreach (EditorCurveBinding binding in objectCurves) GetValues(binding);
+
+                        void GetValues(EditorCurveBinding binding)
                         {
-                            if (!sp.foldoutClips.Contains(clip))
+                            object animatedObject;
+                            animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
+
+                            if (animatedObject == null && invalidPathToSharedProperty.TryGetValue(binding.path, out InvalidSharedProperty sp))
                             {
-                                sp.foldoutClips.Add(clip);
+                                if (!sp.foldoutClips.Contains(clip))
+                                {
+                                    sp.foldoutClips.Add(clip);
+                                }
+                                sp.count++;
                             }
-                            sp.count++;
-                        }
-                        else if (animatedObject == null)
-                        {
-                            InvalidSharedProperty sp2 = new InvalidSharedProperty();
-                            invalidPathToSharedProperty.Add(binding.path, sp2);
-                            sp2.oldPath = binding.path;
-                            sp2.newPath = binding.path;
-                            sp2.foldoutClips.Add(clip);
-                            sp2.count++;
+                            else if (animatedObject == null)
+                            {
+                                InvalidSharedProperty sp2 = new InvalidSharedProperty();
+                                invalidPathToSharedProperty.Add(binding.path, sp2);
+                                sp2.oldPath = binding.path;
+                                sp2.newPath = binding.path;
+                                sp2.foldoutClips.Add(clip);
+                                sp2.count++;
+                            }
                         }
                     }
                 }
             }
 
-            public static void RenameInvalidPaths(AnimationClip clip, string oldPath, string newPath)
+            public static void RenameInvalidPaths(AnimationClip[] clips, string oldPath, string newPath)
             {
-                EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
-                EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
-
-                foreach (EditorCurveBinding binding in floatCurves) ChangeBindings(binding, false);
-                foreach (EditorCurveBinding binding in objectCurves) ChangeBindings(binding, true);
-
-                void ChangeBindings(EditorCurveBinding binding, bool isObjectCurve)
+                try
                 {
-                    object animatedObject;
-                    animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
+                    AssetDatabase.StartAssetEditing();
 
-                    if (isObjectCurve && binding.path == oldPath)
+                    foreach (AnimationClip clip in clips)
                     {
-                        ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
-                        AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
-                        binding.path = newPath;
-                        AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
-                    }
-                    else if (binding.path == oldPath)
-                    {
-                        AnimationCurve floatCurve = AnimationUtility.GetEditorCurve(clip, binding);
-                        AnimationUtility.SetEditorCurve(clip, binding, null);
-                        binding.path = newPath;
-                        AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+                        EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
+                        EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
+
+                        foreach (EditorCurveBinding binding in floatCurves) ChangeBindings(binding, false);
+                        foreach (EditorCurveBinding binding in objectCurves) ChangeBindings(binding, true);
+
+                        void ChangeBindings(EditorCurveBinding binding, bool isObjectCurve)
+                        {
+                            object animatedObject;
+                            animatedObject = GetRoot() == null ? (object)0 : AnimationUtility.GetAnimatedObject(GetRoot().gameObject, binding);
+
+                            if (isObjectCurve && binding.path == oldPath)
+                            {
+                                ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
+                                AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
+                                binding.path = newPath;
+                                AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+                            }
+                            else if (binding.path == oldPath)
+                            {
+                                AnimationCurve floatCurve = AnimationUtility.GetEditorCurve(clip, binding);
+                                AnimationUtility.SetEditorCurve(clip, binding, null);
+                                binding.path = newPath;
+                                AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+                            }
+                        }
                     }
                 }
+                finally { AssetDatabase.StopAssetEditing(); ScanInvalidPaths(GetControllers().ToArray()); }
             }
         }
 
@@ -92,90 +103,109 @@ namespace AutoAnimationRepath
         {
             public static void GetClipPaths()
             {
-                clipsSelected.Clear();
-                clipsSharedProperties.Clear();
-                clipsPathToSharedProperty.Clear();
-
-                clipsSelected = Selection.GetFiltered<AnimationClip>(SelectionMode.Assets).ToList();
-
-                foreach (AnimationClip clip in clipsSelected)
+                if (manualToolSelection == 1)
                 {
-                    EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
-                    EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
+                    InvalidPaths.ScanInvalidPaths(GetControllers().ToArray());
 
-                    foreach (EditorCurveBinding binding in floatCurves) GetValues(binding);
-                    foreach (EditorCurveBinding binding in objectCurves) GetValues(binding);
+                    clipsSelected.Clear();
+                    clipsSharedProperties.Clear();
+                    clipsPathToSharedProperty.Clear();
 
-                    void GetValues(EditorCurveBinding binding)
+                    clipsSelected = Selection.GetFiltered<AnimationClip>(SelectionMode.Assets).ToList();
+
+                    foreach (AnimationClip clip in clipsSelected)
                     {
-                        if (clipsPathToSharedProperty.TryGetValue(binding.path, out ClipsSharedProperty sp))
+                        EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
+                        EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
+
+                        foreach (EditorCurveBinding binding in floatCurves) GetValues(binding);
+                        foreach (EditorCurveBinding binding in objectCurves) GetValues(binding);
+
+                        void GetValues(EditorCurveBinding binding)
                         {
-                            if (!sp.foldoutClips.Contains(clip))
+                            if (clipsPathToSharedProperty.TryGetValue(binding.path, out ClipsSharedProperty sp))
                             {
-                                sp.foldoutClips.Add(clip);
+                                if (!sp.foldoutClips.Contains(clip))
+                                {
+                                    sp.foldoutClips.Add(clip);
+                                }
+                                sp.count++;
                             }
-                            sp.count++;
-                        }
-                        else
-                        {
-                            ClipsSharedProperty sp2 = new ClipsSharedProperty();
-                            clipsPathToSharedProperty.Add(binding.path, sp2);
-                            sp2.oldPath = binding.path;
-                            sp2.newPath = binding.path;
-                            sp2.foldoutClips.Add(clip);
-                            sp2.count++;
+                            else
+                            {
+                                ClipsSharedProperty sp2 = new ClipsSharedProperty();
+                                clipsPathToSharedProperty.Add(binding.path, sp2);
+                                sp2.oldPath = binding.path;
+                                sp2.newPath = binding.path;
+                                sp2.foldoutClips.Add(clip);
+                                sp2.count++;
+
+                                if (invalidPathToSharedProperty.TryGetValue(binding.path, out InvalidSharedProperty sp3))
+                                {
+                                    sp2.invalid = true;
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            public static void RenameClipPaths(AnimationClip clip, bool replaceEntire, string oldPath, string newPath)
+            public static void RenameClipPaths(AnimationClip[] clips, bool replaceEntire, string oldPath, string newPath)
             {
-                EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
-                EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
-
-                foreach (EditorCurveBinding binding in floatCurves) ChangeBindings(binding, false);
-                foreach (EditorCurveBinding binding in objectCurves) ChangeBindings(binding, true);
-
-                void ChangeBindings(EditorCurveBinding binding, bool isObjectCurve)
+                try
                 {
-                    if (isObjectCurve)
+                    AssetDatabase.StartAssetEditing();
+
+                    foreach (AnimationClip clip in clips)
                     {
-                        ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
+                        EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
+                        EditorCurveBinding[] objectCurves = AnimationUtility.GetObjectReferenceCurveBindings(clip);
 
-                        if (!replaceEntire && binding.path.Contains(oldPath))
-                        {
-                            AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
-                            binding.path = binding.path.Replace(oldPath, newPath);
-                            AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
-                        }
+                        foreach (EditorCurveBinding binding in floatCurves) ChangeBindings(binding, false);
+                        foreach (EditorCurveBinding binding in objectCurves) ChangeBindings(binding, true);
 
-                        if (replaceEntire && binding.path == oldPath)
+                        void ChangeBindings(EditorCurveBinding binding, bool isObjectCurve)
                         {
-                            AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
-                            binding.path = newPath;
-                            AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
-                        }
-                    }
-                    else
-                    {
-                        AnimationCurve floatCurve = AnimationUtility.GetEditorCurve(clip, binding);
+                            if (isObjectCurve)
+                            {
+                                ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, binding);
 
-                        if (!replaceEntire && binding.path.Contains(oldPath))
-                        {
-                            AnimationUtility.SetEditorCurve(clip, binding, null);
-                            binding.path = binding.path.Replace(oldPath, newPath);
-                            AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
-                        }
+                                if (!replaceEntire && binding.path.Contains(oldPath))
+                                {
+                                    AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
+                                    binding.path = binding.path.Replace(oldPath, newPath);
+                                    AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+                                }
 
-                        if (replaceEntire && binding.path == oldPath)
-                        {
-                            AnimationUtility.SetEditorCurve(clip, binding, null);
-                            binding.path = newPath;
-                            AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+                                if (replaceEntire && binding.path == oldPath)
+                                {
+                                    AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
+                                    binding.path = newPath;
+                                    AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+                                }
+                            }
+                            else
+                            {
+                                AnimationCurve floatCurve = AnimationUtility.GetEditorCurve(clip, binding);
+
+                                if (!replaceEntire && binding.path.Contains(oldPath))
+                                {
+                                    AnimationUtility.SetEditorCurve(clip, binding, null);
+                                    binding.path = binding.path.Replace(oldPath, newPath);
+                                    AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+                                }
+
+                                if (replaceEntire && binding.path == oldPath)
+                                {
+                                    AnimationUtility.SetEditorCurve(clip, binding, null);
+                                    binding.path = newPath;
+                                    AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+                                }
+                            }
                         }
                     }
                 }
+                finally { AssetDatabase.StopAssetEditing(); GetClipPaths(); }
             }
         }
     }

@@ -73,7 +73,6 @@ namespace AutoAnimationRepath
 
         public static void ResetGeneralData()
         {
-            controllerSelection = 0;
             PlayableSelection = Playables.all;
             ARVariables.Animator = null;
             ARVariables.Avatar = null;

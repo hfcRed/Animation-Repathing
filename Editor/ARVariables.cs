@@ -12,6 +12,7 @@ namespace AutoAnimationRepath
         public static string newestVersion;
         public static bool availableUpdate;
         public static bool automaticIsEnabled;
+
         public static int toolSelection;
         public static int manualToolSelection;
         public static int controllerSelection;
@@ -44,6 +45,7 @@ namespace AutoAnimationRepath
             public string newPath;
             public int count;
             public bool warning;
+            public bool invalid;
         }
         public static List<ClipsSharedProperty> clipsSharedProperties = new List<ClipsSharedProperty>();
         public static Dictionary<string, ClipsSharedProperty> clipsPathToSharedProperty = new Dictionary<string, ClipsSharedProperty>();
@@ -121,9 +123,9 @@ namespace AutoAnimationRepath
         {
             List<AnimatorController> targetControllers = new List<AnimatorController>();
 
-            if (controllerSelection == 0 && Animator != null)
+            if (controllerSelection == 0 && Animator != null && Animator.runtimeAnimatorController != null)
             {
-                targetControllers.Add(Animator?.runtimeAnimatorController as AnimatorController);
+                targetControllers.Add(Animator.runtimeAnimatorController as AnimatorController);
             }
             else if (controllerSelection == 1 && Avatar != null && Avatar.GetComponent<VRCAvatarDescriptor>() != null)
             {
@@ -173,6 +175,7 @@ namespace AutoAnimationRepath
                 }
 #endif
             }
+
             return targetControllers;
         }
 

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 
@@ -118,12 +117,7 @@ namespace AutoAnimationRepath
 
                 if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetInvalidPaths), GUILayout.Height(25)))
                 {
-                    List<AnimatorController> animators = GetControllers();
-
-                    foreach (AnimatorController a in animators)
-                    {
-                        ARManual.InvalidPaths.ScanInvalidPaths(a);
-                    }
+                    ARManual.InvalidPaths.ScanInvalidPaths(GetControllers().ToArray());
                 }
             }
 
@@ -165,23 +159,7 @@ namespace AutoAnimationRepath
                     }
                     if (GUILayout.Button(new GUIContent(ARStrings.InvalidPaths.apply, ARStrings.ToolTips.applyValidPath), GUILayout.Width(75)))
                     {
-                        try
-                        {
-                            AssetDatabase.StartAssetEditing();
-
-                            foreach (AnimationClip clip in sp.foldoutClips)
-                            {
-                                ARManual.InvalidPaths.RenameInvalidPaths(clip, sp.oldPath, sp.newPath);
-                            }
-                        }
-                        finally { AssetDatabase.StopAssetEditing(); }
-
-                        List<AnimatorController> animators = GetControllers();
-
-                        foreach (AnimatorController a in animators)
-                        {
-                            ARManual.InvalidPaths.ScanInvalidPaths(a);
-                        }
+                        ARManual.InvalidPaths.RenameInvalidPaths(sp.foldoutClips.ToArray(), sp.oldPath, sp.newPath);
                     }
                     EditorGUI.EndDisabledGroup();
                 }
@@ -225,251 +203,9 @@ namespace AutoAnimationRepath
             {
                 using (new SqueezeScope((15, 0, 4)))
                 {
-                    using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 3)))
-                    {
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label(new GUIContent(ARStrings.ClipEditing.replacePartOfAll, ARStrings.ToolTips.replacePartOfAll), ARStyle.replacePath);
-                        GUILayout.FlexibleSpace();
-                    }
-
-                    using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
-                    {
-                        GUILayout.Label("", GUILayout.Width(55));
-                        GUILayout.Label(new GUIContent(ARStrings.ClipEditing.from, ARStrings.ToolTips.replaceFrom), ARStyle.replaceFromTo);
-                        GUILayout.Label(new GUIContent(ARStrings.ClipEditing.to, ARStrings.ToolTips.replaceTo), ARStyle.replaceFromTo);
-                        GUILayout.Label("", GUILayout.Width(140));
-                    }
-
-                    bool warning = false;
-                    int countTotal = 0;
-                    List<AnimationClip> clipsTarget = new List<AnimationClip>();
-
-                    using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
-                    {
-                        for (int i = 0; i < clipsPathToSharedProperty.Values.Count; i++)
-                        {
-                            ClipsSharedProperty sp = clipsPathToSharedProperty.Values.ElementAt(i);
-
-                            sp.warning = false;
-
-                            if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
-                            {
-                                countTotal += sp.count;
-
-                                var checkDuplicates = sp.oldPath.IndexOf(clipsReplaceFrom);
-                                if (checkDuplicates != sp.oldPath.LastIndexOf(clipsReplaceFrom))
-                                {
-                                    warning = true;
-                                    sp.warning = true;
-                                }
-
-                                foreach (AnimationClip clip in sp.foldoutClips)
-                                {
-                                    if (!clipsTarget.Contains(clip))
-                                    {
-                                        clipsTarget.Add(clip);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetPartOfAll), ARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
-                        {
-                            clipsReplaceFrom = string.Empty;
-                            clipsReplaceTo = string.Empty;
-                        }
-
-                        GUIContent content = clipsReplaceFoldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
-                        clipsReplaceFoldout = GUILayout.Toggle(clipsReplaceFoldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
-
-                        GUILayout.Space(5);
-
-                        clipsReplaceFrom = EditorGUILayout.TextField(clipsReplaceFrom, GUILayout.MinWidth(1));
-                        string path = DragAndDropGameobject();
-                        if (path != null)
-                        {
-                            clipsReplaceFrom = path;
-                        }
-
-                        clipsReplaceTo = EditorGUILayout.TextField(clipsReplaceTo, GUILayout.MinWidth(1));
-                        string path2 = DragAndDropGameobject();
-                        if (path2 != null)
-                        {
-                            clipsReplaceTo = path2;
-                        }
-
-                        GUILayout.Space(5);
-
-                        if (clipsReplaceFrom == string.Empty || clipsReplaceTo == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
-                        {
-                            EditorGUI.BeginDisabledGroup(true);
-                        }
-                        if (GUILayout.Button(new GUIContent(ARStrings.ClipEditing.apply, ARStrings.ToolTips.applyPartOfAll), GUILayout.Width(75)))
-                        {
-                            try
-                            {
-                                AssetDatabase.StartAssetEditing();
-
-                                foreach (AnimationClip clip in clipsTarget)
-                                {
-                                    ARManual.ClipEditing.RenameClipPaths(clip, false, clipsReplaceFrom, clipsReplaceTo);
-                                }
-                            }
-                            finally { AssetDatabase.StopAssetEditing(); ARManual.ClipEditing.GetClipPaths(); }
-                        }
-                        EditorGUI.EndDisabledGroup();
-
-                        GUILayout.Label("(" + countTotal.ToString() + ")", GUILayout.Width(41));
-                    }
-
-                    if (clipsReplaceFoldout == true)
-                    {
-                        using (new SqueezeScope((5, 0, 4)))
-                        {
-                            EditorGUI.BeginDisabledGroup(true);
-                            foreach (AnimationClip clip in clipsTarget)
-                            {
-                                EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
-                            }
-                            EditorGUI.EndDisabledGroup();
-                        }
-                    }
-
-                    using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
-                    {
-                        if (warning == true)
-                        {
-                            EditorGUILayout.HelpBox(ARStrings.ClipEditing.warning, MessageType.Warning);
-                        }
-                    }
-
+                    DrawReplacePartOfAll();
                     DrawDivider(20, 15, 0, 0);
-
-                    using (new SqueezeScope((0, 10, 4), (0, 0, 4, GUI.skin.box), (5, 5, 3)))
-                    {
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label(new GUIContent(ARStrings.ClipEditing.replaceIndividual, ARStrings.ToolTips.replaceIndividual), ARStyle.replacePath);
-                        GUILayout.FlexibleSpace();
-                    }
-
-                    for (int i = 0; i < clipsPathToSharedProperty.Values.Count; i++)
-                    {
-                        ClipsSharedProperty sp = clipsPathToSharedProperty.Values.ElementAt(i);
-
-                        string str = sp.oldPath;
-
-                        using (new SqueezeScope((0, 0, 4), (0, 0, 3)))
-                        {
-                            if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
-                            {
-                                sp.newPath = sp.oldPath;
-
-                                if (sp.warning == true)
-                                {
-                                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("console.warnicon")), GUILayout.Width(20), GUILayout.Height(20));
-                                }
-                                else if (sp.oldPath.Contains(clipsReplaceFrom))
-                                {
-                                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("TestPassed")), GUILayout.Width(20), GUILayout.Height(20));
-                                }
-                                else
-                                {
-                                    GUILayout.Label("", GUILayout.Width(20), GUILayout.Height(20));
-                                }
-                            }
-                            else if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetIndividual), ARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
-                            {
-                                sp.newPath = sp.oldPath;
-                            }
-
-                            GUIContent content = sp.foldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
-                            sp.foldout = GUILayout.Toggle(sp.foldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
-
-                            if (clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
-                            {
-                                string[] s = sp.oldPath.Split(new string[] { clipsReplaceFrom }, StringSplitOptions.None);
-                                StringBuilder stringBuilder = new StringBuilder();
-
-                                for (int ii = 0; ii < s.Length; ii++)
-                                {
-                                    if (ii != 0)
-                                    {
-                                        if (s.Length < 3)
-                                        {
-                                            stringBuilder.Append("<color=#00ffff><b>");
-                                        }
-                                        else stringBuilder.Append("<color=#ff0000><b>");
-                                        stringBuilder.Append(clipsReplaceFrom);
-                                        stringBuilder.Append("</b></color>");
-                                    }
-
-                                    stringBuilder.Append("<color=#00FF00>");
-                                    stringBuilder.Append(s[ii]);
-                                    stringBuilder.Append("</color>");
-                                }
-
-                                sp.newPath = stringBuilder.ToString();
-                            }
-                            else if (clipsReplaceFrom != string.Empty)
-                            {
-                                GUI.contentColor = Color.gray;
-                            }
-                            else if (sp.newPath.Contains("</color>"))
-                            {
-                                sp.newPath = sp.oldPath;
-                            }
-
-                            GUILayout.Space(5);
-
-                            sp.newPath = GUILayout.TextField(sp.newPath, new GUIStyle(GUI.skin.textField) { richText = true }, GUILayout.MinWidth(1));
-                            string path = DragAndDropGameobject();
-                            if (path != null)
-                            {
-                                sp.newPath = path;
-                            }
-
-                            GUILayout.Space(5);
-
-                            if (clipsReplaceFrom != string.Empty)
-                            {
-                                GUI.contentColor = Color.white;
-                            }
-
-                            if (sp.newPath == string.Empty || sp.newPath == sp.oldPath || clipsReplaceFrom != string.Empty)
-                            {
-                                EditorGUI.BeginDisabledGroup(true);
-                            }
-                            if (GUILayout.Button(new GUIContent(ARStrings.ClipEditing.apply, ARStrings.ToolTips.applyIndividual), GUILayout.Width(75)))
-                            {
-                                try
-                                {
-                                    AssetDatabase.StartAssetEditing();
-
-                                    foreach (AnimationClip clip in sp.foldoutClips)
-                                    {
-                                        ARManual.ClipEditing.RenameClipPaths(clip, true, sp.oldPath, sp.newPath);
-                                    }
-                                }
-                                finally { AssetDatabase.StopAssetEditing(); ARManual.ClipEditing.GetClipPaths(); }
-                            }
-                            EditorGUI.EndDisabledGroup();
-
-                            GUILayout.Label("(" + sp.count.ToString() + ")", GUILayout.Width(41));
-                        }
-
-                        if (sp.foldout == true)
-                        {
-                            using (new SqueezeScope((5, 5, 4)))
-                            {
-                                EditorGUI.BeginDisabledGroup(true);
-                                foreach (AnimationClip clip in sp.foldoutClips)
-                                {
-                                    EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
-                                }
-                                EditorGUI.EndDisabledGroup();
-                            }
-                        }
-                    }
+                    DrawReplaceIndividual();
                 }
             }
 
@@ -488,6 +224,258 @@ namespace AutoAnimationRepath
                     GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("GameObject Icon").image, ""), GUILayout.Width(20), GUILayout.Height(21));
                     GUILayout.Label(ARStrings.ClipEditing.dragAndDrop, ARStyle.invalidPathTip, GUILayout.Height(20));
                     GUILayout.FlexibleSpace();
+                }
+            }
+        }
+
+        public static void DrawReplacePartOfAll()
+        {
+            using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 3)))
+            {
+                GUILayout.FlexibleSpace();
+                GUILayout.Label(new GUIContent(ARStrings.ClipEditing.replacePartOfAll, ARStrings.ToolTips.replacePartOfAll), ARStyle.replacePath);
+                GUILayout.FlexibleSpace();
+            }
+
+            using (new SqueezeScope((10, 0, 4), (0, 0, 3)))
+            {
+                GUILayout.Label("", GUILayout.Width(55));
+                GUILayout.Label(new GUIContent(ARStrings.ClipEditing.from, ARStrings.ToolTips.replaceFrom), ARStyle.replaceFromTo);
+                GUILayout.Label(new GUIContent(ARStrings.ClipEditing.to, ARStrings.ToolTips.replaceTo), ARStyle.replaceFromTo);
+                GUILayout.Label("", GUILayout.Width(140));
+            }
+
+            bool warning = false;
+            int countTotal = 0;
+            List<AnimationClip> clipsTarget = new List<AnimationClip>();
+
+            using (new SqueezeScope((5, 5, 4), (0, 0, 3)))
+            {
+                for (int i = 0; i < clipsPathToSharedProperty.Values.Count; i++)
+                {
+                    ClipsSharedProperty sp = clipsPathToSharedProperty.Values.ElementAt(i);
+
+                    sp.warning = false;
+
+                    if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
+                    {
+                        countTotal += sp.count;
+
+                        var checkDuplicates = sp.oldPath.IndexOf(clipsReplaceFrom);
+                        if (checkDuplicates != sp.oldPath.LastIndexOf(clipsReplaceFrom))
+                        {
+                            warning = true;
+                            sp.warning = true;
+                        }
+
+                        foreach (AnimationClip clip in sp.foldoutClips)
+                        {
+                            if (!clipsTarget.Contains(clip))
+                            {
+                                clipsTarget.Add(clip);
+                            }
+                        }
+                    }
+                }
+
+                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetPartOfAll), ARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
+                {
+                    clipsReplaceFrom = string.Empty;
+                    clipsReplaceTo = string.Empty;
+                }
+
+                GUIContent content = clipsReplaceFoldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
+                clipsReplaceFoldout = GUILayout.Toggle(clipsReplaceFoldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
+
+                GUILayout.Space(5);
+
+                clipsReplaceFrom = EditorGUILayout.TextField(clipsReplaceFrom, GUILayout.MinWidth(1));
+                string path = DragAndDropGameobject();
+                if (path != null)
+                {
+                    clipsReplaceFrom = path;
+                }
+
+                clipsReplaceTo = EditorGUILayout.TextField(clipsReplaceTo, GUILayout.MinWidth(1));
+                string path2 = DragAndDropGameobject();
+                if (path2 != null)
+                {
+                    clipsReplaceTo = path2;
+                }
+
+                GUILayout.Space(5);
+
+                if (clipsReplaceFrom == string.Empty || clipsReplaceTo == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
+                {
+                    EditorGUI.BeginDisabledGroup(true);
+                }
+                if (GUILayout.Button(new GUIContent(ARStrings.ClipEditing.apply, ARStrings.ToolTips.applyPartOfAll), GUILayout.Width(75)))
+                {
+                    ARManual.ClipEditing.RenameClipPaths(clipsTarget.ToArray(), false, clipsReplaceFrom, clipsReplaceTo);
+                }
+                EditorGUI.EndDisabledGroup();
+
+                GUILayout.Label("(" + countTotal.ToString() + ")", GUILayout.Width(41));
+            }
+
+            if (clipsReplaceFoldout == true)
+            {
+                using (new SqueezeScope((0, 0, 4)))
+                {
+                    EditorGUI.BeginDisabledGroup(true);
+                    foreach (AnimationClip clip in clipsTarget)
+                    {
+                        EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
+                    }
+                    EditorGUI.EndDisabledGroup();
+                }
+            }
+
+            using (new SqueezeScope((0, 0, 4), (0, 0, 3)))
+            {
+                if (warning == true)
+                {
+                    EditorGUILayout.HelpBox(ARStrings.ClipEditing.warning, MessageType.Warning);
+                }
+            }
+        }
+
+        public static void DrawReplaceIndividual()
+        {
+            using (new SqueezeScope((0, 10, 4), (0, 0, 4, GUI.skin.box), (5, 5, 3)))
+            {
+                GUILayout.FlexibleSpace();
+                GUILayout.Label(new GUIContent(ARStrings.ClipEditing.replaceIndividual, ARStrings.ToolTips.replaceIndividual), ARStyle.replacePath);
+                GUILayout.FlexibleSpace();
+            }
+
+            for (int i = 0; i < clipsPathToSharedProperty.Values.Count; i++)
+            {
+                ClipsSharedProperty sp = clipsPathToSharedProperty.Values.ElementAt(i);
+
+                string str = sp.oldPath;
+
+                using (new SqueezeScope((0, 0, 4), (0, 0, 3)))
+                {
+                    if (clipsReplaceFrom != null && clipsReplaceFrom != string.Empty)
+                    {
+                        sp.newPath = sp.oldPath;
+
+                        if (sp.warning == true)
+                        {
+                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("console.warnicon")), GUILayout.Width(20), GUILayout.Height(20));
+                        }
+                        else if (sp.oldPath.Contains(clipsReplaceFrom))
+                        {
+                            GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("TestPassed")), GUILayout.Width(20), GUILayout.Height(20));
+                        }
+                        else
+                        {
+                            GUILayout.Label("", GUILayout.Width(20), GUILayout.Height(20));
+                        }
+                    }
+                    else if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetIndividual), ARStyle.resetButton, GUILayout.Width(20), GUILayout.Height(20)))
+                    {
+                        sp.newPath = sp.oldPath;
+                    }
+
+                    GUIContent content = sp.foldout ? new GUIContent(EditorGUIUtility.IconContent("IN foldout act on").image, "") : new GUIContent(EditorGUIUtility.IconContent("IN foldout act").image, "");
+                    sp.foldout = GUILayout.Toggle(sp.foldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
+
+                    Color contentClr = GUI.contentColor;
+                    Color backgroundClr = GUI.backgroundColor;
+                    Color rectColor = new Color(1f, 1f, 0f);
+
+                    if (clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
+                    {
+                        string[] s = sp.oldPath.Split(new string[] { clipsReplaceFrom }, StringSplitOptions.None);
+                        StringBuilder stringBuilder = new StringBuilder();
+
+                        for (int ii = 0; ii < s.Length; ii++)
+                        {
+                            if (ii != 0)
+                            {
+                                if (s.Length < 3)
+                                {
+                                    stringBuilder.Append("<color=#00ffff><b>");
+                                }
+                                else stringBuilder.Append("<color=#ff0000><b>");
+                                stringBuilder.Append(clipsReplaceFrom);
+                                stringBuilder.Append("</b></color>");
+                            }
+
+                            stringBuilder.Append("<color=#00FF00>");
+                            stringBuilder.Append(s[ii]);
+                            stringBuilder.Append("</color>");
+                        }
+
+                        sp.newPath = stringBuilder.ToString();
+                    }
+                    else if (clipsReplaceFrom != string.Empty)
+                    {
+                        GUI.contentColor = Color.gray;
+                    }
+                    else if (sp.newPath.Contains("</color>"))
+                    {
+                        sp.newPath = sp.oldPath;
+                    }
+
+                    GUILayout.Space(5);
+
+                    if (sp.invalid)
+                    {
+                        GUI.backgroundColor = rectColor;
+                    }
+                    sp.newPath = GUILayout.TextField(sp.newPath, new GUIStyle(GUI.skin.textField) { richText = true }, GUILayout.MinWidth(1));
+                    string path = DragAndDropGameobject();
+                    if (path != null)
+                    {
+                        sp.newPath = path;
+                    }
+                    if (sp.invalid)
+                    {
+                        Rect r = GUILayoutUtility.GetLastRect();
+
+                        EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 1), rectColor);
+                        EditorGUI.DrawRect(new Rect(r.x, r.height + r.y - 1, r.width, 1), rectColor);
+
+                        EditorGUI.DrawRect(new Rect(r.x, r.y, 1, r.height), rectColor);
+                        EditorGUI.DrawRect(new Rect(r.width + r.x - 1, r.y, 1, r.height), rectColor);
+
+                        GUI.backgroundColor = backgroundClr;
+                    }
+
+                    GUILayout.Space(5);
+
+                    if (clipsReplaceFrom != string.Empty)
+                    {
+                        GUI.contentColor = contentClr;
+                    }
+
+                    if (sp.newPath == string.Empty || sp.newPath == sp.oldPath || clipsReplaceFrom != string.Empty)
+                    {
+                        EditorGUI.BeginDisabledGroup(true);
+                    }
+                    if (GUILayout.Button(new GUIContent(ARStrings.ClipEditing.apply, ARStrings.ToolTips.applyIndividual), GUILayout.Width(75)))
+                    {
+                        ARManual.ClipEditing.RenameClipPaths(sp.foldoutClips.ToArray(), true, sp.oldPath, sp.newPath);
+                    }
+                    EditorGUI.EndDisabledGroup();
+
+                    GUILayout.Label("(" + sp.count.ToString() + ")", GUILayout.Width(41));
+                }
+
+                if (sp.foldout == true)
+                {
+                    using (new SqueezeScope((5, 5, 4)))
+                    {
+                        EditorGUI.BeginDisabledGroup(true);
+                        foreach (AnimationClip clip in sp.foldoutClips)
+                        {
+                            EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
+                        }
+                        EditorGUI.EndDisabledGroup();
+                    }
                 }
             }
         }
@@ -521,139 +509,8 @@ namespace AutoAnimationRepath
                     }
                 }
 
-                using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
-                {
-                    GUILayout.Label(ARStrings.Settings.general, ARStyle.settings, GUILayout.Height(30));
-
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetSettings), GUILayout.Height(30), GUILayout.Width(30)))
-                    {
-                        ARSaveData.ResetGeneralData();
-                    }
-                }
-
-                using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
-                {
-                    using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
-                    {
-                        GUILayout.Label(new GUIContent(ARStrings.Settings.target, ARStrings.ToolTips.target), GUILayout.MinWidth(100));
-
-                        GUIContent[] content = { new GUIContent(ARStrings.Settings.animatorComponent), new GUIContent(ARStrings.Settings.vrchatAvatar) };
-                        controllerSelection = EditorGUILayout.Popup(controllerSelection, content);
-                    }
-
-                    if (controllerSelection == 0)
-                    {
-                        using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
-                        {
-                            GUILayout.Label(new GUIContent(ARStrings.Settings.controllerToUse, ARStrings.ToolTips.controllerToUse), GUILayout.MinWidth(100));
-                            ARVariables.Animator = (Animator)EditorGUILayout.ObjectField(ARVariables.Animator, typeof(Animator), true);
-                        }
-                    }
-                    else
-                    {
-                        using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
-                        {
-                            GUILayout.Label(new GUIContent(ARStrings.Settings.avatarToUse, ARStrings.ToolTips.avatarToUse), GUILayout.MinWidth(100));
-                            ARVariables.Avatar = (GameObject)EditorGUILayout.ObjectField(ARVariables.Avatar, typeof(GameObject), true);
-                        }
-#if VRC_SDK_VRCSDK3
-                        if (ARVariables.Avatar != null && ARVariables.Avatar.GetComponent<VRCAvatarDescriptor>() != null)
-                        {
-                            using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
-                            {
-                                GUILayout.Label(new GUIContent(ARStrings.Settings.layersToUse, ARStrings.ToolTips.layersToUse), GUILayout.MinWidth(100));
-                                PlayableSelection = (Playables)EditorGUILayout.EnumFlagsField(PlayableSelection);
-                            }
-                        }
-#endif
-                    }
-                }
-
-                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
-                {
-                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
-                    {
-                        EditorGUI.BeginChangeCheck();
-                        disableTooltips = GUILayout.Toggle(disableTooltips, new GUIContent(ARStrings.Settings.disableTooltips, ARStrings.ToolTips.disableTooltips));
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            if (disableTooltips)
-                            {
-                                ARStrings.ClearTooltips();
-                            }
-                            else if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
-                        }
-                    }
-                }
-
-                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
-                {
-                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
-                    {
-                        GUILayout.Label(ARStrings.Settings.language, GUILayout.MinWidth(100));
-
-                        EditorGUI.BeginChangeCheck();
-                        GUIContent[] content = { new GUIContent("English"), new GUIContent("日本") };
-                        languageSelection = EditorGUILayout.Popup(languageSelection, content);
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
-                        }
-                    }
-                }
-
-                using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
-                {
-                    GUILayout.Label(ARStrings.Settings.automatic, ARStyle.settings, GUILayout.Height(30));
-
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetSettings), GUILayout.Height(30), GUILayout.Width(30)))
-                    {
-                        ARSaveData.ResetAutomaticData();
-                    }
-                }
-
-                using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
-                {
-                    using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
-                    {
-                        renameActive = GUILayout.Toggle(renameActive, new GUIContent(ARStrings.Settings.repathWhenRenamed, ARStrings.ToolTips.repathWhenRenamed), GUILayout.MinWidth(100));
-                        reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(ARStrings.Settings.repathWhenReparented, ARStrings.ToolTips.repathWhenReparented));
-                    }
-
-                    using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
-                    {
-                        renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(ARStrings.Settings.warnWhenRenamed, ARStrings.ToolTips.warnWhenRenamed), GUILayout.MinWidth(100));
-                        reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(ARStrings.Settings.warnWhenReparented, ARStrings.ToolTips.warnWhenReparented));
-                    }
-                }
-
-                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
-                {
-                    using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
-                    {
-                        warnOnlyIfUsed = GUILayout.Toggle(warnOnlyIfUsed, new GUIContent(ARStrings.Settings.warnOnlyIfUsed, ARStrings.ToolTips.warnOnlyIfUsed));
-                    }
-
-                    using (new SqueezeScope((0, 5, 4), (5, 5, 3)))
-                    {
-                        GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("d_console.infoicon.inactive.sml").image, ""), GUILayout.Height(20), GUILayout.Width(20));
-
-                        Color c = GUI.color;
-                        GUI.color = new Color(0.75f, 0.75f, 0.75f);
-                        GUILayout.Label(ARStrings.Settings.warning, new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20), GUILayout.Width(EditorGUIUtility.currentViewWidth / 1.4f));
-                        GUI.color = c;
-                    }
-                }
-
-                using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
-                {
-                    using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
-                    {
-                        activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(ARStrings.Settings.runWhenWindowClosed, ARStrings.ToolTips.runWhenWindowClosed));
-                    }
-                }
+                DrawGeneralSettings();
+                DrawAutomaticSettings();
 
                 using (new SqueezeScope((15, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
@@ -680,6 +537,146 @@ namespace AutoAnimationRepath
                     GUI.color = c;
 
                     GUILayout.FlexibleSpace();
+                }
+            }
+        }
+
+        public static void DrawGeneralSettings()
+        {
+            using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
+            {
+                GUILayout.Label(ARStrings.Settings.general, ARStyle.settings, GUILayout.Height(30));
+
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetSettings), GUILayout.Height(30), GUILayout.Width(30)))
+                {
+                    ARSaveData.ResetGeneralData();
+                }
+            }
+
+            using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
+                {
+                    GUILayout.Label(new GUIContent(ARStrings.Settings.target, ARStrings.ToolTips.target), GUILayout.MinWidth(100));
+
+                    GUIContent[] content = { new GUIContent(ARStrings.Settings.animatorComponent), new GUIContent(ARStrings.Settings.vrchatAvatar) };
+                    controllerSelection = EditorGUILayout.Popup(controllerSelection, content);
+                }
+
+                if (controllerSelection == 0)
+                {
+                    using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
+                    {
+                        GUILayout.Label(new GUIContent(ARStrings.Settings.controllerToUse, ARStrings.ToolTips.controllerToUse), GUILayout.MinWidth(100));
+                        ARVariables.Animator = (Animator)EditorGUILayout.ObjectField(ARVariables.Animator, typeof(Animator), true);
+                    }
+                }
+                else
+                {
+                    using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
+                    {
+                        GUILayout.Label(new GUIContent(ARStrings.Settings.avatarToUse, ARStrings.ToolTips.avatarToUse), GUILayout.MinWidth(100));
+                        ARVariables.Avatar = (GameObject)EditorGUILayout.ObjectField(ARVariables.Avatar, typeof(GameObject), true);
+                    }
+#if VRC_SDK_VRCSDK3
+                    if (ARVariables.Avatar != null && ARVariables.Avatar.GetComponent<VRCAvatarDescriptor>() != null)
+                    {
+                        using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
+                        {
+                            GUILayout.Label(new GUIContent(ARStrings.Settings.layersToUse, ARStrings.ToolTips.layersToUse), GUILayout.MinWidth(100));
+                            PlayableSelection = (Playables)EditorGUILayout.EnumFlagsField(PlayableSelection);
+                        }
+                    }
+#endif
+                }
+            }
+
+            using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
+                {
+                    EditorGUI.BeginChangeCheck();
+                    disableTooltips = GUILayout.Toggle(disableTooltips, new GUIContent(ARStrings.Settings.disableTooltips, ARStrings.ToolTips.disableTooltips));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        if (disableTooltips)
+                        {
+                            ARStrings.ClearTooltips();
+                        }
+                        else if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
+                    }
+                }
+            }
+
+            using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
+                {
+                    GUILayout.Label(ARStrings.Settings.language, GUILayout.MinWidth(100));
+
+                    EditorGUI.BeginChangeCheck();
+                    GUIContent[] content = { new GUIContent("English"), new GUIContent("日本") };
+                    languageSelection = EditorGUILayout.Popup(languageSelection, content);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
+                    }
+                }
+            }
+        }
+
+        public static void DrawAutomaticSettings()
+        {
+            using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
+            {
+                GUILayout.Label(ARStrings.Settings.automatic, ARStyle.settings, GUILayout.Height(30));
+
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ARStrings.ToolTips.resetSettings), GUILayout.Height(30), GUILayout.Width(30)))
+                {
+                    ARSaveData.ResetAutomaticData();
+                }
+            }
+
+            using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
+                {
+                    renameActive = GUILayout.Toggle(renameActive, new GUIContent(ARStrings.Settings.repathWhenRenamed, ARStrings.ToolTips.repathWhenRenamed), GUILayout.MinWidth(100));
+                    reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(ARStrings.Settings.repathWhenReparented, ARStrings.ToolTips.repathWhenReparented));
+                }
+
+                using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
+                {
+                    renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(ARStrings.Settings.warnWhenRenamed, ARStrings.ToolTips.warnWhenRenamed), GUILayout.MinWidth(100));
+                    reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(ARStrings.Settings.warnWhenReparented, ARStrings.ToolTips.warnWhenReparented));
+                }
+            }
+
+            using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
+                {
+                    warnOnlyIfUsed = GUILayout.Toggle(warnOnlyIfUsed, new GUIContent(ARStrings.Settings.warnOnlyIfUsed, ARStrings.ToolTips.warnOnlyIfUsed));
+                }
+
+                using (new SqueezeScope((0, 5, 4), (5, 5, 3)))
+                {
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("d_console.infoicon.inactive.sml").image, ""), GUILayout.Height(20), GUILayout.Width(20));
+
+                    Color c = GUI.color;
+                    GUI.color = new Color(0.75f, 0.75f, 0.75f);
+                    GUILayout.Label(ARStrings.Settings.warning, new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20), GUILayout.Width(EditorGUIUtility.currentViewWidth / 1.4f));
+                    GUI.color = c;
+                }
+            }
+
+            using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
+                {
+                    activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(ARStrings.Settings.runWhenWindowClosed, ARStrings.ToolTips.runWhenWindowClosed));
                 }
             }
         }
