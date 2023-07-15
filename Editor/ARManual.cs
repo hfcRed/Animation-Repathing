@@ -1,10 +1,10 @@
-﻿using static AutoAnimationRepath.ARVariables;
+﻿using static AnimationRepathing.ARVariables;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-namespace AutoAnimationRepath
+namespace AnimationRepathing
 {
     [InitializeOnLoad]
     public class ARManual

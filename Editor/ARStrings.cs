@@ -1,4 +1,4 @@
-﻿namespace AutoAnimationRepath
+﻿namespace AnimationRepathing
 {
     public static class ARStrings
     {
@@ -51,8 +51,10 @@
             public static string animatorComponent;
             public static string vrchatAvatar;
             public static string controllerToUse;
-            public static string layersToUse;
+            public static string missingController;
             public static string avatarToUse;
+            public static string missingDescriptor;
+            public static string layersToUse;
             public static string disableTooltips;
             public static string language;
             public static string automatic;
@@ -143,8 +145,10 @@
             Settings.animatorComponent = "Animator Component";
             Settings.vrchatAvatar = "VRChat Avatar";
             Settings.controllerToUse = "Animator to use";
-            Settings.layersToUse = "Layers to use";
+            Settings.missingController = "No Animator Controller assigned!";
             Settings.avatarToUse = "Avatar to use";
+            Settings.missingDescriptor = "No Avatar Descriptor assigned!";
+            Settings.layersToUse = "Layers to use";
             Settings.disableTooltips = " Disable tooltips";
             Settings.language = "Language";
             Settings.automatic = "Automatic";

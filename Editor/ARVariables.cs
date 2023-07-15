@@ -4,7 +4,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 
-namespace AutoAnimationRepath
+namespace AnimationRepathing
 {
     public class ARVariables
     {

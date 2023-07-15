@@ -1,11 +1,11 @@
-using static AutoAnimationRepath.ARVariables;
+using static AnimationRepathing.ARVariables;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace AutoAnimationRepath
+namespace AnimationRepathing
 {
     public class ARUpdater
     {

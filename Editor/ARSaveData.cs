@@ -1,8 +1,8 @@
-﻿using static AutoAnimationRepath.ARVariables;
+﻿using static AnimationRepathing.ARVariables;
 using UnityEditor;
 using UnityEngine;
 
-namespace AutoAnimationRepath
+namespace AnimationRepathing
 {
     [InitializeOnLoad]
     public static class ARSaveData

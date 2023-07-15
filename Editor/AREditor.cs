@@ -1,4 +1,4 @@
-﻿using static AutoAnimationRepath.ARVariables;
+﻿using static AnimationRepathing.ARVariables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 
-namespace AutoAnimationRepath
+namespace AnimationRepathing
 {
     [InitializeOnLoad]
     public class AREditor : EditorWindow
@@ -571,6 +571,14 @@ namespace AutoAnimationRepath
                         GUILayout.Label(new GUIContent(ARStrings.Settings.controllerToUse, ARStrings.ToolTips.controllerToUse), GUILayout.MinWidth(100));
                         ARVariables.Animator = (Animator)EditorGUILayout.ObjectField(ARVariables.Animator, typeof(Animator), true);
                     }
+
+                    if (!ARVariables.Animator.runtimeAnimatorController)
+                    {
+                        using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
+                        {
+                            EditorGUILayout.HelpBox(ARStrings.Settings.missingController, MessageType.Warning);
+                        }
+                    }
                 }
                 else
                 {
@@ -586,6 +594,13 @@ namespace AutoAnimationRepath
                         {
                             GUILayout.Label(new GUIContent(ARStrings.Settings.layersToUse, ARStrings.ToolTips.layersToUse), GUILayout.MinWidth(100));
                             PlayableSelection = (Playables)EditorGUILayout.EnumFlagsField(PlayableSelection);
+                        }
+                    }
+                    else if (ARVariables.Avatar != null)
+                    {
+                        using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
+                        {
+                            EditorGUILayout.HelpBox(ARStrings.Settings.missingDescriptor, MessageType.Warning);
                         }
                     }
 #endif

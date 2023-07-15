@@ -1,4 +1,4 @@
-﻿using static AutoAnimationRepath.ARVariables;
+﻿using static AnimationRepathing.ARVariables;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-namespace AutoAnimationRepath
+namespace AnimationRepathing
 {
     [InitializeOnLoad]
     public class ARAutomatic
