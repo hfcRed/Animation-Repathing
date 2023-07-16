@@ -17,11 +17,8 @@ namespace AnimationRepathing
         public static int manualToolSelection;
         public static int controllerSelection;
         public static int languageSelection;
-        public static bool renameActive = true;
-        public static bool reparentActive = true;
-        public static bool renameWarning = true;
+        public static bool sendWarning = true;
         public static bool warnOnlyIfUsed = true;
-        public static bool reparentWarning = true;
         public static bool activeInBackground = false;
         public static bool disableTooltips = false;
 

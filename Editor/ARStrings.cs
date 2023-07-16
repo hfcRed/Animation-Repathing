@@ -58,13 +58,10 @@
             public static string disableTooltips;
             public static string language;
             public static string automatic;
-            public static string repathWhenRenamed;
-            public static string repathWhenReparented;
-            public static string warnWhenRenamed;
-            public static string warnWhenReparented;
-            public static string runWhenWindowClosed;
+            public static string warningPopup;
             public static string warnOnlyIfUsed;
             public static string warning;
+            public static string runWhenWindowClosed;
             public static string credit;
             public static string docs;
         }
@@ -100,15 +97,12 @@
             public static string resetSettings;
             public static string target;
             public static string controllerToUse;
-            public static string layersToUse;
             public static string avatarToUse;
+            public static string layersToUse;
             public static string disableTooltips;
-            public static string repathWhenRenamed;
-            public static string repathWhenReparented;
-            public static string warnWhenRenamed;
-            public static string warnWhenReparented;
-            public static string runWhenWindowClosed;
+            public static string warningPopup;
             public static string warnOnlyIfUsed;
+            public static string runWhenWindowClosed;
         }
 
         public static void LoadEnglisch()
@@ -152,13 +146,10 @@
             Settings.disableTooltips = " Disable tooltips";
             Settings.language = "Language";
             Settings.automatic = "Automatic";
-            Settings.repathWhenRenamed = " Repath when renamed";
-            Settings.repathWhenReparented = " Repath when reparented";
-            Settings.warnWhenRenamed = " Warn when renamed";
-            Settings.warnWhenReparented = " Warn when reparented";
-            Settings.runWhenWindowClosed = " Run when window is closed";
+            Settings.warningPopup = " Warn on hierarchy change";
             Settings.warnOnlyIfUsed = " Warn only if used";
             Settings.warning = "This setting might cause slight lag when working with big Animator Controllers";
+            Settings.runWhenWindowClosed = " Run when window is closed";
             Settings.credit = "Made by hfcRed";
             Settings.docs = "Documentation";
 
@@ -188,15 +179,12 @@
             ToolTips.resetSettings = "Reset settings to their default values";
             ToolTips.target = "The object the tool should target. Can be set to either target the Animator Controller inside of the Animator Component of a Gameobject or target all Animator Controllers on a VRChat Avatar";
             ToolTips.controllerToUse = "The Gameobject which holds the Animator Component with the target Animator Controller";
-            ToolTips.layersToUse = "All of the Animator Controllers on the VRChat Avatar that the tool should target";
             ToolTips.avatarToUse = "The VRChat Avatar which holds the target Animator Controllers";
+            ToolTips.layersToUse = "All of the Animator Controllers on the VRChat Avatar that the tool should target";
             ToolTips.disableTooltips = "Hide all Tooltips?";
-            ToolTips.repathWhenRenamed = "Should the tool automatically change the Animation Paths if a Gameobject is renamed in the Hierarchy?";
-            ToolTips.repathWhenReparented = "Should the tool automatically change the Animations Paths if a Gameobject is moved to a different spot in the Hierarchy?";
-            ToolTips.warnWhenRenamed = "Should the tool show a pop-up message if a Gameobject is renamed in the Hierarchy?";
-            ToolTips.warnWhenReparented = "Should the tool show a pop-up message if a Gameobject is moved to a different spot in the Hierarchy?";
+            ToolTips.warningPopup = "Should the tool open a warning popup if any changes are made to the hierarchy?";
+            ToolTips.warnOnlyIfUsed = "Should the tool only open the warning popup if the affected GameObject is used in your Animator Controllers?";
             ToolTips.runWhenWindowClosed = "Should the tool still work even if the window has been closed?";
-            ToolTips.warnOnlyIfUsed = "Should the tool only warn you if the affected GameObject is used in your Animator Controllers?";
 
             if (ARVariables.disableTooltips)
             {
@@ -238,18 +226,17 @@
             Settings.animatorComponent = "Animatorコンポーネント";
             Settings.vrchatAvatar = "VRChatアバター";
             Settings.controllerToUse = "使用するAnimator";
+            Settings.missingController = "No Animator Controller assigned!";
             Settings.layersToUse = "使用するレイヤー";
             Settings.avatarToUse = "使用するアバター";
+            Settings.missingDescriptor = "No Avatar Descriptor assigned!";
             Settings.disableTooltips = "ツールチップを無効にする";
             Settings.language = "言語";
             Settings.automatic = "自動";
-            Settings.repathWhenRenamed = " リネーム時にリパスする";
-            Settings.repathWhenReparented = " 再親子関係時にリパスする";
-            Settings.warnWhenRenamed = " リネーム時に警告する";
-            Settings.warnWhenReparented = " 再親子関係時に警告する";
-            Settings.runWhenWindowClosed = " ウィンドウが閉じられた時に実行する";
+            //
             Settings.warnOnlyIfUsed = " 使用される場合のみ警告する";
             Settings.warning = "この設定は、大きなAnimatorコントローラと作業する際にわずかな遅延を引き起こす可能性があります";
+            Settings.runWhenWindowClosed = " ウィンドウが閉じられた時に実行する";
             Settings.credit = "hfcRed作成";
             Settings.docs = "ドキュメント";
 
@@ -279,15 +266,12 @@
             ToolTips.resetSettings = "設定をデフォルト値にリセットします";
             ToolTips.target = "ツールの対象とするオブジェクト。ゲームオブジェクトのAnimator Component内のAnimator Controllerを対象とするか、VRChat Avatar内のすべてのAnimator Controllerを対象とすることができます";
             ToolTips.controllerToUse = "アニメーターコンポーネントを保持するゲームオブジェクトで、対象のAnimator Controllerが含まれています";
-            ToolTips.layersToUse = "ツールの対象とするVRChat AvatarのすべてのAnimator Controller";
             ToolTips.avatarToUse = "対象のAnimator Controllerを保持するVRChat Avatar";
+            ToolTips.layersToUse = "ツールの対象とするVRChat AvatarのすべてのAnimator Controller";
             ToolTips.disableTooltips = "すべてのツールチップを非表示にしますか？";
-            ToolTips.repathWhenRenamed = "ヒエラルキー内のゲームオブジェクトの名前が変更された場合、ツールは自動的にアニメーションパスを変更する必要がありますか？";
-            ToolTips.repathWhenReparented = "ヒエラルキー内の別の場所にゲームオブジェクトが移動された場合、ツールは自動的にアニメーションパスを変更する必要がありますか？";
-            ToolTips.warnWhenRenamed = "ヒエラルキー内のゲームオブジェクトの名前が変更された場合、ツールはポップアップメッセージを表示する必要がありますか？";
-            ToolTips.warnWhenReparented = "ヒエラルキー内のゲームオブジェクトが別の場所に移動された場合、ツールはポップアップメッセージを表示する必要がありますか？";
-            ToolTips.runWhenWindowClosed = "ウィンドウが閉じられた場合でも、ツールは動作する必要がありますか？";
             ToolTips.warnOnlyIfUsed = "ツールは、影響を受けるゲームオブジェクトがAnimator Controllerで使用されている場合にのみ警告しますか？";
+            //
+            ToolTips.runWhenWindowClosed = "ウィンドウが閉じられた場合でも、ツールは動作する必要がありますか？";
 
             if (ARVariables.disableTooltips)
             {
@@ -318,12 +302,10 @@
             ToolTips.controllerToUse = "";
             ToolTips.avatarToUse = "";
             ToolTips.layersToUse = "";
-            ToolTips.repathWhenRenamed = "";
-            ToolTips.repathWhenReparented = "";
-            ToolTips.warnWhenRenamed = "";
-            ToolTips.warnWhenReparented = "";
-            ToolTips.runWhenWindowClosed = "";
             ToolTips.disableTooltips = "";
+            ToolTips.warningPopup = "";
+            ToolTips.warnOnlyIfUsed = "";
+            ToolTips.runWhenWindowClosed = "";
         }
     }
 }

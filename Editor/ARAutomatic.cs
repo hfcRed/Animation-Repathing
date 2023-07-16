@@ -48,7 +48,6 @@ namespace AnimationRepathing
         {
             bool shouldRun = automaticIsEnabled;
             shouldRun &= activeInBackground || EditorWindow.HasOpenInstances<AREditor>();
-            shouldRun &= renameActive || reparentActive;
 
             var root = GetRoot();
             shouldRun &= root;
@@ -99,11 +98,11 @@ namespace AnimationRepathing
 
             if (changedPaths.Count == 0) return;
 
-            if (warnOnlyIfUsed && ScanAnimators() && (!reparentWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
+            if (warnOnlyIfUsed && ScanAnimators() && (!sendWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
             {
                 RepathAnimations(controllers.ToArray());
             }
-            else if (!warnOnlyIfUsed && (!reparentWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
+            else if (!warnOnlyIfUsed && (!sendWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
             {
                 RepathAnimations(controllers.ToArray());
             }

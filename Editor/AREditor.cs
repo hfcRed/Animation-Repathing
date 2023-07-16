@@ -36,6 +36,7 @@ namespace AnimationRepathing
                 case 0: DrawAutomatic(); break;
                 case 1: DrawManual(); break;
             }
+            DrawDivider(28, 20, 5, 5);
             DrawSettings();
 
             GUILayout.EndScrollView();
@@ -58,7 +59,7 @@ namespace AnimationRepathing
 
         public static void DrawAutomatic()
         {
-            using (new SqueezeScope((5, 5, 3), (10, 5, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
+            using (new SqueezeScope((5, 5, 3), (10, 0, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
                 using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
@@ -78,7 +79,7 @@ namespace AnimationRepathing
 
         public static void DrawManual()
         {
-            using (new SqueezeScope((5, 5, 3), (10, 5, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
+            using (new SqueezeScope((5, 5, 3), (10, 0, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
                 using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
@@ -383,7 +384,6 @@ namespace AnimationRepathing
                     sp.foldout = GUILayout.Toggle(sp.foldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
 
                     Color contentClr = GUI.contentColor;
-                    Color backgroundClr = GUI.backgroundColor;
                     Color rectColor = new Color(1f, 1f, 0f);
 
                     if (clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
@@ -422,10 +422,6 @@ namespace AnimationRepathing
 
                     GUILayout.Space(5);
 
-                    if (sp.invalid)
-                    {
-                        GUI.backgroundColor = rectColor;
-                    }
                     sp.newPath = GUILayout.TextField(sp.newPath, new GUIStyle(GUI.skin.textField) { richText = true }, GUILayout.MinWidth(1));
                     string path = DragAndDropGameobject();
                     if (path != null)
@@ -441,8 +437,6 @@ namespace AnimationRepathing
 
                         EditorGUI.DrawRect(new Rect(r.x, r.y, 1, r.height), rectColor);
                         EditorGUI.DrawRect(new Rect(r.width + r.x - 1, r.y, 1, r.height), rectColor);
-
-                        GUI.backgroundColor = backgroundClr;
                     }
 
                     GUILayout.Space(5);
@@ -482,8 +476,6 @@ namespace AnimationRepathing
 
         public static void DrawSettings()
         {
-            DrawDivider(23, 20, 5, 5);
-
             using (new SqueezeScope((5, 5, 3), (0, 10, 4), (0, 0, 4, EditorStyles.helpBox), (5, 5, 3), (10, 10, 4)))
             {
                 using (new SqueezeScope((0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
@@ -512,15 +504,17 @@ namespace AnimationRepathing
                 DrawGeneralSettings();
                 DrawAutomaticSettings();
 
-                using (new SqueezeScope((15, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
+                using (new SqueezeScope((20, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                 {
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.credit, EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.4f), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.credit, EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.5f), GUILayout.Height(25)))
                     {
                         Application.OpenURL("https://hfcred.carrd.co");
                     }
 
-                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.docs, EditorGUIUtility.IconContent("TextAsset Icon").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.4f), GUILayout.Height(20)))
+                    GUILayout.Space(15);
+
+                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.docs, EditorGUIUtility.IconContent("TextAsset Icon").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.5f), GUILayout.Height(25)))
                     {
                         Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
                     }
@@ -572,7 +566,7 @@ namespace AnimationRepathing
                         ARVariables.Animator = (Animator)EditorGUILayout.ObjectField(ARVariables.Animator, typeof(Animator), true);
                     }
 
-                    if (!ARVariables.Animator.runtimeAnimatorController)
+                    if (ARVariables.Animator && !ARVariables.Animator.runtimeAnimatorController)
                     {
                         using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
                         {
@@ -643,7 +637,7 @@ namespace AnimationRepathing
 
         public static void DrawAutomaticSettings()
         {
-            using (new SqueezeScope((15, 5, 4), (3, 0, 3)))
+            using (new SqueezeScope((25, 5, 4), (3, 0, 3)))
             {
                 GUILayout.Label(ARStrings.Settings.automatic, ARStyle.settings, GUILayout.Height(30));
 
@@ -656,16 +650,9 @@ namespace AnimationRepathing
 
             using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
             {
-                using (new SqueezeScope((10, 0, 4), (5, 5, 3)))
+                using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                 {
-                    renameActive = GUILayout.Toggle(renameActive, new GUIContent(ARStrings.Settings.repathWhenRenamed, ARStrings.ToolTips.repathWhenRenamed), GUILayout.MinWidth(100));
-                    reparentActive = GUILayout.Toggle(reparentActive, new GUIContent(ARStrings.Settings.repathWhenReparented, ARStrings.ToolTips.repathWhenReparented));
-                }
-
-                using (new SqueezeScope((5, 10, 4), (5, 5, 3)))
-                {
-                    renameWarning = GUILayout.Toggle(renameWarning, new GUIContent(ARStrings.Settings.warnWhenRenamed, ARStrings.ToolTips.warnWhenRenamed), GUILayout.MinWidth(100));
-                    reparentWarning = GUILayout.Toggle(reparentWarning, new GUIContent(ARStrings.Settings.warnWhenReparented, ARStrings.ToolTips.warnWhenReparented));
+                    sendWarning = GUILayout.Toggle(sendWarning, new GUIContent(ARStrings.Settings.warningPopup, ARStrings.ToolTips.warningPopup));
                 }
             }
 
