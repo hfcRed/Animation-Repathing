@@ -17,6 +17,12 @@ namespace AnimationRepathing
 
         public static Vector2 scroll = Vector2.zero;
 
+        public static Texture loadingImage;
+        public static int loadingCount = 0;
+        public static int loadingBuffer = 0;
+        public static int loadingRepeat = 0;
+        public static bool finishedLoading = false;
+
         public string GetScriptPath()
         {
             var script = MonoScript.FromScriptableObject(this);
@@ -504,21 +510,90 @@ namespace AnimationRepathing
                 DrawGeneralSettings();
                 DrawAutomaticSettings();
 
-                using (new SqueezeScope((20, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
+                using (new SqueezeScope((20, 0, 4), (0, 0, 4, GUI.skin.box), (10, 10, 4)))
                 {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.credit, EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.5f), GUILayout.Height(25)))
+                    using (new SqueezeScope((5, 5, 3)))
                     {
-                        Application.OpenURL("https://hfcred.carrd.co");
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button(new GUIContent(ARStrings.Settings.credit, EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.5f), GUILayout.Height(25)))
+                        {
+                            Application.OpenURL("https://hfcred.carrd.co");
+                        }
+
+                        GUILayout.Space(15);
+
+                        if (GUILayout.Button(new GUIContent(ARStrings.Settings.docs, EditorGUIUtility.IconContent("TextAsset Icon").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.5f), GUILayout.Height(25)))
+                        {
+                            Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
+                        }
+                        GUILayout.FlexibleSpace();
                     }
 
-                    GUILayout.Space(15);
-
-                    if (GUILayout.Button(new GUIContent(ARStrings.Settings.docs, EditorGUIUtility.IconContent("TextAsset Icon").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.5f), GUILayout.Height(25)))
+                    using (new SqueezeScope((5, -5, 4), (0, 0, 3)))
                     {
-                        Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
+                        if (loadingCount > 0)
+                        {
+                            finishedLoading = false;
+
+                            if (loadingBuffer == 0)
+                            {
+                                string[] imageNumber = { "11", "10", "09", "08", "07", "06", "05", "04", "03", "02", "01", "00" };
+
+                                loadingImage = EditorGUIUtility.IconContent("d_WaitSpin" + imageNumber[loadingCount]).image;
+
+                                loadingCount--;
+                                loadingBuffer = 50;
+
+                                if (loadingCount == 0 && loadingRepeat > 0)
+                                {
+                                    loadingCount = 11;
+                                    loadingRepeat--;
+                                }
+
+                                if (loadingRepeat == 0 && loadingCount == 0)
+                                {
+                                    availableUpdate = ARUpdater.CheckForNewVersion();
+                                    finishedLoading = true;
+                                }
+                            }
+                            else loadingBuffer--;
+                        }
+                        else loadingImage = EditorGUIUtility.IconContent("TreeEditor.Refresh").image;
+
+                        GUILayout.FlexibleSpace();
+
+                        Color c = GUI.color;
+                        GUI.color = new Color(0.75f, 0.75f, 0.75f);
+                        if (GUILayout.Button(new GUIContent(" Check for new version", loadingImage, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                        {
+                            loadingCount = 11;
+                            loadingRepeat = 2;
+                        }
+                        GUI.color = c;
+
+                        GUILayout.FlexibleSpace();
                     }
-                    GUILayout.FlexibleSpace();
+
+                    if (finishedLoading)
+                    {
+                        using (new SqueezeScope((5, -5, 4), (5, 5, 3)))
+                        {
+                            GUILayout.FlexibleSpace();
+
+                            Color c = GUI.color;
+                            GUI.color = new Color(0.6f, 0.6f, 0.6f);
+
+                            string text = availableUpdate ? " New version available! Download it at the top" : " No new version available";
+
+                            if (GUILayout.Button(new GUIContent(text, EditorGUIUtility.IconContent("animationvisibilitytoggleoff").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                            {
+                                finishedLoading = false;
+                            }
+                            GUI.color = c;
+
+                            GUILayout.FlexibleSpace();
+                        }
+                    }
                 }
 
                 using (new SqueezeScope((5, 0, 4), (0, 0, 3)))
@@ -656,6 +731,29 @@ namespace AnimationRepathing
                                 break;
                         }
                     }
+                }
+
+                switch (languageSelection)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        DrawLanguageCredits("", "https://www.google.com");
+                        break;
+                    case 2:
+                        DrawLanguageCredits("Translation by Neuru", "https://twitter.com/Neuru5278");
+                        break;
+                }
+            }
+        }
+
+        public static void DrawLanguageCredits(string buttonText, string link)
+        {
+            using (new SqueezeScope((0, 10, 4), (5, 5, 3)))
+            {
+                if (GUILayout.Button(new GUIContent(buttonText, EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), GUILayout.Height(25)))
+                {
+                    Application.OpenURL(link);
                 }
             }
         }
