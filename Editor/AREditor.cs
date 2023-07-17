@@ -613,7 +613,21 @@ namespace AnimationRepathing
                         {
                             ARStrings.ClearTooltips();
                         }
-                        else if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
+                        else
+                        {
+                            switch (languageSelection)
+                            {
+                                case 0:
+                                    ARStrings.LoadEnglisch();
+                                    break;
+                                case 1:
+                                    ARStrings.LoadJapanese();
+                                    break;
+                                case 2:
+                                    ARStrings.LoadKorean();
+                                    break;
+                            }
+                        }
                     }
                 }
             }
@@ -625,11 +639,22 @@ namespace AnimationRepathing
                     GUILayout.Label(ARStrings.Settings.language, GUILayout.MinWidth(100));
 
                     EditorGUI.BeginChangeCheck();
-                    GUIContent[] content = { new GUIContent("English"), new GUIContent("日本") };
+                    GUIContent[] content = { new GUIContent("English"), new GUIContent("日本"), new GUIContent("한국어") };
                     languageSelection = EditorGUILayout.Popup(languageSelection, content);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
+                        switch (languageSelection)
+                        {
+                            case 0:
+                                ARStrings.LoadEnglisch();
+                                break;
+                            case 1:
+                                ARStrings.LoadJapanese();
+                                break;
+                            case 2:
+                                ARStrings.LoadKorean();
+                                break;
+                        }
                     }
                 }
             }
