@@ -59,7 +59,18 @@ namespace AnimationRepathing
             ARVariables.Avatar = GameObject.Find(PlayerPrefs.GetString("ARAvatar"));
             ARVariables.Animator = GameObject.Find(PlayerPrefs.GetString("ARController"))?.GetComponent<Animator>();
 
-            if (languageSelection == 0) ARStrings.LoadEnglisch(); else ARStrings.LoadJapanese();
+            switch (languageSelection)
+            {
+                case 0:
+                    ARStrings.LoadEnglisch();
+                    break;
+                case 1:
+                    ARStrings.LoadJapanese();
+                    break;
+                case 2:
+                    ARStrings.LoadKorean();
+                    break;
+            }
 
             ARAutomatic.GetAllChildren();
             availableUpdate = ARUpdater.CheckForNewVersion();
