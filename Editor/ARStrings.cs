@@ -279,6 +279,93 @@
             }
         }
 
+        public static void LoadKorean()
+        {
+            Main.windowName = "애니메이션 리패스";
+            Main.automatic = " 자동 수정";
+            Main.manual = " 수동 변경";
+
+            Automatic.title = "자동 애니메이션 리패스";
+            Automatic.disabled = "비활성화";
+            Automatic.enabled = "활성화";
+
+            Manual.title = "수동 애니메이션 리패스";
+            Manual.fixPaths = "손상된 경로 수정";
+            Manual.editClips = "애니메이션 클립 편집";
+
+            InvalidPaths.invalidPaths = "손상된 경로";
+            InvalidPaths.apply = "적용";
+            InvalidPaths.noInvalidPaths = "컨트롤러에 손상된 경로가 없습니다";
+            InvalidPaths.dragAndDrop = "게임 오브젝트를 텍스트 필드에 끌어다 놓을 수 있습니다";
+
+            ClipEditing.replacePartOfAll = "모든 경로 일괄 변경";
+            ClipEditing.from = "기존 문자열 (From)";
+            ClipEditing.to = "변경 문자열 (To)";
+            ClipEditing.apply = "적용";
+            ClipEditing.warning = "기존 문자열이 여러 번 포함된 경로가 존재합니다. 적용 버튼을 누르면 경로 내의 모든 기존 문자열이 변경됩니다!";
+            ClipEditing.replaceIndividual = "개별 경로 변경";
+            ClipEditing.noClipsSelected = "선택된 애니메이션 클립 없음";
+            ClipEditing.dragAndDrop = "게임 오브젝트를 텍스트 필드로 끌어다 놓을 수 있습니다";
+
+            Settings.settings = "설정";
+            Settings.general = "일반 설정";
+            Settings.target = "대상";
+            Settings.animatorComponent = "애니메이터 컴포넌트";
+            Settings.vrchatAvatar = "VRChat 아바타";
+            Settings.controllerToUse = "사용할 애니메이터";
+            Settings.missingController = "애니메이터 컨트롤러가 할당되지 않았습니다!";
+            Settings.layersToUse = "사용할 레이어";
+            Settings.avatarToUse = "사용할 아바타";
+            Settings.missingDescriptor = "아바타 디스크립터가 할당되지 않았습니다!";
+            Settings.disableTooltips = "툴팁 비활성화";
+            Settings.language = "언어";
+            Settings.automatic = "자동 수정 설정";
+            Settings.warningPopup = "하이어라키 변경 시 경고 표시";
+            Settings.warnOnlyIfUsed = "대상에 영향 줄 시에만 경고 표시";
+            Settings.warning = "이 설정은 작업 중인 애니메이터 컨트롤러가 커지면 지연이 발생할 수 있습니다";
+            Settings.runWhenWindowClosed = "창을 닫아도 계속 실행";
+            Settings.credit = "제작자: hfcRed";
+            Settings.docs = "문서";
+
+            Popup.title = "애니메이션 리패스";
+            Popup.message = "하이어라키 변경이 감지되었습니다. 애니메이션 경로도 수정하시겠습니까?";
+            Popup.to = "  ==>  ";
+            Popup.continuee = "예";
+            Popup.cancel = "아니오";
+            Popup.debug = "애니메이션 리패스:";
+
+            ToolTips.automatic = "하이어라키 변경 시 애니메이션 경로를 자동으로 수정합니다";
+            ToolTips.manual = "애니메이션 경로를 직접 수동으로 변경합니다";
+            ToolTips.toggleButton = "자동 애니메이션 리패스를 켜거나 끕니다";
+            ToolTips.fixPaths = "사용 중인 애니메이터에서 손상된 (노란색) 애니메이션 경로를 수정합니다";
+            ToolTips.editClips = "여러 애니메이션 클립의 애니메이션 경로를 직접 변경합니다";
+            ToolTips.resetInvalidPaths = "사용 중인 애니메이터에서 손상된 애니메이션 경로의 목록을 새로고침 합니다";
+            ToolTips.resetInvalidPath = "기존 애니메이션 경로 복구";
+            ToolTips.applyValidPath = "손상된 애니메이션 경로를 지정한 경로로 수정합니다. 경로는 비어 있거나 손상된 경로와 동일해서는 안 됩니다";
+            ToolTips.replacePartOfAll = "선택된 애니메이션 클립 경로들의 일부 문자열을 지정한 문자열로 모두 변경합니다";
+            ToolTips.resetPartOfAll = "두 텍스트 필드의 모든 내용을 지웁니다";
+            ToolTips.replaceFrom = "모든 애니메이션 경로에서 '변경 문자열'로 대체될 문자열";
+            ToolTips.replaceTo = "모든 애니메이션 경로에서 '기존 문자열'을 대체할 문자열";
+            ToolTips.applyPartOfAll = "모든 애니메이션 경로의 일부 문자열을 지정한 문자열로 변경합니다. '기존 문자열'은 비어 있거나 '변경 문자열'과 동일해서는 안 됩니다";
+            ToolTips.replaceIndividual = "선택한 애니메이션 클립의 전체 애니메이션 경로를 수정한 경로로 변경합니다";
+            ToolTips.resetIndividual = "기존 애니메이션 경로 복원";
+            ToolTips.applyIndividual = "기존 애니메이션 경로를 지정한 경로로 변경합니다. 경로는 비어 있거나 기존 경로와 동일해서는 안 됩니다";
+            ToolTips.resetSettings = "설정을 기본 값으로 초기화합니다";
+            ToolTips.target = "이 툴이 타기팅할 대상. 게임 오브젝트의 애니메이터 컴포넌트에 할당된 애니메이터 컨트롤러를 대상으로 할지, VRChat 아바타의 모든 애니메이터 컨트롤러를 대상으로 할지 설정";
+            ToolTips.controllerToUse = "대상 애니메이터 컨트롤러가 포함된 게임 오브젝트";
+            ToolTips.avatarToUse = "대상 애니메이터 컨트롤러가 포함된 VRChat 아바타";
+            ToolTips.layersToUse = "대상이 될 VRChat 아바타의 애니메이터 컨트롤러";
+            ToolTips.disableTooltips = "모든 툴팁을 숨깁니까?";
+            ToolTips.warningPopup = "하이어라키 변경 시 경고창을 표시할까요?";
+            ToolTips.warnOnlyIfUsed = "하이어라키 변경에 영향 받는 게임 오브젝트가 대상 애니메이터 컨트롤러에서 사용될 시에만 경고창을 표시할까요?";
+            ToolTips.runWhenWindowClosed = "창이 닫혀도 툴을 계속 작동시킬까요?";
+
+            if (ARVariables.disableTooltips)
+            {
+                ClearTooltips();
+            }
+        }
+
         public static void ClearTooltips()
         {
             ToolTips.automatic = "";
