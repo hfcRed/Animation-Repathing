@@ -9,7 +9,7 @@ namespace AnimationRepathing
 {
     public class ARUpdater
     {
-        public static string versionURL = "https://raw.githubusercontent.com/hfcRed/Animation-Repathing/main/version.txt";
+        public static string versionURL = "https://raw.githubusercontent.com/hfcRed/Animation-Repathing/main/com.hfcred.animationrepathing/version.txt";
         public static string downloadURL = "https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation-Repathing.unitypackage";
         public static string outputPath = "Assets/AROutput.unitypackage";
         public static List<string> assetsToDelete = new List<string>();
