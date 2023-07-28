@@ -18,6 +18,6 @@ Animation Repathing allows you to:
 
 [![Generic badge](https://img.shields.io/badge/-Download_Unitypackage_​_​_​-success?style=for-the-badge)](https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation_Repathing.unitypackage)
 
-[![Generic badge](https://img.shields.io/badge/-Add_To_Creator_Companion​-informational?style=for-the-badge)](https://github.com/hfcRed/Animation-Repathing/releases/latest/download/Animation_Repathing.unitypackage)
+[![Generic badge](https://img.shields.io/badge/-Add_To_Creator_Companion​-informational?style=for-the-badge)](vcc://vpm/addRepo?url=https://hfcRed.github.io/VPM-Listing/index.json)
 
 ___
