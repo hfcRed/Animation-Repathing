@@ -24,7 +24,6 @@ namespace AnimationRepathing
             else return false;
         }
 
-
         public static string GetNewestVersion()
         {
             try
