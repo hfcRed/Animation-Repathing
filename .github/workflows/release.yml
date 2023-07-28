@@ -8,7 +8,7 @@ on:
 
 env:
   packageName: "com.hfcred.animationrepathing"
-  packageDisplayName: "Animation Repathing"
+  packageDisplayName: "AnimationRepathing"
 
 permissions:
   contents: write
