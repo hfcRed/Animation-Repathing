@@ -1,0 +1,80 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: main
+    paths: com.hfcred.animationrepathing/**
+
+env:
+  packageName: "com.hfcred.animationrepathing"
+  packageDisplayName: "Animation Repathing"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: get version
+        id: version
+        uses: zoexx/github-action-json-file-properties@b9f36ce6ee6fe2680cd3c32b2c62e22eade7e590
+        with:
+          file_path: "${{env.packageName}}/package.json"
+          prop_path: "version"
+
+      - name: generate tag
+        id: tag
+        run: echo prop="v${{ steps.version.outputs.value }}" >> $GITHUB_OUTPUT
+
+      - name: Check if Release Tag Exists
+        id: checkReleaseTag
+        uses: mukunku/tag-exists-action@v1.2.0
+        with:
+          tag: ${{ steps.tag.outputs.prop }}
+
+      - name: Set Environment Variables
+        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+        run: |
+          echo "zipFile=${{ env.packageDisplayName }}_v${{ steps.version.outputs.value }}".zip >> $GITHUB_ENV
+          echo "unityPackage=${{ env.packageDisplayName }}_v${{ steps.version.outputs.value }}.unitypackage" >> $GITHUB_ENV
+
+      - name: Create Zip
+        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+        uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
+        with:
+          type: "zip"
+          directory: "${{env.packageName}}/"
+          filename: "../${{env.zipFile}}" # make the zip file one directory up, since we start one directory in above
+
+      - name: Create Packages Directory and Move Files
+        run: |
+          if [ ! -d "Packages" ]; then
+            mkdir Packages
+            mv ${{env.packageName}} Packages/
+          fi
+
+      - run: find "Packages/${{env.packageName}}/" -name \*.meta >> metaList
+        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+
+      - name: Create UnityPackage
+        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+        uses: pCYSl5EDgo/create-unitypackage@cfcd3cf0391a5ef1306342794866a9897c32af0b
+        with:
+          package-path: ${{ env.unityPackage }}
+          include-files: metaList
+
+      - name: Make Release
+        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
+        with:
+          name: "${{ github.event.repository.name }} v${{ steps.version.outputs.value }}"
+          tag_name: "v${{ steps.version.outputs.value }}"
+          files: |
+            ${{ env.zipFile }}
+            ${{ env.unityPackage }}
+            Packages/${{ env.packageName }}/package.json

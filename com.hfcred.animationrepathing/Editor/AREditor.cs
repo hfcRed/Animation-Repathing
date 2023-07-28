@@ -390,7 +390,7 @@ namespace AnimationRepathing
                     sp.foldout = GUILayout.Toggle(sp.foldout, content, new GUIStyle(GUI.skin.button), GUILayout.Width(25));
 
                     Color contentClr = GUI.contentColor;
-                    Color rectColor = new Color(1f, 1f, 0f);
+                    Color rectColor = new Color(0.55f, 0.55f, 0f);
 
                     if (clipsReplaceFrom != string.Empty && sp.oldPath.Contains(clipsReplaceFrom))
                     {
@@ -567,7 +567,7 @@ namespace AnimationRepathing
                         if (GUILayout.Button(new GUIContent(" Check for new version", loadingImage, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                         {
                             loadingCount = 11;
-                            loadingRepeat = 2;
+                            loadingRepeat = 1;
                         }
                         GUI.color = c;
 
