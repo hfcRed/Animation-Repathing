@@ -15,7 +15,7 @@ namespace AnimationRepathing
         public static string packagePath = "Assets/AROutput.unitypackage";
 
         public static List<string> assetsToDelete = new List<string>();
-        // public static List<string> metasToDelete = new List<string>();
+        public static List<string> metasToDelete = new List<string>();
 
         public static bool CheckForNewVersion()
         {
@@ -96,7 +96,7 @@ namespace AnimationRepathing
         public static void GetAssetsToDelete()
         {
             assetsToDelete.Clear();
-            // metasToDelete.Clear();
+            metasToDelete.Clear();
 
 
             var editor = ScriptableObject.CreateInstance<AREditor>();
@@ -114,7 +114,7 @@ namespace AnimationRepathing
                 File.Move(oldPath, folderPath + "/ARToDelete" + s + ext);
 
                 assetsToDelete.Add(folderPath + "/ARToDelete" + s + ext);
-                // metasToDelete.Add(oldPath + ".meta");
+                metasToDelete.Add(oldPath + ".meta");
             }
         }
 
@@ -122,13 +122,13 @@ namespace AnimationRepathing
         {
             AssetDatabase.DeleteAsset(packagePath);
 
-            // foreach (string s in metasToDelete)
-            // {
-            //     if (File.Exists(s))
-            //     {
-            //         File.Delete(s);
-            //     }
-            // }
+            foreach (string s in metasToDelete)
+            {
+                if (File.Exists(s))
+                {
+                    File.Delete(s);
+                }
+            }
 
             foreach (string s in assetsToDelete)
             {
