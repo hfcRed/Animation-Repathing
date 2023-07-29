@@ -28,7 +28,7 @@ namespace AnimationRepathing
         }
 
         [System.Serializable]
-        public class Version
+        public class JsonData
         {
             public string version;
         }
@@ -42,8 +42,8 @@ namespace AnimationRepathing
             string parentFolder = Path.GetDirectoryName(folderPath);
             string jsonText = File.ReadAllText(parentFolder + "/package.json");
 
-            Version version = JsonUtility.FromJson<Version>(jsonText);
-            return version.version;
+            JsonData data = JsonUtility.FromJson<JsonData>(jsonText);
+            return data.version;
         }
 
         public static string GetNewestVersion()
@@ -53,8 +53,8 @@ namespace AnimationRepathing
                 var client = new System.Net.WebClient();
                 string jsonText = client.DownloadString(versionURL);
 
-                Version version = JsonUtility.FromJson<Version>(jsonText);
-                return version.version;
+                JsonData data = JsonUtility.FromJson<JsonData>(jsonText);
+                return data.version;
             }
             catch (System.Net.WebException e)
             {
