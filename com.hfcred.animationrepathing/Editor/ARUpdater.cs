@@ -81,6 +81,7 @@ namespace AnimationRepathing
                     downloadSuccess = true;
                     GetAssetsToDelete();
 
+
                     AssetDatabase.ImportAsset(packagePath);
                     AssetDatabase.ImportPackage(packagePath, false);
                 }
