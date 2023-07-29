@@ -16,11 +16,7 @@ namespace AnimationRepathing
         public static void ShowWindow() => GetWindow<AREditor>("Animation Repathing").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
-
-        public static Texture loadingImage;
-        public static int loadingCount = 0;
-        public static int loadingBuffer = 0;
-        public static int loadingRepeat = 0;
+        public static int loading = 0;
         public static bool finishedLoading = false;
 
         public string GetScriptPath()
@@ -32,7 +28,6 @@ namespace AnimationRepathing
         public void OnGUI()
         {
             Repaint();
-
 
             EditorGUI.BeginChangeCheck();
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(position.width));
@@ -532,52 +527,27 @@ namespace AnimationRepathing
 
                     using (new SqueezeScope((5, -5, 4), (0, 0, 3)))
                     {
-                        if (loadingCount > 0)
-                        {
-                            finishedLoading = false;
-
-                            if (loadingBuffer == 0)
-                            {
-                                string[] imageNumber = { "11", "10", "09", "08", "07", "06", "05", "04", "03", "02", "01", "00" };
-
-                                loadingImage = EditorGUIUtility.IconContent("d_WaitSpin" + imageNumber[loadingCount]).image;
-
-                                loadingCount--;
-                                loadingBuffer = 50;
-
-                                if (loadingCount == 0 && loadingRepeat > 0)
-                                {
-                                    loadingCount = 11;
-                                    loadingRepeat--;
-                                }
-
-                                if (loadingRepeat == 0 && loadingCount == 0)
-                                {
-                                    availableUpdate = ARUpdater.CheckForNewVersion();
-                                    finishedLoading = true;
-                                }
-                            }
-                            else loadingBuffer--;
-                        }
-                        else loadingImage = EditorGUIUtility.IconContent("TreeEditor.Refresh").image;
-
                         GUILayout.FlexibleSpace();
 
                         Color c = GUI.color;
                         GUI.color = new Color(0.75f, 0.75f, 0.75f);
-                        if (GUILayout.Button(new GUIContent(" Check for new version", loadingImage, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                        if (GUILayout.Button(new GUIContent(" Check for new version", EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                         {
-                            loadingCount = 11;
-                            loadingRepeat = 1;
+                            finishedLoading = false;
+                            loading = 125;
+                            availableUpdate = ARUpdater.CheckForNewVersion();
                         }
                         GUI.color = c;
+
+                        if (loading == 1) finishedLoading = true;
+                        if (loading > 0) loading--;
 
                         GUILayout.FlexibleSpace();
                     }
 
-                    if (finishedLoading)
+                    using (new SqueezeScope((5, -5, 4), (5, 5, 3)))
                     {
-                        using (new SqueezeScope((5, -5, 4), (5, 5, 3)))
+                        if (finishedLoading)
                         {
                             GUILayout.FlexibleSpace();
 
@@ -586,12 +556,20 @@ namespace AnimationRepathing
 
                             string text = availableUpdate ? " New version available! Download it at the top" : " No new version available";
 
-                            if (GUILayout.Button(new GUIContent(text, EditorGUIUtility.IconContent("animationvisibilitytoggleoff").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                            if (GUILayout.Button(text, new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                             {
                                 finishedLoading = false;
                             }
                             GUI.color = c;
 
+                            GUILayout.FlexibleSpace();
+                        }
+                        else
+                        {
+                            GUILayout.FlexibleSpace();
+                            if (GUILayout.Button("", new GUIStyle(GUI.skin.label), GUILayout.Height(0)))
+                            {
+                            }
                             GUILayout.FlexibleSpace();
                         }
                     }

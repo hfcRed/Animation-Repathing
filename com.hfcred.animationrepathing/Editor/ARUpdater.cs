@@ -25,7 +25,7 @@ namespace AnimationRepathing
             currentVersion = GetCurrentVersion()?.ToString();
             newestVersion = GetNewestVersion()?.ToString();
 
-            if (newestVersion != null && newestVersion != currentVersion) return true;
+            if (newestVersion != null && currentVersion != null && newestVersion != currentVersion) return true;
             else return false;
         }
 
@@ -42,6 +42,8 @@ namespace AnimationRepathing
 
             string folderPath = Path.GetDirectoryName(path);
             string parentFolder = Path.GetDirectoryName(folderPath);
+
+            if (!File.Exists(parentFolder + "/package.json")) return null;
             string jsonText = File.ReadAllText(parentFolder + "/package.json");
 
             JsonData data = JsonUtility.FromJson<JsonData>(jsonText);
