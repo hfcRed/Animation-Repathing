@@ -33,6 +33,7 @@ namespace AnimationRepathing
         {
             Repaint();
 
+
             EditorGUI.BeginChangeCheck();
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(position.width));
 
