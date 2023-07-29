@@ -1,7 +1,7 @@
 {
   "name": "com.hfcred.animationrepathing",
   "displayName": "Animation Repathing",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Feature rich Unity editor tool to help streamline the process of changing the paths of animations.",
   "url": "https://github.com/hfcRed/Animation-Repathing",
   "gitDependencies": {},
