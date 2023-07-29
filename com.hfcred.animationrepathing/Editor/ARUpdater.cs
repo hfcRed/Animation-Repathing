@@ -98,6 +98,7 @@ namespace AnimationRepathing
             assetsToDelete.Clear();
             // metasToDelete.Clear();
 
+
             var editor = ScriptableObject.CreateInstance<AREditor>();
             string path = editor.GetScriptPath();
 
