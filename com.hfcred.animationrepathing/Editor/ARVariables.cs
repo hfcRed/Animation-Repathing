@@ -1,11 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Animations;
 using UnityEngine;
+
+#if VRC_SDK_VRCSDK3
 using VRC.SDK3.Avatars.Components;
+#endif
 
 namespace AnimationRepathing
 {
+#if VRC_SDK_VRCSDK3
+    public static class PlayableExtension
+    {
+        public static VRCAvatarDescriptor.AnimLayerType ToAnimLayer(this ARVariables.Playables playable)
+        {
+            switch (playable)
+            {
+                case ARVariables.Playables.Base: return VRCAvatarDescriptor.AnimLayerType.Base;
+                case ARVariables.Playables.Additive: return VRCAvatarDescriptor.AnimLayerType.Additive;
+                case ARVariables.Playables.Gesture: return VRCAvatarDescriptor.AnimLayerType.Gesture;
+                case ARVariables.Playables.Action: return VRCAvatarDescriptor.AnimLayerType.Action;
+                case ARVariables.Playables.FX: return VRCAvatarDescriptor.AnimLayerType.FX;
+                case ARVariables.Playables.Sitting: return VRCAvatarDescriptor.AnimLayerType.Sitting;
+                case ARVariables.Playables.TPose: return VRCAvatarDescriptor.AnimLayerType.TPose;
+                case ARVariables.Playables.IKPose: return VRCAvatarDescriptor.AnimLayerType.IKPose;
+                case ARVariables.Playables.all: return VRCAvatarDescriptor.AnimLayerType.Deprecated0;
+            }
+
+            return VRCAvatarDescriptor.AnimLayerType.FX;
+        }
+    }
+#endif
     public class ARVariables
     {
         public static string currentVersion;
@@ -99,6 +125,7 @@ namespace AnimationRepathing
             IKPose = 1 << 7,
             all = ~0
         }
+        
         public static Playables PlayableSelection = Playables.all;
 
         /// <summary>
@@ -129,45 +156,23 @@ namespace AnimationRepathing
             {
 #if VRC_SDK_VRCSDK3
                 VRCAvatarDescriptor descriptor = Avatar.GetComponent<VRCAvatarDescriptor>();
-
+                
                 foreach (Playables playable in Enum.GetValues(typeof(Playables)))
                 {
                     if ((playable & PlayableSelection) != 0)
                     {
-                        switch (playable)
+                        if (descriptor.baseAnimationLayers.Count() == 5 && descriptor.baseAnimationLayers[3].type == VRCAvatarDescriptor.AnimLayerType.FX)
                         {
-                            case Playables.Base:
-                                if (EnsureNull(descriptor.baseAnimationLayers[0].animatorController) != null)
-                                    targetControllers.Add(descriptor.baseAnimationLayers[0].animatorController as AnimatorController);
-                                break;
-                            case Playables.Additive:
-                                if (EnsureNull(descriptor.baseAnimationLayers[1].animatorController) != null)
-                                    targetControllers.Add(descriptor.baseAnimationLayers[1].animatorController as AnimatorController);
-                                break;
-                            case Playables.Gesture:
-                                if (EnsureNull(descriptor.baseAnimationLayers[2].animatorController) != null)
-                                    targetControllers.Add(descriptor.baseAnimationLayers[2].animatorController as AnimatorController);
-                                break;
-                            case Playables.Action:
-                                if (EnsureNull(descriptor.baseAnimationLayers[3].animatorController) != null)
-                                    targetControllers.Add(descriptor.baseAnimationLayers[3].animatorController as AnimatorController);
-                                break;
-                            case Playables.FX:
-                                if (EnsureNull(descriptor.baseAnimationLayers[4].animatorController) != null)
-                                    targetControllers.Add(descriptor.baseAnimationLayers[4].animatorController as AnimatorController);
-                                break;
-                            case Playables.Sitting:
-                                if (EnsureNull(descriptor.specialAnimationLayers[0].animatorController) != null)
-                                    targetControllers.Add(descriptor.specialAnimationLayers[0].animatorController as AnimatorController);
-                                break;
-                            case Playables.TPose:
-                                if (EnsureNull(descriptor.specialAnimationLayers[1].animatorController) != null)
-                                    targetControllers.Add(descriptor.specialAnimationLayers[1].animatorController as AnimatorController);
-                                break;
-                            case Playables.IKPose:
-                                if (EnsureNull(descriptor.specialAnimationLayers[2].animatorController) != null)
-                                    targetControllers.Add(descriptor.specialAnimationLayers[2].animatorController as AnimatorController);
-                                break;
+                            descriptor.baseAnimationLayers[3].type = VRCAvatarDescriptor.AnimLayerType.Action;
+                        }
+
+                        VRCAvatarDescriptor.AnimLayerType VRCType = playable.ToAnimLayer();
+                        foreach (var customAnimLayer in descriptor.baseAnimationLayers.Concat(descriptor.specialAnimationLayers).Where(x => x.type == VRCType))
+                        {
+                            if (EnsureNull(customAnimLayer.animatorController) != null)
+                            {
+                                targetControllers.Add(customAnimLayer.animatorController as AnimatorController);
+                            }
                         }
                     }
                 }
