@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
+#if VRC_SDK_VRCSDK3
 using VRC.SDK3.Avatars.Components;
+#endif
 
 namespace AnimationRepathing
 {

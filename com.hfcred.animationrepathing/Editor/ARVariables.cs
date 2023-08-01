@@ -152,9 +152,9 @@ namespace AnimationRepathing
             {
                 targetControllers.Add(Animator.runtimeAnimatorController as AnimatorController);
             }
+#if VRC_SDK_VRCSDK3
             else if (controllerSelection == 1 && Avatar != null && Avatar.GetComponent<VRCAvatarDescriptor>() != null)
             {
-#if VRC_SDK_VRCSDK3
                 VRCAvatarDescriptor descriptor = Avatar.GetComponent<VRCAvatarDescriptor>();
                 
                 foreach (Playables playable in Enum.GetValues(typeof(Playables)))
@@ -176,8 +176,8 @@ namespace AnimationRepathing
                         }
                     }
                 }
-#endif
             }
+#endif
 
             return targetControllers;
         }
