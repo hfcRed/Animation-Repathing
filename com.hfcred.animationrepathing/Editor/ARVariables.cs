@@ -55,6 +55,7 @@ namespace AnimationRepathing
         public static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
         public static Animator _animator;
         public static GameObject _avatar;
+        public static int hierarchyHash;
         public static Animator Animator
         {
             get

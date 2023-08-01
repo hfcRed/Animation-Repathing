@@ -44,6 +44,62 @@ namespace AnimationRepathing
             }
         }
 
+ public class Tree
+        {
+            public string value;
+            public Transform transform;
+            public Tree[] children;
+
+            public Tree(string value, Transform transform, Tree[] children)
+            {
+                this.value = value;
+                this.transform = transform;
+                this.children = children;
+            }
+            
+            protected bool Equals(Tree other)
+            {
+                return value == other.value && Equals(children, other.children);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Tree)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    if (children == null)
+                    {
+                        return ((value != null ? value.GetHashCode() : 0) * 397);
+                    }
+
+                    int childVal = children.Length;
+                    foreach (var child in children)
+                    {
+                        childVal = childVal * 17 + child.GetHashCode();
+                    }
+                    return ((value != null ? value.GetHashCode() : 0) * 397) ^ childVal;
+                }
+            }
+
+            public static Tree GetTreeFromChildren(Transform root)
+            {
+                Tree[] children = new Tree[root.transform.childCount];
+                for (int i = 0; i < root.transform.childCount; i++)
+                {
+                    children[i] = GetTreeFromChildren(root.transform.GetChild(i));
+                }
+                return new Tree(root.name, root, children);
+            }
+        }
+        
+        
         public static void HierarchyChanged()
         {
             bool shouldRun = automaticIsEnabled;
@@ -56,6 +112,14 @@ namespace AnimationRepathing
             shouldRun &= controllers != null;
             shouldRun &= controllers.Count > 0;
             if (!shouldRun) return;
+            
+            Tree tree = Tree.GetTreeFromChildren(root);
+
+            int hashCode = tree.GetHashCode();
+            if (hashCode == hierarchyHash)
+            {
+                return;
+            }
 
             var childCount = root.GetComponentsInChildren<Transform>(true).Where(x => x != root).ToList();
             if (childCount.Count != hierarchyTransforms.Count)
