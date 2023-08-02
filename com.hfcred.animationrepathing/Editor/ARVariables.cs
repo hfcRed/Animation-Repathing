@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Animations;
 using UnityEngine;
-
 #if VRC_SDK_VRCSDK3
 using VRC.SDK3.Avatars.Components;
 #endif
@@ -125,7 +124,7 @@ namespace AnimationRepathing
             IKPose = 1 << 7,
             all = ~0
         }
-        
+
         public static Playables PlayableSelection = Playables.all;
 
         /// <summary>
@@ -156,7 +155,7 @@ namespace AnimationRepathing
             else if (controllerSelection == 1 && Avatar != null && Avatar.GetComponent<VRCAvatarDescriptor>() != null)
             {
                 VRCAvatarDescriptor descriptor = Avatar.GetComponent<VRCAvatarDescriptor>();
-                
+
                 foreach (Playables playable in Enum.GetValues(typeof(Playables)))
                 {
                     if ((playable & PlayableSelection) != 0)

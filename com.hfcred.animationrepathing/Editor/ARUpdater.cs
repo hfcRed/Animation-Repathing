@@ -5,6 +5,11 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+#if VRC_SDK_VRCSDK3
+using VRC.PackageManagement.Core;
+using VRC.PackageManagement.Core.Types;
+using VRC.PackageManagement.Resolver;
+#endif
 
 namespace AnimationRepathing
 {
@@ -70,6 +75,22 @@ namespace AnimationRepathing
         public static void UpdateTool()
         {
             AssetDatabase.Refresh();
+
+#if VRC_SDK_VRCSDK3
+            if (Resolver.VPMManifestExists())
+            {
+                var project = new UnityProject(Resolver.ProjectDir);
+                var package = Repos.GetPackageWithVersionMatch("com.hfcred.animationrepathing", newestVersion);
+
+                if (package != null)
+                {
+                    project.UpdateVPMPackage(package);
+                    AssetDatabase.Refresh();
+                    return;
+                }
+            }
+#endif
+
             bool downloadSuccess = false;
 
             var client = new UnityWebRequest(downloadURL + newestVersion + ".unitypackage")
@@ -82,7 +103,6 @@ namespace AnimationRepathing
                 {
                     downloadSuccess = true;
                     GetAssetsToDelete();
-
 
                     AssetDatabase.ImportAsset(packagePath);
                     AssetDatabase.ImportPackage(packagePath, false);

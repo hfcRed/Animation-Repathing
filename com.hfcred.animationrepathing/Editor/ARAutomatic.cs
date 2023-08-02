@@ -49,7 +49,7 @@ namespace AnimationRepathing
             unchecked
             {
                 int nameValue = (root.name.GetHashCode()) * 397;
-                
+
                 for (int i = 0; i < root.transform.childCount; i++)
                 {
                     nameValue = nameValue * 17 + GetHashCode(root.GetChild(i));
@@ -71,14 +71,14 @@ namespace AnimationRepathing
             shouldRun &= controllers != null;
             shouldRun &= controllers.Count > 0;
             if (!shouldRun) return;
-            
-            
+
+
             int hashCode = GetHashCode(root);
             if (hashCode == hierarchyHash)
             {
                 return;
             }
-            
+
             hierarchyHash = hashCode;
 
             var childCount = root.GetComponentsInChildren<Transform>(true).Where(x => x != root).ToList();
@@ -188,14 +188,14 @@ namespace AnimationRepathing
                         void HandleBinding(EditorCurveBinding b, bool isObjectCurve)
                         {
                             if (!changedPaths.TryGetValue(b.path, out string newPath)) return;
-                            
+
                             if (!displayedChanges.ToString().Contains(b.path))
                             {
                                 string s = b.path + ARStrings.Popup.to + newPath;
                                 displayedChanges.AppendLine("");
                                 displayedChanges.AppendLine(s);
                             }
-                            
+
                             if (isObjectCurve)
                             {
                                 ObjectReferenceKeyframe[] objectCurve = AnimationUtility.GetObjectReferenceCurve(clip, b);

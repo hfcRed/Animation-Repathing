@@ -29,6 +29,8 @@ namespace AnimationRepathing
 
         public void OnGUI()
         {
+            Repaint();
+
             EditorGUI.BeginChangeCheck();
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(position.width));
 
