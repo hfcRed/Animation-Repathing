@@ -87,6 +87,7 @@ namespace AnimationRepathing
                     project.UpdateVPMPackage(package);
                     AssetDatabase.Refresh();
                     return;
+
                 }
             }
 #endif
