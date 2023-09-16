@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-#if VRC_SDK_VRCSDK3
+#if VRC_AVATARS
 using VRC.SDK3.Avatars.Components;
 #endif
 
@@ -15,11 +15,9 @@ namespace AnimationRepathing
     public class AREditor : EditorWindow
     {
         [MenuItem("hfcRed/Tools/Animation Repathing")]
-        public static void ShowWindow() => GetWindow<AREditor>("Animation Repathing").titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
+        public static void ShowWindow() => GetWindow<AREditor>("Animation Repathing", true).titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
-        public static int loading = 0;
-        public static bool finishedLoading = false;
 
         public string GetScriptPath()
         {
@@ -31,6 +29,8 @@ namespace AnimationRepathing
         {
             Repaint();
 
+            GUI.skin.font = fontStyle.font;
+
             EditorGUI.BeginChangeCheck();
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(position.width));
 
@@ -40,6 +40,7 @@ namespace AnimationRepathing
                 case 0: DrawAutomatic(); break;
                 case 1: DrawManual(); break;
             }
+
             DrawDivider(28, 20, 5, 5);
             DrawSettings();
 
@@ -57,6 +58,7 @@ namespace AnimationRepathing
                 GUIContent[] content = { new GUIContent(ARStrings.Main.automatic, ARStrings.ToolTips.automatic), new GUIContent(ARStrings.Main.manual, ARStrings.ToolTips.manual) };
                 content[0].image = EditorGUIUtility.IconContent("Profiler.Memory").image;
                 content[1].image = EditorGUIUtility.IconContent("ViewToolMove").image;
+
                 toolSelection = GUILayout.Toolbar(toolSelection, content, GUILayout.Height(25));
             }
         }
@@ -75,8 +77,12 @@ namespace AnimationRepathing
 
                 using (new SqueezeScope((15, 0, 4)))
                 {
+                    GUI.color = automaticIsEnabled ? Color.green : Color.grey;
+
                     GUIContent content = automaticIsEnabled ? new GUIContent("<color=#4aff93><b>" + ARStrings.Automatic.enabled + "</b></color>", ARStrings.ToolTips.toggleButton) : new GUIContent("<color=#ff5263><b>" + ARStrings.Automatic.disabled + "</b></color>", ARStrings.ToolTips.toggleButton);
                     automaticIsEnabled = GUILayout.Toggle(automaticIsEnabled, content, ARStyle.toggleButton, GUILayout.Height(40));
+
+                    GUI.color = Color.white;
                 }
             }
         }
@@ -134,7 +140,7 @@ namespace AnimationRepathing
 
                 using (new SqueezeScope((10, 0, 4), (0, 0, 4, GUI.skin.box), (5, 5, 3)))
                 {
-                    GUILayout.Label(new GUIContent("<color=#F0DE08><b>" + str + "</b></color>"), ARStyle.invalidPath);
+                    GUILayout.Label(new GUIContent("<color=#F0DE08><b>" + str + "</b></color>"), ARStyle.invalidPath, GUILayout.MinWidth(1));
                 }
 
                 using (new SqueezeScope((0, 0, 4), (0, 0, 3)))
@@ -535,21 +541,16 @@ namespace AnimationRepathing
                         GUI.color = new Color(0.75f, 0.75f, 0.75f);
                         if (GUILayout.Button(new GUIContent(" Check for new version", EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                         {
-                            finishedLoading = false;
-                            loading = 125;
                             availableUpdate = ARUpdater.CheckForNewVersion();
                         }
                         GUI.color = c;
-
-                        if (loading == 1) finishedLoading = true;
-                        if (loading > 0) loading--;
 
                         GUILayout.FlexibleSpace();
                     }
 
                     using (new SqueezeScope((5, -5, 4), (5, 5, 3)))
                     {
-                        if (finishedLoading)
+                        if (!fetchingVersion)
                         {
                             GUILayout.FlexibleSpace();
 
@@ -558,9 +559,9 @@ namespace AnimationRepathing
 
                             string text = availableUpdate ? " New version available! Download it at the top" : " No new version available";
 
-                            if (GUILayout.Button(text, new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                            if (GUILayout.Button(text, new GUIStyle(GUI.skin.label), GUILayout.Height(25), GUILayout.MinWidth(1)))
                             {
-                                finishedLoading = false;
+                                fetchingVersion = true;
                             }
                             GUI.color = c;
 
@@ -637,7 +638,7 @@ namespace AnimationRepathing
                         GUILayout.Label(new GUIContent(ARStrings.Settings.avatarToUse, ARStrings.ToolTips.avatarToUse), GUILayout.MinWidth(100));
                         ARVariables.Avatar = (GameObject)EditorGUILayout.ObjectField(ARVariables.Avatar, typeof(GameObject), true);
                     }
-#if VRC_SDK_VRCSDK3
+#if VRC_AVATARS
                     if (ARVariables.Avatar != null && ARVariables.Avatar.GetComponent<VRCAvatarDescriptor>() != null)
                     {
                         using (new SqueezeScope((-5, 10, 4), (5, 5, 3)))
@@ -795,7 +796,7 @@ namespace AnimationRepathing
             using (new SqueezeScope((above, below, 4), (left, right, 3)))
             {
                 Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(10));
-                EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 2), new Color(0.5f, 0.5f, 0.5f));
+                EditorGUI.DrawRect(new Rect(r.x, r.y, r.width, 3), new Color(0.5f, 0.5f, 0.5f));
             }
         }
 
@@ -830,10 +831,10 @@ namespace AnimationRepathing
                     string p = controllerSelection == 0 ?
                     ARVariables.Animator == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, ARVariables.Animator.transform) :
                     ARVariables.Avatar == null ? AnimationUtility.CalculateTransformPath(go.transform, go.GetComponentInParent<Animator>()?.transform) : AnimationUtility.CalculateTransformPath(go.transform, ARVariables.Avatar.transform);
-                    return (p);
+                    return p;
                 }
             }
-            return (null);
+            return null;
         }
     }
 

@@ -72,8 +72,8 @@ namespace AnimationRepathing
                     break;
             }
 
-            ARAutomatic.GetAllChildren();
-            availableUpdate = ARUpdater.CheckForNewVersion();
+            ARVariables.fontStyle.font = Resources.Load<Font>("Silka-Light");
+
         }
 
         public static void ResetGeneralData()

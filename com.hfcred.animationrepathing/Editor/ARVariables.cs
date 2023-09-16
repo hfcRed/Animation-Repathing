@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Animations;
 using UnityEngine;
-#if VRC_SDK_VRCSDK3
+#if VRC_AVATARS
 using VRC.SDK3.Avatars.Components;
 #endif
 
 namespace AnimationRepathing
 {
-#if VRC_SDK_VRCSDK3
+#if VRC_AVATARS
     public static class PlayableExtension
     {
         public static VRCAvatarDescriptor.AnimLayerType ToAnimLayer(this ARVariables.Playables playable)
@@ -31,13 +31,14 @@ namespace AnimationRepathing
         }
     }
 #endif
+
     public class ARVariables
     {
         public static string currentVersion;
         public static string newestVersion;
         public static bool availableUpdate;
+        public static bool fetchingVersion;
         public static bool automaticIsEnabled;
-
         public static int toolSelection;
         public static int manualToolSelection;
         public static int controllerSelection;
@@ -46,6 +47,7 @@ namespace AnimationRepathing
         public static bool warnOnlyIfUsed = true;
         public static bool activeInBackground = false;
         public static bool disableTooltips = false;
+        public static GUIStyle fontStyle = new GUIStyle();
 
         public class InvalidSharedProperty
         {
@@ -57,7 +59,6 @@ namespace AnimationRepathing
         }
         public static List<InvalidSharedProperty> invalidSharedProperties = new List<InvalidSharedProperty>();
         public static Dictionary<string, InvalidSharedProperty> invalidPathToSharedProperty = new Dictionary<string, InvalidSharedProperty>();
-        public static int invalidPosition;
 
         public class ClipsSharedProperty
         {
@@ -151,7 +152,7 @@ namespace AnimationRepathing
             {
                 targetControllers.Add(Animator.runtimeAnimatorController as AnimatorController);
             }
-#if VRC_SDK_VRCSDK3
+#if VRC_AVATARS
             else if (controllerSelection == 1 && Avatar != null && Avatar.GetComponent<VRCAvatarDescriptor>() != null)
             {
                 VRCAvatarDescriptor descriptor = Avatar.GetComponent<VRCAvatarDescriptor>();

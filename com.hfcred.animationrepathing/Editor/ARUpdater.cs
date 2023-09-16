@@ -5,6 +5,11 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Collections;
+using System.Threading.Tasks;
+using UnityEngine.Experimental.Networking;
+using System;
+
 #if VRC_SDK_VRCSDK3
 using VRC.PackageManagement.Core;
 using VRC.PackageManagement.Core.Types;
@@ -28,7 +33,16 @@ namespace AnimationRepathing
             currentVersion = string.Empty;
 
             currentVersion = GetCurrentVersion()?.ToString();
-            newestVersion = GetNewestVersion()?.ToString();
+
+            GetNewestVersion(jsonText =>
+            {
+                if (jsonText != null && jsonText != string.Empty)
+                {
+                    JsonData data = JsonUtility.FromJson<JsonData>(jsonText);
+                    newestVersion = data.version;
+                }
+                else newestVersion = null;
+            });
 
             if (newestVersion != null && currentVersion != null && newestVersion != currentVersion) return true;
             else return false;
@@ -49,46 +63,62 @@ namespace AnimationRepathing
             string parentFolder = Path.GetDirectoryName(folderPath);
 
             if (!File.Exists(parentFolder + "/package.json")) return null;
+
             string jsonText = File.ReadAllText(parentFolder + "/package.json");
 
-            JsonData data = JsonUtility.FromJson<JsonData>(jsonText);
-            return data.version;
-        }
-
-        public static string GetNewestVersion()
-        {
-            try
+            if (jsonText != null && jsonText != string.Empty)
             {
-                var client = new System.Net.WebClient();
-                string jsonText = client.DownloadString(versionURL);
-
                 JsonData data = JsonUtility.FromJson<JsonData>(jsonText);
                 return data.version;
             }
-            catch (System.Net.WebException e)
-            {
-                Debug.Log(e);
-            }
+
+
             return null;
+        }
+
+        public static void GetNewestVersion(Action<string> callback)
+        {
+            fetchingVersion = true;
+            string jsonText = string.Empty;
+
+            var client = new UnityWebRequest(versionURL)
+            {
+                downloadHandler = new DownloadHandlerBuffer()
+            };
+
+            client.SendWebRequest().completed += AA =>
+            {
+                if (client.downloadHandler.isDone)
+                {
+                    jsonText = client.downloadHandler.text;
+                    fetchingVersion = false;
+                    callback(jsonText);
+                }
+            };
         }
 
         public static void UpdateTool()
         {
+            if (newestVersion == null || currentVersion == null || newestVersion == currentVersion) return;
+
             AssetDatabase.Refresh();
 
 #if VRC_SDK_VRCSDK3
             if (Resolver.VPMManifestExists())
             {
-                var project = new UnityProject(Resolver.ProjectDir);
-                var package = Repos.GetPackageWithVersionMatch("com.hfcred.animationrepathing", newestVersion);
-
-                if (package != null)
+                try
                 {
-                    project.UpdateVPMPackage(package);
-                    AssetDatabase.Refresh();
-                    return;
+                    var project = new UnityProject(Resolver.ProjectDir);
+                    var package = Repos.GetPackageWithVersionMatch("com.hfcred.animationrepathing", newestVersion);
 
+                    if (package != null)
+                    {
+                        project.UpdateVPMPackage(package);
+                        AssetDatabase.Refresh();
+                        return;
+                    }
                 }
+                catch (Exception e) { };
             }
 #endif
 
@@ -98,6 +128,7 @@ namespace AnimationRepathing
             {
                 downloadHandler = new DownloadHandlerFile(packagePath)
             };
+
             client.SendWebRequest().completed += AA =>
             {
                 if (client.downloadHandler.isDone)
@@ -110,6 +141,7 @@ namespace AnimationRepathing
                 }
 
                 client.Dispose();
+                AssetDatabase.DeleteAsset(packagePath);
 
                 if (downloadSuccess) DeleteAssets();
                 else Debug.LogError("Animation Repathing: Download could not be completed, you may have to manually update the tool through the VRChat Creator Companion or by downloading the latest release from https://github.com/hfcRed/Animation-Repathing/releases");
@@ -142,8 +174,6 @@ namespace AnimationRepathing
 
         public static void DeleteAssets()
         {
-            AssetDatabase.DeleteAsset(packagePath);
-
             foreach (string s in metasToDelete)
             {
                 if (File.Exists(s))

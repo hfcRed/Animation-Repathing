@@ -72,7 +72,6 @@ namespace AnimationRepathing
             shouldRun &= controllers.Count > 0;
             if (!shouldRun) return;
 
-
             int hashCode = GetHashCode(root);
             if (hashCode == hierarchyHash)
             {
