@@ -160,14 +160,15 @@ namespace AnimationRepathing
 
             string folderPath = Path.GetDirectoryName(path);
             string parentFolder = Path.GetDirectoryName(folderPath);
-            string[] assetGUID = AssetDatabase.FindAssets("", new[] { parentFolder }).Where(x => x != AssetDatabase.AssetPathToGUID(folderPath)).ToArray();
+            string[] assetGUID = AssetDatabase.FindAssets("", new[] { parentFolder }).ToArray();
+            string[] foldersToExclude = Directory.GetDirectories(parentFolder).Select(x => AssetDatabase.AssetPathToGUID(x)).ToArray();
+            assetGUID = assetGUID.Except(foldersToExclude).ToArray();
 
             foreach (string s in assetGUID)
             {
                 string ext = Path.GetExtension(AssetDatabase.GUIDToAssetPath(s));
                 string oldPath = AssetDatabase.GUIDToAssetPath(s);
-
-                File.Move(oldPath, folderPath + "/ARToDelete" + s + ext);
+                AssetDatabase.MoveAsset(oldPath, folderPath + "/ARToDelete" + s + ext);
 
                 assetsToDelete.Add(folderPath + "/ARToDelete" + s + ext);
                 metasToDelete.Add(oldPath + ".meta");
