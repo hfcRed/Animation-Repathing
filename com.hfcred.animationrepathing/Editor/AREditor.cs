@@ -503,7 +503,7 @@ namespace AnimationRepathing
                         GUILayout.FlexibleSpace();
                         GUILayout.Label("New Version Available!", GUILayout.Height(25));
                         GUILayout.Space(10);
-                        if (GUILayout.Button("Update  " + currentVersion + " ==> " + newestVersion, GUILayout.Height(25)))
+                        if (GUILayout.Button("Update  " + currentVersion + "  ==>  " + newestVersion, GUILayout.Height(25)))
                         {
                             ARUpdater.UpdateTool();
                         }
@@ -541,7 +541,7 @@ namespace AnimationRepathing
                         GUI.color = new Color(0.75f, 0.75f, 0.75f);
                         if (GUILayout.Button(new GUIContent(" Check for new version", EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                         {
-                            availableUpdate = ARUpdater.CheckForNewVersion();
+                            ARUpdater.CheckForNewVersion();
                         }
                         GUI.color = c;
 
@@ -555,14 +555,28 @@ namespace AnimationRepathing
                             GUILayout.FlexibleSpace();
 
                             Color c = GUI.color;
-                            GUI.color = new Color(0.6f, 0.6f, 0.6f);
 
-                            string text = availableUpdate ? " New version available! Download it at the top" : " No new version available";
-
-                            if (GUILayout.Button(text, new GUIStyle(GUI.skin.label), GUILayout.Height(25), GUILayout.MinWidth(1)))
+                            if (fetchingFailed)
                             {
-                                fetchingVersion = true;
+                                GUI.color = new Color(0.95f, 0.2f, 0.2f);
+
+                                if (GUILayout.Button("Could not fetch new version", new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                                {
+                                    fetchingVersion = true;
+                                }
                             }
+                            else
+                            {
+                                GUI.color = new Color(0.6f, 0.6f, 0.6f);
+
+                                string text = availableUpdate ? "New version available! Download it at the top" : "No new version available";
+
+                                if (GUILayout.Button(text, new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                                {
+                                    fetchingVersion = true;
+                                }
+                            }
+
                             GUI.color = c;
 
                             GUILayout.FlexibleSpace();

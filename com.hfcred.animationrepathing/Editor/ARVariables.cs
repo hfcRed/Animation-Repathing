@@ -38,6 +38,7 @@ namespace AnimationRepathing
         public static string newestVersion;
         public static bool availableUpdate;
         public static bool fetchingVersion;
+        public static bool fetchingFailed;
         public static bool automaticIsEnabled;
         public static int toolSelection;
         public static int manualToolSelection;

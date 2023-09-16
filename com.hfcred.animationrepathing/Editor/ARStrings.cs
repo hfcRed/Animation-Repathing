@@ -155,7 +155,7 @@
 
             Popup.title = "Animation Repathing";
             Popup.message = "Hierarchy changes detected, would you like to repath your animations?";
-            Popup.to = "  ==>  ";
+            Popup.to = "  -->  ";
             Popup.continuee = "Yes";
             Popup.cancel = "No";
             Popup.debug = "Animation Repathing:";
@@ -329,7 +329,7 @@
 
             Popup.title = "애니메이션 리패스";
             Popup.message = "하이어라키 변경이 감지되었습니다. 애니메이션 경로도 수정하시겠습니까?";
-            Popup.to = "  ==>  ";
+            Popup.to = "  -->  ";
             Popup.continuee = "예";
             Popup.cancel = "아니오";
             Popup.debug = "애니메이션 리패스:";

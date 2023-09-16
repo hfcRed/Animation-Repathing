@@ -1,15 +1,11 @@
 using static AnimationRepathing.ARVariables;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Collections;
-using System.Threading.Tasks;
-using UnityEngine.Experimental.Networking;
-using System;
-
 #if VRC_SDK_VRCSDK3
 using VRC.PackageManagement.Core;
 using VRC.PackageManagement.Core.Types;
@@ -27,7 +23,7 @@ namespace AnimationRepathing
         public static List<string> assetsToDelete = new List<string>();
         public static List<string> metasToDelete = new List<string>();
 
-        public static bool CheckForNewVersion()
+        public static void CheckForNewVersion()
         {
             newestVersion = string.Empty;
             currentVersion = string.Empty;
@@ -42,10 +38,10 @@ namespace AnimationRepathing
                     newestVersion = data.version;
                 }
                 else newestVersion = null;
-            });
 
-            if (newestVersion != null && currentVersion != null && newestVersion != currentVersion) return true;
-            else return false;
+                if (newestVersion != null && currentVersion != null && newestVersion != currentVersion) availableUpdate = true;
+                else availableUpdate = false;
+            });
         }
 
         [System.Serializable]
@@ -72,13 +68,13 @@ namespace AnimationRepathing
                 return data.version;
             }
 
-
             return null;
         }
 
         public static void GetNewestVersion(Action<string> callback)
         {
             fetchingVersion = true;
+            fetchingFailed = false;
             string jsonText = string.Empty;
 
             var client = new UnityWebRequest(versionURL)
@@ -88,7 +84,13 @@ namespace AnimationRepathing
 
             client.SendWebRequest().completed += AA =>
             {
-                if (client.downloadHandler.isDone)
+                if (client.isNetworkError || client.isHttpError)
+                {
+                    fetchingVersion = false;
+                    fetchingFailed = true;
+                    newestVersion = null;
+                }
+                else if (client.downloadHandler.isDone)
                 {
                     jsonText = client.downloadHandler.text;
                     fetchingVersion = false;
@@ -118,7 +120,7 @@ namespace AnimationRepathing
                         return;
                     }
                 }
-                catch (Exception e) { };
+                catch (Exception e) { Debug.Log(e); };
             }
 #endif
 

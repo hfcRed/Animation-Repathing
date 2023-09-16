@@ -74,6 +74,7 @@ namespace AnimationRepathing
 
             ARVariables.fontStyle.font = Resources.Load<Font>("Silka-Light");
 
+            ARUpdater.CheckForNewVersion();
         }
 
         public static void ResetGeneralData()
