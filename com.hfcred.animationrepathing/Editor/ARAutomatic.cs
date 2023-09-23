@@ -35,7 +35,6 @@ namespace AnimationRepathing
 
             Transform root = GetRoot();
             if (!root) return;
-
             var allChildren = root.GetComponentsInChildren<Transform>(true);
             for (int i = 1; i < allChildren.Length; i++)
             {
@@ -88,6 +87,7 @@ namespace AnimationRepathing
                 {
                     compare.Add(new HierarchyTransform(t, root));
                 }
+
                 hierarchyTransforms.AddRange(compare.Where(x => !hierarchyTransforms.Contains(x)));
             }
 
@@ -121,11 +121,15 @@ namespace AnimationRepathing
 
             if (changedPaths.Count == 0) return;
 
-            if (warnOnlyIfUsed && ScanAnimators() && (!sendWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
+            if (sendWarning && warnOnlyIfUsed && ScanAnimators() && EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel))
             {
                 RepathAnimations(controllers.ToArray());
             }
-            else if (!warnOnlyIfUsed && (!sendWarning || EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel)))
+            else if (!warnOnlyIfUsed && sendWarning && EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel))
+            {
+                RepathAnimations(controllers.ToArray());
+            }
+            else
             {
                 RepathAnimations(controllers.ToArray());
             }
@@ -213,7 +217,8 @@ namespace AnimationRepathing
                     }
                 }
             }
-            finally { AssetDatabase.StopAssetEditing(); Debug.Log(displayedChanges); }
+            finally { AssetDatabase.StopAssetEditing(); if (!disableDebugLogging) Debug.Log(displayedChanges); }
+
         }
     }
 }

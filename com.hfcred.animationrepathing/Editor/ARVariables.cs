@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 #if VRC_AVATARS
@@ -34,6 +35,36 @@ namespace AnimationRepathing
 
     public class ARVariables
     {
+        static ARVariables()
+        {
+            Selection.selectionChanged -= getAutomaticController;
+            Selection.selectionChanged += getAutomaticController;
+        }
+
+        public static void getAutomaticController()
+        {
+            if (getControllerAutomatically)
+            {
+                if (Selection.activeGameObject == null)
+                {
+                    automaticAnimator = null;
+                    return;
+                }
+                if (!Selection.activeGameObject.GetComponentInParent<Animator>()?.runtimeAnimatorController)
+                {
+                    automaticAnimator = null;
+                    return;
+                }
+
+                var compare = Selection.activeGameObject.GetComponentInParent<Animator>();
+
+                if (compare != automaticAnimator)
+                {
+                    automaticAnimator = compare; ARAutomatic.GetAllChildren();
+                }
+            }
+        }
+
         public static string currentVersion;
         public static string newestVersion;
         public static bool availableUpdate;
@@ -43,11 +74,13 @@ namespace AnimationRepathing
         public static int toolSelection;
         public static int manualToolSelection;
         public static int controllerSelection;
+        public static bool getControllerAutomatically;
         public static int languageSelection;
-        public static bool sendWarning = true;
-        public static bool warnOnlyIfUsed = true;
-        public static bool activeInBackground = false;
-        public static bool disableTooltips = false;
+        public static bool sendWarning;
+        public static bool warnOnlyIfUsed;
+        public static bool activeInBackground;
+        public static bool disableDebugLogging;
+        public static bool disableTooltips;
         public static GUIStyle fontStyle = new GUIStyle();
 
         public class InvalidSharedProperty
@@ -80,9 +113,10 @@ namespace AnimationRepathing
 
         public static readonly List<ARAutomatic.HierarchyTransform> hierarchyTransforms = new List<ARAutomatic.HierarchyTransform>();
         public static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
-        public static Animator _animator;
-        public static GameObject _avatar;
         public static int hierarchyHash;
+        public static Animator _animator;
+        public static Animator automaticAnimator;
+        public static GameObject _avatar;
         public static Animator Animator
         {
             get
@@ -136,6 +170,14 @@ namespace AnimationRepathing
         /// </summary>
         public static Transform GetRoot()
         {
+            if (getControllerAutomatically)
+            {
+                if (!Selection.activeGameObject) return null;
+                if (!Selection.activeGameObject.GetComponentInParent<Animator>()?.runtimeAnimatorController) return null;
+
+                return Selection.activeGameObject.GetComponentInParent<Animator>().transform;
+            }
+
             return controllerSelection == 0 ?
             Animator?.transform : Avatar?.transform;
         }
@@ -149,7 +191,14 @@ namespace AnimationRepathing
         {
             List<AnimatorController> targetControllers = new List<AnimatorController>();
 
-            if (controllerSelection == 0 && Animator != null && Animator.runtimeAnimatorController != null)
+            if (getControllerAutomatically)
+            {
+                if (!Selection.activeGameObject) return targetControllers;
+                if (!Selection.activeGameObject.GetComponentInParent<Animator>()?.runtimeAnimatorController) return targetControllers;
+
+                targetControllers.Add(Selection.activeGameObject.GetComponentInParent<Animator>().runtimeAnimatorController as AnimatorController);
+            }
+            else if (controllerSelection == 0 && Animator != null && Animator.runtimeAnimatorController != null)
             {
                 targetControllers.Add(Animator.runtimeAnimatorController as AnimatorController);
             }

@@ -27,10 +27,12 @@ namespace AnimationRepathing
         public static void SaveData()
         {
             PlayerPrefs.SetInt("AREnabled", automaticIsEnabled ? 1 : 0);
+            PlayerPrefs.SetInt("ARGetAutomatically", getControllerAutomatically ? 1 : 0);
             PlayerPrefs.SetInt("ARTooltips", disableTooltips ? 1 : 0);
             PlayerPrefs.SetInt("ARSendWarning", sendWarning ? 1 : 0);
             PlayerPrefs.SetInt("ARWarnOnlyIfUsed", warnOnlyIfUsed ? 1 : 0);
             PlayerPrefs.SetInt("ARRunInBackground", activeInBackground ? 1 : 0);
+            PlayerPrefs.SetInt("ARDisableDebugLogging", disableDebugLogging ? 1 : 0);
 
             PlayerPrefs.SetInt("ARToolSelection", toolSelection);
             PlayerPrefs.SetInt("ARManualToolSelection", manualToolSelection);
@@ -45,10 +47,12 @@ namespace AnimationRepathing
         public static void LoadData()
         {
             automaticIsEnabled = PlayerPrefs.GetInt("AREnabled") != 0;
+            getControllerAutomatically = PlayerPrefs.GetInt("ARGetAutomatically") != 0;
             disableTooltips = PlayerPrefs.GetInt("ARTooltips") != 0;
             sendWarning = PlayerPrefs.GetInt("ARSendWarning") != 0;
             warnOnlyIfUsed = PlayerPrefs.GetInt("ARWarnOnlyIfUsed") != 0;
             activeInBackground = PlayerPrefs.GetInt("ARRunInBackground") != 0;
+            disableDebugLogging = PlayerPrefs.GetInt("ARDisableDebugLogging") != 0;
 
             toolSelection = PlayerPrefs.GetInt("ARToolSelection");
             manualToolSelection = PlayerPrefs.GetInt("ARManualToolSelection");
@@ -79,9 +83,10 @@ namespace AnimationRepathing
 
         public static void ResetGeneralData()
         {
-            PlayableSelection = Playables.all;
             ARVariables.Animator = null;
             ARVariables.Avatar = null;
+            PlayableSelection = Playables.all;
+            getControllerAutomatically = false;
             SaveData();
         }
 
@@ -90,6 +95,7 @@ namespace AnimationRepathing
             sendWarning = true;
             warnOnlyIfUsed = true;
             activeInBackground = false;
+            disableDebugLogging = true;
             SaveData();
         }
     }

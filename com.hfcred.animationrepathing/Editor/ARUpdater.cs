@@ -86,9 +86,11 @@ namespace AnimationRepathing
             {
                 if (client.isNetworkError || client.isHttpError)
                 {
+                    Debug.LogError("Could not get newest version for Animation Repathing! => " + client.error);
                     fetchingVersion = false;
                     fetchingFailed = true;
                     newestVersion = null;
+                    callback(string.Empty);
                 }
                 else if (client.downloadHandler.isDone)
                 {
@@ -133,7 +135,11 @@ namespace AnimationRepathing
 
             client.SendWebRequest().completed += AA =>
             {
-                if (client.downloadHandler.isDone)
+                if (client.isNetworkError || client.isHttpError)
+                {
+                    Debug.Log(client.error);
+                }
+                else if (client.downloadHandler.isDone)
                 {
                     downloadSuccess = true;
                     GetAssetsToDelete();

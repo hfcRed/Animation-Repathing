@@ -558,9 +558,9 @@ namespace AnimationRepathing
 
                             if (fetchingFailed)
                             {
-                                GUI.color = new Color(0.95f, 0.2f, 0.2f);
+                                GUI.color = new Color(1f, 0.4f, 0.4f);
 
-                                if (GUILayout.Button("Could not fetch new version", new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                                if (GUILayout.Button(" Could not fetch newest version", new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                                 {
                                     fetchingVersion = true;
                                 }
@@ -569,7 +569,7 @@ namespace AnimationRepathing
                             {
                                 GUI.color = new Color(0.6f, 0.6f, 0.6f);
 
-                                string text = availableUpdate ? "New version available! Download it at the top" : "No new version available";
+                                string text = availableUpdate ? " New version available! Download it at the top" : " No new version available";
 
                                 if (GUILayout.Button(text, new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                                 {
@@ -619,6 +619,7 @@ namespace AnimationRepathing
                 }
             }
 
+            if (getControllerAutomatically) EditorGUI.BeginDisabledGroup(true);
             using (new SqueezeScope((0, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
             {
                 using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
@@ -669,6 +670,35 @@ namespace AnimationRepathing
                         }
                     }
 #endif
+                }
+            }
+            EditorGUI.EndDisabledGroup();
+
+            using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
+                {
+                    getControllerAutomatically = GUILayout.Toggle(getControllerAutomatically, "Use Controller from root Animator");
+                }
+
+                using (new SqueezeScope((0, 5, 4), (5, 5, 3)))
+                {
+                    GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent("d_console.infoicon.inactive.sml").image, ""), GUILayout.Height(20), GUILayout.Width(20));
+
+                    Color c = GUI.color;
+                    GUI.color = new Color(0.75f, 0.75f, 0.75f);
+                    GUILayout.Label(" This setting is slightly slower than setting the target manually", new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20), GUILayout.Width(EditorGUIUtility.currentViewWidth / 1.4f));
+                    GUI.color = c;
+                }
+
+                if (getControllerAutomatically)
+                {
+                    EditorGUI.BeginDisabledGroup(true);
+                    using (new SqueezeScope((0, 5, 4), (5, 5, 3)))
+                    {
+                        automaticAnimator = (Animator)EditorGUILayout.ObjectField(automaticAnimator, typeof(Animator), true);
+                    }
+                    EditorGUI.EndDisabledGroup();
                 }
             }
 
@@ -775,6 +805,7 @@ namespace AnimationRepathing
                 }
             }
 
+            if (!sendWarning) EditorGUI.BeginDisabledGroup(true);
             using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
             {
                 using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
@@ -792,12 +823,21 @@ namespace AnimationRepathing
                     GUI.color = c;
                 }
             }
+            EditorGUI.EndDisabledGroup();
 
             using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
             {
                 using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                 {
                     activeInBackground = GUILayout.Toggle(activeInBackground, new GUIContent(ARStrings.Settings.runWhenWindowClosed, ARStrings.ToolTips.runWhenWindowClosed));
+                }
+            }
+
+            using (new SqueezeScope((10, 0, 4), (0, 0, 4, EditorStyles.helpBox)))
+            {
+                using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
+                {
+                    disableDebugLogging = GUILayout.Toggle(disableDebugLogging, new GUIContent("Disable console logging"));
                 }
             }
         }
