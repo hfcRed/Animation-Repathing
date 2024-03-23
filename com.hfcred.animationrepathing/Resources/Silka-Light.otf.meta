@@ -8,13 +8,12 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 0
-  fontName: Silka
   fontNames:
   - Silka
   fallbackFontReferences:
   - {instanceID: 0}
   customCharacters: 
-  fontRenderingMode: 1
+  fontRenderingMode: 0
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0
   shouldRoundAdvanceValue: 1
