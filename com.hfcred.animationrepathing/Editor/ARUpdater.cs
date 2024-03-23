@@ -54,6 +54,7 @@ namespace AnimationRepathing
         {
             var editor = ScriptableObject.CreateInstance<AREditor>();
             string path = editor.GetScriptPath();
+            ScriptableObject.DestroyImmediate(editor);
 
             string folderPath = Path.GetDirectoryName(path);
             string parentFolder = Path.GetDirectoryName(folderPath);
@@ -163,6 +164,7 @@ namespace AnimationRepathing
 
             var editor = ScriptableObject.CreateInstance<AREditor>();
             string path = editor.GetScriptPath();
+            ScriptableObject.DestroyImmediate(editor);
 
             string folderPath = Path.GetDirectoryName(path);
             string parentFolder = Path.GetDirectoryName(folderPath);
