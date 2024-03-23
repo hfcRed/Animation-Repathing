@@ -95,7 +95,12 @@ namespace AnimationRepathing
                         }
                     }
                 }
-                finally { AssetDatabase.StopAssetEditing(); ScanInvalidPaths(GetControllers().ToArray()); }
+                finally
+                {
+                    AssetDatabase.StopAssetEditing();
+                    ScanInvalidPaths(GetControllers().ToArray());
+                    ARAutomatic.HierarchyChanged();
+                }
             }
         }
 
@@ -205,7 +210,12 @@ namespace AnimationRepathing
                         }
                     }
                 }
-                finally { AssetDatabase.StopAssetEditing(); GetClipPaths(); }
+                finally
+                {
+                    AssetDatabase.StopAssetEditing();
+                    GetClipPaths();
+                    ARAutomatic.HierarchyChanged();
+                }
             }
         }
     }
