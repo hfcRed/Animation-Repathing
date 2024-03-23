@@ -1,7 +1,9 @@
 {
   "name": "com.hfcred.animationrepathing",
+  "unity": "2019.4.29f1",
+  "icon": "https://cdn.discordapp.com/attachments/706913825122680906/1155954038119071764/depresso.png",
   "displayName": "Animation Repathing",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Feature rich Unity editor tool to help streamline the process of changing the paths of animations.",
   "url": "https://github.com/hfcRed/Animation-Repathing",
   "gitDependencies": {},
