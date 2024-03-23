@@ -11,11 +11,10 @@ using VRC.SDK3.Avatars.Components;
 
 namespace AnimationRepathing
 {
-    [InitializeOnLoad]
     public class AREditor : EditorWindow
     {
         [MenuItem("hfcRed/Tools/Animation Repathing")]
-        public static void ShowWindow() => GetWindow<AREditor>(ARStrings.Main.windowName, true).titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
+        public static void ShowWindow() => GetWindow<AREditor>("Animation Repathing", true).titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
 
