@@ -115,7 +115,7 @@ namespace AnimationRepathing
         public static readonly Dictionary<string, string> changedPaths = new Dictionary<string, string>();
         public static int hierarchyHash;
         public static Animator _animator;
-        public static Animator automaticAnimator;
+        public static Animator _automaticAnimator;
         public static GameObject _avatar;
         public static Animator Animator
         {
@@ -132,6 +132,22 @@ namespace AnimationRepathing
                 }
             }
         }
+        public static Animator automaticAnimator
+        {
+            get
+            {
+                return EnsureNull(_automaticAnimator);
+            }
+            set
+            {
+                if (_automaticAnimator != value)
+                {
+                    _automaticAnimator = value;
+                    ARAutomatic.GetAllChildren();
+                }
+            }
+        }
+
         public static GameObject Avatar
         {
             get
