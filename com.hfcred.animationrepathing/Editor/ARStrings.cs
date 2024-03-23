@@ -46,6 +46,7 @@
         public static class Settings
         {
             public static string settings;
+            public static string newVersion;
             public static string general;
             public static string target;
             public static string animatorComponent;
@@ -55,6 +56,8 @@
             public static string avatarToUse;
             public static string missingDescriptor;
             public static string layersToUse;
+            public static string useRootController;
+            public static string useRootInfo;
             public static string disableTooltips;
             public static string language;
             public static string automatic;
@@ -64,6 +67,11 @@
             public static string runWhenWindowClosed;
             public static string credit;
             public static string docs;
+            public static string disableLogging;
+            public static string checkNewVersion;
+            public static string noNewVersion;
+            public static string yesNewVersion;
+            public static string cantGetVersion;
         }
 
         public static class Popup
@@ -121,7 +129,7 @@
 
             InvalidPaths.invalidPaths = "Invalid Paths";
             InvalidPaths.apply = "Apply";
-            InvalidPaths.noInvalidPaths = "You have no Invalid Paths in your controllers";
+            InvalidPaths.noInvalidPaths = "You have no Invalid Paths in your Controllers";
             InvalidPaths.dragAndDrop = "You can drag and drop GameObjects into the text fields";
 
             ClipEditing.replacePartOfAll = "Replace part of all Paths";
@@ -134,6 +142,7 @@
             ClipEditing.dragAndDrop = "You can drag and drop GameObjects into the text fields";
 
             Settings.settings = "Settings";
+            Settings.newVersion = "New Version Available!";
             Settings.general = "General";
             Settings.target = "Target";
             Settings.animatorComponent = "Animator Component";
@@ -143,6 +152,8 @@
             Settings.avatarToUse = "Avatar to use";
             Settings.missingDescriptor = "No Avatar Descriptor assigned!";
             Settings.layersToUse = "Layers to use";
+            Settings.useRootController = "Use Controller from root Animator";
+            Settings.useRootInfo = " This setting is slightly slower than setting the target manually";
             Settings.disableTooltips = " Disable tooltips";
             Settings.language = "Language";
             Settings.automatic = "Automatic";
@@ -152,9 +163,14 @@
             Settings.runWhenWindowClosed = " Run when window is closed";
             Settings.credit = "Made by hfcRed";
             Settings.docs = "Documentation";
+            Settings.disableLogging = "Disable console logging";
+            Settings.checkNewVersion = " Check for new version";
+            Settings.noNewVersion = " No new version available";
+            Settings.yesNewVersion = " New version available! Download it at the top";
+            Settings.cantGetVersion = " Could not fetch newest version";
 
             Popup.title = "Animation Repathing";
-            Popup.message = "Hierarchy changes detected, would you like to repath your animations?";
+            Popup.message = "Hierarchy changes detected, would you like to Repath your Animations?";
             Popup.to = "  -->  ";
             Popup.continuee = "Yes";
             Popup.cancel = "No";
@@ -172,7 +188,7 @@
             ToolTips.resetPartOfAll = "Clear out both text fields";
             ToolTips.replaceFrom = "The part of all Animation Paths that you want to replace";
             ToolTips.replaceTo = "What you want the part of all Animation Paths to be replaced with";
-            ToolTips.applyPartOfAll = "Replace the part of all Animation Paths with the specified string. \"Replace from\" can not be empty or the same as \"replace to\"";
+            ToolTips.applyPartOfAll = "Replace the part of all Animation Paths with the specified string. \"Replace From\" can not be empty or the same as \"Replace To\"";
             ToolTips.replaceIndividual = "Replace an entire Animation Path in every selected Animation Clip with a new one";
             ToolTips.resetIndividual = "Restore original Animation Path";
             ToolTips.applyIndividual = "Replace the old Animation Path with the specified Path. Path can not be empty or the same as the old Path";
@@ -194,84 +210,92 @@
 
         public static void LoadJapanese()
         {
-            Main.windowName = "";
-            Main.automatic = "";
-            Main.manual = "";
+            Main.windowName = "アニメーションリパス";
+            Main.automatic = " オートマティック（自動）";
+            Main.manual = " マニュアル（手動）";
 
-            Automatic.title = "";
-            Automatic.disabled = "";
-            Automatic.enabled = "";
+            Automatic.title = "自動アニメーションリパス";
+            Automatic.disabled = "無効";
+            Automatic.enabled = "有効";
 
-            Manual.title = "";
-            Manual.fixPaths = "";
-            Manual.editClips = "";
+            Manual.title = "手動アニメーションリパス";
+            Manual.fixPaths = " 無効パスの修正";
+            Manual.editClips = " アニメーションクリップを修正";
 
-            InvalidPaths.invalidPaths = "";
-            InvalidPaths.apply = "";
-            InvalidPaths.noInvalidPaths = "";
-            InvalidPaths.dragAndDrop = "";
+            InvalidPaths.invalidPaths = "無効パス";
+            InvalidPaths.apply = "適用";
+            InvalidPaths.noInvalidPaths = "Controllerに無効パスがありません";
+            InvalidPaths.dragAndDrop = "テキストフィールドにGameObjectをドラッグ＆ドロップすることができます";
 
-            ClipEditing.replacePartOfAll = "";
-            ClipEditing.from = "";
-            ClipEditing.to = "";
-            ClipEditing.apply = "";
-            ClipEditing.warning = "";
-            ClipEditing.replaceIndividual = "";
-            ClipEditing.noClipsSelected = "";
-            ClipEditing.dragAndDrop = "";
+            ClipEditing.replacePartOfAll = "すべてのパスの一部を置き換える";
+            ClipEditing.from = "始点";
+            ClipEditing.to = "終点";
+            ClipEditing.apply = "適用";
+            ClipEditing.warning = "入力した文字列がひとつ、または複数のパスに一回以上含まれております。適用した場合は全て置き換えますのでご注意ください。";
+            ClipEditing.replaceIndividual = "個別にパスを置き換える";
+            ClipEditing.noClipsSelected = "選択中のアニメーションクリップがありません";
+            ClipEditing.dragAndDrop = "テキストフィールドにGameObjectをドラッグ＆ドロップすることができます";
 
-            Settings.settings = "";
-            Settings.general = "";
-            Settings.target = "";
-            Settings.animatorComponent = "";
-            Settings.vrchatAvatar = "";
-            Settings.controllerToUse = "";
-            Settings.missingController = "";
-            Settings.avatarToUse = "";
-            Settings.missingDescriptor = "";
-            Settings.layersToUse = "";
-            Settings.disableTooltips = "";
-            Settings.language = "";
-            Settings.automatic = "";
-            Settings.warningPopup = "";
-            Settings.warnOnlyIfUsed = "";
-            Settings.warning = "";
-            Settings.runWhenWindowClosed = "";
-            Settings.credit = "";
-            Settings.docs = "";
+            Settings.settings = "設定";
+            Settings.newVersion = "新しいバージョンがあります";
+            Settings.general = "一般";
+            Settings.target = "ターゲット";
+            Settings.animatorComponent = "Animator Component";
+            Settings.vrchatAvatar = "VRChatアバター";
+            Settings.controllerToUse = "Animatorの指定";
+            Settings.missingController = "Animator Controllerが設定されていません！";
+            Settings.avatarToUse = "使用アバター";
+            Settings.missingDescriptor = "Avatar Descriptorが設定されていません！";
+            Settings.layersToUse = "使用レイヤー";
+            Settings.useRootController = "Root AnimatorのControllerを使用";
+            Settings.useRootInfo = " この設定をご利用の場合は動作が少し遅くなります";
+            Settings.disableTooltips = " ツールチップを非表示にする";
+            Settings.language = "言語設定";
+            Settings.automatic = "自動";
+            Settings.warningPopup = " Hierarchyの変更警告";
+            Settings.warnOnlyIfUsed = " 使用の際のみ警告";
+            Settings.warning = "複雑なAnimator Controllerを使用する際にこの設定を有効化していると多少ラグが生じる可能性があります。";
+            Settings.runWhenWindowClosed = " ウィンドウ非表示時にも実行を継続する";
+            Settings.credit = "hfcRed制作";
+            Settings.docs = "ドキュメンテーション";
+            Settings.disableLogging = "コンソールへのログの書き出しを無効にする";
+            Settings.checkNewVersion = " 更新の確認";
+            Settings.noNewVersion = " 現在利用可能なバージョンアップデートはありません";
+            Settings.yesNewVersion = " 新バージョンが利用可能です！上からダウンロードしてください。";
+            Settings.cantGetVersion = " アップデートの取得に失敗しました";
 
-            Popup.title = "";
-            Popup.message = "";
-            Popup.to = "";
-            Popup.continuee = "";
-            Popup.cancel = "";
-            Popup.debug = "";
+            Popup.title = "アニメーションのリパス";
+            Popup.message = "Hierarchyへの変更が検出されました。アニメーションのリパスを行いますか？";
+            Popup.to = "  -->  ";
+            Popup.continuee = "はい";
+            Popup.cancel = "いいえ";
+            Popup.debug = "アニメーションリパス:";
 
-            ToolTips.automatic = "";
-            ToolTips.manual = "";
-            ToolTips.toggleButton = "";
-            ToolTips.fixPaths = "";
-            ToolTips.editClips = "";
-            ToolTips.resetInvalidPaths = "";
-            ToolTips.resetInvalidPath = "";
-            ToolTips.applyValidPath = "";
-            ToolTips.replacePartOfAll = "";
-            ToolTips.resetPartOfAll = "";
-            ToolTips.replaceFrom = "";
-            ToolTips.replaceTo = "";
-            ToolTips.applyPartOfAll = "";
-            ToolTips.replaceIndividual = "";
-            ToolTips.resetIndividual = "";
-            ToolTips.applyIndividual = "";
-            ToolTips.resetSettings = "";
-            ToolTips.target = "";
-            ToolTips.controllerToUse = "";
-            ToolTips.avatarToUse = "";
-            ToolTips.layersToUse = "";
-            ToolTips.disableTooltips = "";
-            ToolTips.warningPopup = "";
-            ToolTips.warnOnlyIfUsed = "";
-            ToolTips.runWhenWindowClosed = "";
+            ToolTips.automatic = "Hierarchyの変更が検出された際、自動的にアニメーションパスを変更";
+            ToolTips.manual = "手動でアニメーションパスを変更";
+            ToolTips.toggleButton = "自動アニメーションリパスの有効化・無効化";
+            ToolTips.fixPaths = "設定されたAnimator内の破損しているアニメーションパス（黄色）を修復";
+            ToolTips.editClips = "一つ、または複数のアニメーションクリップのアニメーションパスを直接変更";
+            ToolTips.resetInvalidPaths = "設定されたAnimatorの破損しているアニメーションパスのリストの更新";
+            ToolTips.resetInvalidPath = "オリジナルのアニメーションパスを復元";
+            ToolTips.applyValidPath = "破損したアニメーションパスを指定したパスと置き換える。破損したパスとまったく同じパス、パスの指定なしは不可";
+            ToolTips.replacePartOfAll = "選択したAnimation Clip内のアニメーションパスの一部またはすべてを指定したstringに置き換える";
+            ToolTips.resetPartOfAll = "テキストフィールドを両方クリアする";
+            ToolTips.replaceFrom = "全アニメーションパスにて置き換えたい部分の指定";
+            ToolTips.replaceTo = "選択したアニメーションパスを置き換える内容";
+            ToolTips.applyPartOfAll = "アニメーションパスの一部をすべて指定したstringに置き換える。\"始点・終点\" は空欄不可、そして \"始点\" との重複での設定も不可";
+            ToolTips.replaceIndividual = "選択したAnimation Clipのアニメーションパスを丸ごと新しいものと置き換える";
+            ToolTips.resetIndividual = "オリジナルのアニメーションパスを復元する";
+            ToolTips.applyIndividual = "既存のアニメーションパスを指定したパスに置き換える。まったく同じパス、パスの指定なしは不可";
+            ToolTips.resetSettings = "設定をデフォルトの状態に戻す";
+            ToolTips.target = "ツールがターゲットするオブジェクト。GameObjectのAnimator Component内のAnimator Controller、またはVRChatアバターの全Animator Controllerを対象に設定できます。";
+            ToolTips.controllerToUse = "ターゲットのAnimator Controllerが組み込まれているAnimator Componentを持ったGameObject";
+            ToolTips.avatarToUse = "Animator Controllerが組み込まれているVRChatアバター";
+            ToolTips.layersToUse = "VRChatのアバターに使用されているツールの対象のすべてのAnimator Controller";
+            ToolTips.disableTooltips = "全ツールチップを非表示にしますか？";
+            ToolTips.warningPopup = "Hierarchyの変更を感知した際、警告メッセージを表示しますか？";
+            ToolTips.warnOnlyIfUsed = "Animator Controller内に変更中のGameObjectが使用されているのを感知した際に警告メッセージを表示しますか？";
+            ToolTips.runWhenWindowClosed = "ウインドウを閉じてもツールの機能を有効化させますか？";
 
             if (ARVariables.disableTooltips)
             {
@@ -308,6 +332,7 @@
             ClipEditing.dragAndDrop = "게임 오브젝트를 텍스트 필드로 끌어다 놓을 수 있습니다";
 
             Settings.settings = "설정";
+            Settings.newVersion = "New Version Available!";
             Settings.general = "일반 설정";
             Settings.target = "대상";
             Settings.animatorComponent = "애니메이터 컴포넌트";
@@ -317,6 +342,8 @@
             Settings.layersToUse = "사용할 레이어";
             Settings.avatarToUse = "사용할 아바타";
             Settings.missingDescriptor = "아바타 디스크립터가 할당되지 않았습니다!";
+            Settings.useRootController = "Use Controller from root Animator";
+            Settings.useRootInfo = " This setting is slightly slower than setting the target manually";
             Settings.disableTooltips = "툴팁 비활성화";
             Settings.language = "언어";
             Settings.automatic = "자동 수정 설정";
@@ -326,6 +353,11 @@
             Settings.runWhenWindowClosed = "창을 닫아도 계속 실행";
             Settings.credit = "제작자: hfcRed";
             Settings.docs = "문서";
+            Settings.disableLogging = "Disable console logging";
+            Settings.checkNewVersion = " Check for new version";
+            Settings.noNewVersion = " No new version available";
+            Settings.yesNewVersion = " New version available! Download it at the top";
+            Settings.cantGetVersion = " Could not fetch newest version";
 
             Popup.title = "애니메이션 리패스";
             Popup.message = "하이어라키 변경이 감지되었습니다. 애니메이션 경로도 수정하시겠습니까?";
