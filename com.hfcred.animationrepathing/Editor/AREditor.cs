@@ -15,7 +15,7 @@ namespace AnimationRepathing
     public class AREditor : EditorWindow
     {
         [MenuItem("hfcRed/Tools/Animation Repathing")]
-        public static void ShowWindow() => GetWindow<AREditor>("Animation Repathing", true).titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
+        public static void ShowWindow() => GetWindow<AREditor>(ARStrings.Main.windowName, true).titleContent.image = EditorGUIUtility.IconContent("AnimationClip Icon").image;
 
         public static Vector2 scroll = Vector2.zero;
 
@@ -501,7 +501,7 @@ namespace AnimationRepathing
                     using (new SqueezeScope((10, -5, 4), (0, 0, 4, GUI.skin.box), (5, 5, 4), (5, 5, 3)))
                     {
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label("New Version Available!", GUILayout.Height(25));
+                        GUILayout.Label(ARStrings.Settings.newVersion, GUILayout.Height(25));
                         GUILayout.Space(10);
                         if (GUILayout.Button("Update  " + currentVersion + "  ==>  " + newestVersion, GUILayout.Height(25)))
                         {
@@ -539,7 +539,7 @@ namespace AnimationRepathing
 
                         Color c = GUI.color;
                         GUI.color = new Color(0.75f, 0.75f, 0.75f);
-                        if (GUILayout.Button(new GUIContent(" Check for new version", EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                        if (GUILayout.Button(new GUIContent(ARStrings.Settings.checkNewVersion, EditorGUIUtility.IconContent("TreeEditor.Refresh").image, ""), new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                         {
                             ARUpdater.CheckForNewVersion();
                         }
@@ -560,7 +560,7 @@ namespace AnimationRepathing
                             {
                                 GUI.color = new Color(1f, 0.4f, 0.4f);
 
-                                if (GUILayout.Button(" Could not fetch newest version", new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
+                                if (GUILayout.Button(ARStrings.Settings.cantGetVersion, new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                                 {
                                     fetchingVersion = true;
                                 }
@@ -569,7 +569,7 @@ namespace AnimationRepathing
                             {
                                 GUI.color = new Color(0.6f, 0.6f, 0.6f);
 
-                                string text = availableUpdate ? " New version available! Download it at the top" : " No new version available";
+                                string text = availableUpdate ? ARStrings.Settings.yesNewVersion : ARStrings.Settings.noNewVersion;
 
                                 if (GUILayout.Button(text, new GUIStyle(GUI.skin.label), GUILayout.Height(25)))
                                 {
@@ -678,7 +678,7 @@ namespace AnimationRepathing
             {
                 using (new SqueezeScope((10, 5, 4), (5, 5, 3)))
                 {
-                    getControllerAutomatically = GUILayout.Toggle(getControllerAutomatically, "Use Controller from root Animator");
+                    getControllerAutomatically = GUILayout.Toggle(getControllerAutomatically, ARStrings.Settings.useRootController);
                 }
 
                 using (new SqueezeScope((0, 5, 4), (5, 5, 3)))
@@ -687,7 +687,7 @@ namespace AnimationRepathing
 
                     Color c = GUI.color;
                     GUI.color = new Color(0.75f, 0.75f, 0.75f);
-                    GUILayout.Label(" This setting is slightly slower than setting the target manually", new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20), GUILayout.Width(EditorGUIUtility.currentViewWidth / 1.4f));
+                    GUILayout.Label(ARStrings.Settings.useRootInfo, new GUIStyle(GUI.skin.label) { fontSize = 11 }, GUILayout.Height(20), GUILayout.Width(EditorGUIUtility.currentViewWidth / 1.4f));
                     GUI.color = c;
                 }
 
@@ -837,7 +837,7 @@ namespace AnimationRepathing
             {
                 using (new SqueezeScope((10, 10, 4), (5, 5, 3)))
                 {
-                    disableDebugLogging = GUILayout.Toggle(disableDebugLogging, new GUIContent("Disable console logging"));
+                    disableDebugLogging = GUILayout.Toggle(disableDebugLogging, new GUIContent(ARStrings.Settings.disableLogging));
                 }
             }
         }
