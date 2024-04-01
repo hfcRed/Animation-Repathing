@@ -527,7 +527,7 @@ namespace AnimationRepathing
 
                         if (GUILayout.Button(new GUIContent(ARStrings.Settings.docs, EditorGUIUtility.IconContent("TextAsset Icon").image, ""), GUILayout.Width(EditorGUIUtility.currentViewWidth / 2.5f), GUILayout.Height(25)))
                         {
-                            Application.OpenURL("https://github.com/hfcRed/Animation-Repathing");
+                            Application.OpenURL("https://docs.hfcred.dev/animation-repathing/overview/");
                         }
                         GUILayout.FlexibleSpace();
                     }
