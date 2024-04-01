@@ -25,4 +25,4 @@ Animation Repathing allows you to:
 * Fix invalid animation paths
 * Directly edit the animation paths inside of selected Animation Clips
 
-[Full Documentation](http://localhost:4321/animation-repathing/overview/)
+## [Full Documentation](http://localhost:4321/animation-repathing/overview/)
