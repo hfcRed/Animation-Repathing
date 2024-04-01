@@ -1,6 +1,8 @@
 ﻿using static AnimationRepathing.ARVariables;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
+using System;
 
 namespace AnimationRepathing
 {
@@ -11,11 +13,23 @@ namespace AnimationRepathing
         {
             if (!EditorPrefs.HasKey("ARFirstStartup"))
             {
+                var client = new UnityWebRequest("https://api.hfcred.dev/animation-repathing/putuser");
+                client.SendWebRequest().completed += AA =>
+                {
+                    client.Dispose();
+                };
+
                 EditorPrefs.SetInt("ARFirstStartup", 1);
             }
 
             if (!PlayerPrefs.HasKey("ARFirstProjectStartup"))
             {
+                var client = new UnityWebRequest("https://api.hfcred.dev/animation-repathing/putproject");
+                client.SendWebRequest().completed += AA =>
+                {
+                    client.Dispose();
+                };
+
                 ResetGeneralData();
                 ResetAutomaticData();
                 PlayerPrefs.SetInt("ARFirstProjectStartup", 1);
