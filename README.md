@@ -20,7 +20,7 @@ Feature rich Unity editor tool to help streamline the process of changing the pa
 Animation Repathing allows you to:
 
 * Automatically change animation paths when moving or renaming a GameObject
-* Fix invalid (yellow) animation paths
-* Directly edit the animation paths inside of selected animation clips
-* Target Playable Layers on VRChat Avatars
+* Fix invalid animation paths
+* Directly edit the animation paths inside of selected Animation Clips
 
+[Full Documentation](http://localhost:4321/animation-repathing/overview/)
