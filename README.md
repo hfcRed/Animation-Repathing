@@ -9,6 +9,8 @@
 
 Feature rich Unity editor tool to help streamline the process of changing the paths of animations
 
+![repathing](https://github.com/hfcRed/Animation-Repathing/assets/101019309/eab80165-730f-4dce-957d-051f593e1203)
+
 [![Generic badge](https://img.shields.io/badge/-Download_Unitypackage_​_​_​-success?style=for-the-badge)](https://github.com/hfcRed/Animation-Repathing/releases/latest)
 
 [![Generic badge](https://img.shields.io/badge/-Add_To_Creator_Companion​-informational?style=for-the-badge)](https://hfcred.github.io/VPM-Listing/)
