@@ -13,7 +13,7 @@ namespace AnimationRepathing
         {
             if (!EditorPrefs.HasKey("ARFirstStartup"))
             {
-                var client = new UnityWebRequest("https://api.hfcred.dev/animation-repathing/putuser");
+                var client = new UnityWebRequest("https://animation-repathing.hfcred.workers.dev/putuser");
                 client.SendWebRequest().completed += AA =>
                 {
                     client.Dispose();
@@ -24,7 +24,7 @@ namespace AnimationRepathing
 
             if (!PlayerPrefs.HasKey("ARFirstProjectStartup"))
             {
-                var client = new UnityWebRequest("https://api.hfcred.dev/animation-repathing/putproject");
+                var client = new UnityWebRequest("https://animation-repathing.hfcred.workers.dev/putproject");
                 client.SendWebRequest().completed += AA =>
                 {
                     client.Dispose();
