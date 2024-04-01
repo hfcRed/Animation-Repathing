@@ -763,7 +763,7 @@ namespace AnimationRepathing
                     case 0:
                         break;
                     case 1:
-                        DrawLanguageCredits("", "https://www.google.com");
+                        DrawLanguageCredits("Translation by Potato", "https://twitter.com/potatovrc");
                         break;
                     case 2:
                         DrawLanguageCredits("Translation by Neuru", "https://twitter.com/Neuru5278");
