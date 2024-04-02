@@ -16,7 +16,7 @@ namespace AnimationRepathing
 {
     public class ARUpdater
     {
-        public static string versionURL = "https://raw.githubusercontent.com/hfcRed/Animation-Repathing/main/com.hfcred.animationrepathing/package.json";
+        public static string versionURL = "https://raw.githubusercontent.com/hfcRed/Animation-Repathing/main/package.json";
         public static string downloadURL = "https://github.com/hfcRed/Animation-Repathing/releases/latest/download/AnimationRepathing_v";
         public static string packagePath = "Assets/AROutput.unitypackage";
 
