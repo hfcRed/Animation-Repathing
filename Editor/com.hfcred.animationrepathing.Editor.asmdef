@@ -1,5 +1,5 @@
 {
-    "name": "dev.hfcred.animationrepathing.Editor",
+    "name": "com.hfcred.animationrepathing.Editor",
     "rootNamespace": "",
     "references": [
         "VRC.SDK3A",

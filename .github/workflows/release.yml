@@ -7,8 +7,8 @@ on:
     paths: package.json
 
 env:
-  packageName: "dev.hfcred.animationrepathing"
-  packagePath: "Packages/dev.hfcred.animationrepathing"
+  packageName: "com.hfcred.animationrepathing"
+  packagePath: "Packages/com.hfcred.animationrepathing"
   packageFileName: "animationrepathing"
   packageReleaseName: "Animation Repathing"
   triggerRepoUpdate: ${{ true }}
