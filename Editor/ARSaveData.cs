@@ -33,6 +33,7 @@ namespace AnimationRepathing
                 ResetGeneralData();
                 ResetAutomaticData();
                 PlayerPrefs.SetInt("ARFirstProjectStartup", 1);
+                PlayerPrefs.SetInt("ARRepathCount", 0);
             }
 
             if (PlayerPrefs.GetInt("ARRepathCount") != 0)
