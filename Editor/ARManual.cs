@@ -84,6 +84,8 @@ namespace AnimationRepathing
                                 AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
                                 binding.path = newPath;
                                 AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+
+                                PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                             }
                             else if (binding.path == oldPath)
                             {
@@ -91,6 +93,8 @@ namespace AnimationRepathing
                                 AnimationUtility.SetEditorCurve(clip, binding, null);
                                 binding.path = newPath;
                                 AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+
+                                PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                             }
                         }
                     }
@@ -180,6 +184,8 @@ namespace AnimationRepathing
                                     AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
                                     binding.path = binding.path.Replace(oldPath, newPath);
                                     AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+
+                                    PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                                 }
 
                                 if (replaceEntire && binding.path == oldPath)
@@ -187,6 +193,8 @@ namespace AnimationRepathing
                                     AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
                                     binding.path = newPath;
                                     AnimationUtility.SetObjectReferenceCurve(clip, binding, objectCurve);
+
+                                    PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                                 }
                             }
                             else
@@ -198,6 +206,8 @@ namespace AnimationRepathing
                                     AnimationUtility.SetEditorCurve(clip, binding, null);
                                     binding.path = binding.path.Replace(oldPath, newPath);
                                     AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+
+                                    PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                                 }
 
                                 if (replaceEntire && binding.path == oldPath)
@@ -205,6 +215,8 @@ namespace AnimationRepathing
                                     AnimationUtility.SetEditorCurve(clip, binding, null);
                                     binding.path = newPath;
                                     AnimationUtility.SetEditorCurve(clip, binding, floatCurve);
+
+                                    PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                                 }
                             }
                         }

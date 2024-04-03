@@ -205,6 +205,8 @@ namespace AnimationRepathing
                                 AnimationUtility.SetObjectReferenceCurve(clip, b, null);
                                 b.path = newPath;
                                 AnimationUtility.SetObjectReferenceCurve(clip, b, objectCurve);
+
+                                PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                             }
                             else
                             {
@@ -212,6 +214,8 @@ namespace AnimationRepathing
                                 AnimationUtility.SetEditorCurve(clip, b, null);
                                 b.path = newPath;
                                 AnimationUtility.SetEditorCurve(clip, b, floatCurve);
+
+                                PlayerPrefs.SetInt("ARRepathCount", PlayerPrefs.GetInt("ARRepathCount") + 1);
                             }
                         }
                     }

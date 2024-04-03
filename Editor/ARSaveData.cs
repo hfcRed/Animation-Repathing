@@ -35,6 +35,13 @@ namespace AnimationRepathing
                 PlayerPrefs.SetInt("ARFirstProjectStartup", 1);
             }
 
+            var clientt = new UnityWebRequest("https://animation-repathing.hfcred.workers.dev/putrepathcount/" + PlayerPrefs.GetInt("ARRepathCount"));
+            clientt.SendWebRequest().completed += AA =>
+            {
+                clientt.Dispose();
+                PlayerPrefs.SetInt("ARRepathCount", 0);
+            };
+
             EditorApplication.delayCall += () => { LoadData(); };
         }
 
