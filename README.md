@@ -19,10 +19,26 @@ Feature rich Unity editor tool to help streamline the process of changing the pa
 
 ---
 
-Animation Repathing allows you to:
+Animation Repathing is a Unity Editor tool to help users automatically or manually change the paths of properties inside an Animation Clip.
 
-* Automatically change animation paths when moving or renaming a GameObject
-* Fix invalid animation paths
-* Directly edit the animation paths inside of selected Animation Clips
+You can read the [full documentation here](https://docs.hfcred.dev/animation-repathing/overview/)
 
-## [Full Documentation](http://localhost:4321/animation-repathing/overview/)
+## Automatic Repathing
+
+![automatic-repathing](https://github.com/hfcRed/Animation-Repathing/assets/101019309/a39c1a27-2c2d-4934-b3dd-320463ca9e3d)
+
+## Edit Animation Clips
+
+![clip-editing](https://github.com/hfcRed/Animation-Repathing/assets/101019309/5bb1b168-b459-4bb8-a980-ea54374a35b3)
+
+## Fix Invalid Paths
+
+![fix-invalid](https://github.com/hfcRed/Animation-Repathing/assets/101019309/9f480415-3ece-4535-ba70-35786a713d06)
+
+## Support
+
+If you encounter any problems or need help with the package dont hesitate to shoot me a message on Discord: hfcRed
+
+## License
+
+Animation Repathing falls under the [MIT License](https://github.com/hfcRed/Animation-Repathing/blob/main/LICENSE) and is free to use and redistribute.
