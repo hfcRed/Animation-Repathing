@@ -3,12 +3,11 @@
   "unity": "2019.4",
   "icon": "",
   "displayName": "Animation Repathing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Feature rich Unity editor tool to help streamline the process of changing the paths of animations.",
   "url": "https://github.com/hfcRed/Animation-Repathing",
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.vrchat.avatars": "^3.2.0"
   },
   "legacyFolders": {},
   "legacyFiles": {},
