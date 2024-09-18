@@ -121,9 +121,9 @@ namespace AnimationRepathing
                     clipsPathToSharedProperty.Clear();
 
                     clipsSelected = Selection.GetFiltered<AnimationClip>(SelectionMode.Assets).ToList();
-
-                    EditorWindow instance = EditorWindow.GetWindow(typeof(AREditor), false, null, false);
-                    instance.Repaint();
+                    
+                    bool hasInstance = EditorWindow.HasOpenInstances<AREditor>();
+                    if (hasInstance) EditorWindow.GetWindow(typeof(AREditor), false, null, false).Repaint();
 
                     foreach (AnimationClip clip in clipsSelected)
                     {
