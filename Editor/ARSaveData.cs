@@ -101,8 +101,6 @@ namespace AnimationRepathing
                     break;
             }
 
-            ARVariables.fontStyle.font = Resources.Load<Font>("Silka-Light");
-
             ARUpdater.CheckForNewVersion();
         }
 

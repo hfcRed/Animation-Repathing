@@ -26,10 +26,6 @@ namespace AnimationRepathing
 
         public void OnGUI()
         {
-            Repaint();
-
-            GUI.skin.font = fontStyle.font;
-
             EditorGUI.BeginChangeCheck();
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(position.width));
 
