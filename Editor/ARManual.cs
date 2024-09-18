@@ -122,6 +122,9 @@ namespace AnimationRepathing
 
                     clipsSelected = Selection.GetFiltered<AnimationClip>(SelectionMode.Assets).ToList();
 
+                    EditorWindow instance = EditorWindow.GetWindow(typeof(AREditor), false, null, false);
+                    instance.Repaint();
+
                     foreach (AnimationClip clip in clipsSelected)
                     {
                         EditorCurveBinding[] floatCurves = AnimationUtility.GetCurveBindings(clip);
