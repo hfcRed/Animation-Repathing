@@ -442,8 +442,8 @@
             Main.manual = " 手动模式";
 
             Automatic.title = "自动动画路径重定向";
-            Automatic.disabled = "禁用";
-            Automatic.enabled = "启用";
+            Automatic.disabled = "已禁用";
+            Automatic.enabled = "已启用";
 
             Manual.title = "手动动画路径重定向";
             Manual.fixPaths = " 修复无效路径";
