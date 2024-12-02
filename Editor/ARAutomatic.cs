@@ -121,13 +121,19 @@ namespace AnimationRepathing
 
             if (changedPaths.Count == 0) return;
 
-            if (sendWarning && warnOnlyIfUsed && ScanAnimators() && EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel))
+            if (sendWarning && warnOnlyIfUsed)
             {
-                RepathAnimations(controllers.ToArray());
+                if (ScanAnimators() && EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel))
+                {
+                    RepathAnimations(controllers.ToArray());
+                }
             }
-            else if (!warnOnlyIfUsed && sendWarning && EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel))
+            else if (sendWarning && !warnOnlyIfUsed)
             {
-                RepathAnimations(controllers.ToArray());
+                if (EditorUtility.DisplayDialog(ARStrings.Popup.title, ARStrings.Popup.message, ARStrings.Popup.continuee, ARStrings.Popup.cancel))
+                {
+                    RepathAnimations(controllers.ToArray());
+                }
             }
             else
             {
