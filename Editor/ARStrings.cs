@@ -476,7 +476,7 @@
             Settings.layersToUse = "指定 Playable Layer";
             Settings.useRootController = "指定 Avatar 根 Animator 上的 Animator Controller";
             Settings.useRootInfo = " 与手动指定目标相比，该设置会造成轻微性能下降";
-            Settings.disableTooltips = " 禁用工具提示";
+            Settings.disableTooltips = " 隐藏提示信息";
             Settings.language = "语言";
             Settings.automatic = "自动化";
             Settings.warningPopup = " 层级结构改变时弹出警告";
@@ -519,9 +519,9 @@
             ToolTips.controllerToUse = "带有设置了 Animator Controller 的 Animator 组件的对象";
             ToolTips.avatarToUse = "Playable Layer 设置中包含自定义 Animator Controller 的 VRChat Avatar";
             ToolTips.layersToUse = "VRChat Avatar 的 Playable Layer 设置中指定的 Animator Contrller";
-            ToolTips.disableTooltips = "是否隐藏所有工具提示？";
-            ToolTips.warningPopup = "如果层次结构有任何变化，是否应该弹出警告？";
-            ToolTips.warnOnlyIfUsed = "是否在只在层次结构变化影响到设置中指定的 Animator Controller 时弹出警告？";
+            ToolTips.disableTooltips = "是否隐藏所有提示信息？";
+            ToolTips.warningPopup = "如果层级结构有任何变化，是否应该弹出警告？";
+            ToolTips.warnOnlyIfUsed = "是否在只在层级结构变化影响到设置中指定的 Animator Controller 时弹出警告？";
             ToolTips.runWhenWindowClosed = "窗口关闭后该工具是否仍然在后台工作？";
 
             if (ARVariables.disableTooltips)
