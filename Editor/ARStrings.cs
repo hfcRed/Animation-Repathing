@@ -470,9 +470,9 @@
             Settings.animatorComponent = "Animator 组件";
             Settings.vrchatAvatar = "VRChat Avatar";
             Settings.controllerToUse = "指定 Animator 组件";
-            Settings.missingController = "没有指定任何 Animator Controller！";
+            Settings.missingController = "指定对象的 Animator 上没有 Animator Controller！";
             Settings.avatarToUse = "指定 VCRChat Avatar";
-            Settings.missingDescriptor = "没有指定任何 Avatar Descriptor！";
+            Settings.missingDescriptor = "指定的对象上没有 Avatar Descriptor！";
             Settings.layersToUse = "指定 Playable Layer";
             Settings.useRootController = "指定 Avatar 根 Animator 上的 Animator Controller";
             Settings.useRootInfo = " 与手动指定目标相比，该设置会造成轻微性能下降";
