@@ -711,18 +711,7 @@ namespace AnimationRepathing
                         }
                         else
                         {
-                            switch (languageSelection)
-                            {
-                                case 0:
-                                    ARStrings.LoadEnglisch();
-                                    break;
-                                case 1:
-                                    ARStrings.LoadJapanese();
-                                    break;
-                                case 2:
-                                    ARStrings.LoadKorean();
-                                    break;
-                            }
+                            ARStrings.ReloadLanguage(languageSelection);
                         }
                     }
                 }
@@ -735,35 +724,18 @@ namespace AnimationRepathing
                     GUILayout.Label(ARStrings.Settings.language, GUILayout.MinWidth(100));
 
                     EditorGUI.BeginChangeCheck();
-                    GUIContent[] content = { new GUIContent("English"), new GUIContent("日本"), new GUIContent("한국어") };
+                    GUIContent[] content = { new GUIContent("English"), new GUIContent("日本"), new GUIContent("한국어"), new GUIContent("简体中文") };
                     languageSelection = EditorGUILayout.Popup(languageSelection, content);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        switch (languageSelection)
-                        {
-                            case 0:
-                                ARStrings.LoadEnglisch();
-                                break;
-                            case 1:
-                                ARStrings.LoadJapanese();
-                                break;
-                            case 2:
-                                ARStrings.LoadKorean();
-                                break;
-                        }
+                        ARStrings.ReloadLanguage(languageSelection);
                     }
                 }
 
-                switch (languageSelection)
+                var (languageCreditText, languageCreditLink) = ARStrings.GetLanguageCredits(languageSelection);
+                if (languageCreditText != null)
                 {
-                    case 0:
-                        break;
-                    case 1:
-                        DrawLanguageCredits("Translation by Potato", "https://twitter.com/potatovrc");
-                        break;
-                    case 2:
-                        DrawLanguageCredits("Translation by Neuru", "https://twitter.com/Neuru5278");
-                        break;
+                    DrawLanguageCredits(languageCreditText, languageCreditLink);
                 }
             }
         }
@@ -774,7 +746,10 @@ namespace AnimationRepathing
             {
                 if (GUILayout.Button(new GUIContent(buttonText, EditorGUIUtility.IconContent("BuildSettings.Web.Small").image, ""), GUILayout.Height(25)))
                 {
-                    Application.OpenURL(link);
+                    if (link != null && link != string.Empty)
+                    {
+                        Application.OpenURL(link);
+                    }
                 }
             }
         }

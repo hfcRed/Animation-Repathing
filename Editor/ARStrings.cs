@@ -113,7 +113,44 @@
             public static string runWhenWindowClosed;
         }
 
-        public static void LoadEnglisch()
+        public static void ReloadLanguage(int languageSelection)
+        {
+            switch (languageSelection)
+            {
+                case 0:
+                    LoadEnglish();
+                    break;
+                case 1:
+                    LoadJapanese();
+                    break;
+                case 2:
+                    LoadKorean();
+                    break;
+                case 3:
+                    LoadSimplifiedChinese();
+                    break;
+                default:
+                    LoadEnglish();
+                    break;
+            }
+        }
+
+        public static (string, string) GetLanguageCredits(int languageSelection)
+        {
+            switch (languageSelection)
+            {
+                case 1:
+                    return ("Translation by Potato", "https://twitter.com/potatovrc");
+                case 2:
+                    return ("Translation by Neuru", "https://twitter.com/Neuru5278");
+                case 3:
+                    return ("Translation by ColorlessColor", null);
+                default:
+                    return (null, null);
+            }
+        }
+
+        public static void LoadEnglish()
         {
             Main.windowName = "Animation Repathing";
             Main.automatic = " Automatic";
@@ -391,6 +428,101 @@
             ToolTips.warningPopup = "하이어라키 변경 시 경고창을 표시할까요?";
             ToolTips.warnOnlyIfUsed = "하이어라키 변경에 영향 받는 게임 오브젝트가 대상 애니메이터 컨트롤러에서 사용될 시에만 경고창을 표시할까요?";
             ToolTips.runWhenWindowClosed = "창이 닫혀도 툴을 계속 작동시킬까요?";
+
+            if (ARVariables.disableTooltips)
+            {
+                ClearTooltips();
+            }
+        }
+
+        public static void LoadSimplifiedChinese()
+        {
+            Main.windowName = "动画路径重定向";
+            Main.automatic = " 自动模式";
+            Main.manual = " 手动模式";
+
+            Automatic.title = "自动动画路径重定向";
+            Automatic.disabled = "已禁用";
+            Automatic.enabled = "已启用";
+
+            Manual.title = "手动动画路径重定向";
+            Manual.fixPaths = " 修复无效路径";
+            Manual.editClips = " 编辑动画片段";
+
+            InvalidPaths.invalidPaths = "无效路径";
+            InvalidPaths.apply = "应用";
+            InvalidPaths.noInvalidPaths = "Animator Controller 中没有无效路径";
+            InvalidPaths.dragAndDrop = "可以将对象直接拖进文本框作为路径使用";
+
+            ClipEditing.replacePartOfAll = "替换所有路径";
+            ClipEditing.from = "源字符串";
+            ClipEditing.to = "新字符串";
+            ClipEditing.apply = "应用";
+            ClipEditing.warning = "部分路径中包含多个指定的源字符串子串，按下应用将替换所有匹配到的子字符串！";
+            ClipEditing.replaceIndividual = "单独替换路径";
+            ClipEditing.noClipsSelected = "没有选中任何 Animation Clip";
+            ClipEditing.dragAndDrop = "可以将对象直接拖进文本框作为路径使用";
+
+            Settings.settings = "设置";
+            Settings.newVersion = "新版本可用！";
+            Settings.general = "常规设置";
+            Settings.target = "目标";
+            Settings.animatorComponent = "Animator 组件";
+            Settings.vrchatAvatar = "VRChat Avatar";
+            Settings.controllerToUse = "指定 Animator 组件";
+            Settings.missingController = "指定对象的 Animator 上没有 Animator Controller！";
+            Settings.avatarToUse = "指定 VCRChat Avatar";
+            Settings.missingDescriptor = "指定的对象上没有 Avatar Descriptor！";
+            Settings.layersToUse = "指定 Playable Layer";
+            Settings.useRootController = "指定 Avatar 根 Animator 上的 Animator Controller";
+            Settings.useRootInfo = " 与手动指定目标相比，该设置会造成轻微性能下降";
+            Settings.disableTooltips = " 隐藏提示信息";
+            Settings.language = "语言";
+            Settings.automatic = "自动化";
+            Settings.warningPopup = " 层级结构改变时弹出警告";
+            Settings.warnOnlyIfUsed = " 按需弹出警告";
+            Settings.warning = "如果 Animator Controller 很复杂，该功能会造成轻微性能下降";
+            Settings.runWhenWindowClosed = " 窗口关闭时保持后台运行";
+            Settings.credit = "由 hfcRed 编写";
+            Settings.docs = "文档";
+            Settings.disableLogging = "禁用控制台日志";
+            Settings.checkNewVersion = " 检查更新";
+            Settings.noNewVersion = " 没有新版本";
+            Settings.yesNewVersion = " 新版本可用！在窗口顶部下载更新";
+            Settings.cantGetVersion = " 无法获取新版本信息";
+
+            Popup.title = "Animation Repathing";
+            Popup.message = "检测到层级结构改变。是否修改所有受影响的动画路径？";
+            Popup.to = "  -->  ";
+            Popup.continuee = "是";
+            Popup.cancel = "否";
+            Popup.debug = "Animation Repathing:";
+
+            ToolTips.automatic = "当层级结构改变时自动修改动画路径";
+            ToolTips.manual = "手工修改动画路径";
+            ToolTips.toggleButton = "打开或关闭自动动画路径重定向";
+            ToolTips.fixPaths = "修复设置中指定目标包含的无效的（黄色）动画路径";
+            ToolTips.editClips = "直接修改 Animation Clip 中的动画路径";
+            ToolTips.resetInvalidPaths = "刷新设置中指定的 Animator Controller 中的存在的无效的动画路径列表";
+            ToolTips.resetInvalidPath = "恢复原始动画路径";
+            ToolTips.applyValidPath = "用指定路径替换无效的动画路径。新路径必须有效且不能为空";
+            ToolTips.replacePartOfAll = "用指定字符串替换所有选中的 Animation Clip 中的所有动画路径";
+            ToolTips.resetPartOfAll = "清除所有文本框";
+            ToolTips.replaceFrom = "所有动画路径中需要被替换字符串";
+            ToolTips.replaceTo = "所有动画路径中替换后的新字符串";
+            ToolTips.applyPartOfAll = "用指定字符串替换所有动画路径。“源字符串”不能为空，也不能和“新字符串”相同";
+            ToolTips.replaceIndividual = "将所有选中的 Animation Clip 中的所有的该动画路径替换为新路径";
+            ToolTips.resetIndividual = "还原为原始动画路径";
+            ToolTips.applyIndividual = "用指定路径替换所有的旧路径。“源字符串”不能为空，也不能和旧路径相同";
+            ToolTips.resetSettings = "还原为默认设置";
+            ToolTips.target = "该工具指定的目标。可以是特定对象上 Animator 组件中的 Animator Controller，也可以是 VRChat Avatar 上的所有 Animator Controller";
+            ToolTips.controllerToUse = "带有设置了 Animator Controller 的 Animator 组件的对象";
+            ToolTips.avatarToUse = "Playable Layer 设置中包含自定义 Animator Controller 的 VRChat Avatar";
+            ToolTips.layersToUse = "VRChat Avatar 的 Playable Layer 设置中指定的 Animator Contrller";
+            ToolTips.disableTooltips = "是否隐藏所有提示信息？";
+            ToolTips.warningPopup = "如果层级结构有任何变化，是否应该弹出警告？";
+            ToolTips.warnOnlyIfUsed = "是否在只在层级结构变化影响到设置中指定的 Animator Controller 时弹出警告？";
+            ToolTips.runWhenWindowClosed = "窗口关闭后该工具是否仍然在后台工作？";
 
             if (ARVariables.disableTooltips)
             {
