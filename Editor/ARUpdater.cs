@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-#if VRC_SDK_VRCSDK3
+#if VRC_RESOLVER
 using VRC.PackageManagement.Core;
 using VRC.PackageManagement.Core.Types;
 using VRC.PackageManagement.Resolver;
@@ -108,7 +108,7 @@ namespace AnimationRepathing
 
             AssetDatabase.Refresh();
 
-#if VRC_SDK_VRCSDK3
+#if VRC_RESOLVER
             if (Resolver.VPMManifestExists())
             {
                 try

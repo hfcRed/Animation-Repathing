@@ -6,8 +6,8 @@
         "VRC.SDK3A.Editor",
         "VRC.SDKBase",
         "VRC.SDKBase.Editor",
-        "com.hfcred.animationrepathing",
-        "com.vrchat.core.vpm-resolver.Editor"
+        "com.vrchat.core.vpm-resolver.Editor",
+        "com.hfcred.animationrepathing"
     ],
     "includePlatforms": [
         "Editor"
@@ -23,6 +23,11 @@
             "name": "com.vrchat.avatars",
             "expression": "3.0.0",
             "define": "VRC_AVATARS"
+        },
+        {
+            "name": "com.vrchat.core.vpm-resolver",
+            "expression": "0.1.2",
+            "define": "VRC_RESOLVER"
         }
     ],
     "noEngineReferences": false
