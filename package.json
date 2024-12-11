@@ -3,7 +3,7 @@
   "unity": "2019.4",
   "icon": "",
   "displayName": "Animation Repathing",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Feature rich Unity editor tool to help streamline the process of changing the paths of animations.",
   "url": "https://github.com/hfcRed/Animation-Repathing",
   "gitDependencies": {},
