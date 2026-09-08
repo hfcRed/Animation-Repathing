@@ -311,7 +311,7 @@ namespace AnimationRepathing
 
                 GUILayout.Space(5);
 
-                if (clipsReplaceFrom == string.Empty || clipsReplaceTo == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
+                if (clipsReplaceFrom == string.Empty || clipsReplaceFrom == clipsReplaceTo || countTotal == 0)
                 {
                     EditorGUI.BeginDisabledGroup(true);
                 }
