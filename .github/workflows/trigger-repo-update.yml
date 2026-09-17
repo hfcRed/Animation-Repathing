@@ -1,7 +1,7 @@
 name: Update VPM Listing
 
 # Asks hfcRed/VPM-Listing to rebuild its index so it picks up the latest
-# release. Needs the HFCRED_VPM secret, a fine-grained personal access token
+# release. Needs the VPM secret, a fine-grained personal access token
 # for the VPM-Listing repository with "Actions: Read and write" permission.
 #
 # Called by release.yml after a release is built, and also runs when a release
@@ -22,18 +22,18 @@ jobs:
     name: Trigger listing rebuild
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.HFCRED_VPM }}
+      GH_TOKEN: ${{ secrets.VPM }}
     steps:
       - name: Check access token
         if: env.GH_TOKEN == ''
         run: |
-          echo "::warning::Secret HFCRED_VPM is not set, so the VPM listing was not rebuilt. Run it by hand: https://github.com/${listingRepo}/actions/workflows/${listingWorkflow}"
+          echo "::warning::Secret VPM is not set, so the VPM listing was not rebuilt. Run it by hand: https://github.com/${listingRepo}/actions/workflows/${listingWorkflow}"
 
       - name: Trigger listing rebuild
         if: env.GH_TOKEN != ''
         run: |
           if ! gh workflow run "$listingWorkflow" --repo "$listingRepo" --ref "$listingBranch"; then
-            echo "::error::Could not dispatch the listing workflow. The HFCRED_VPM token is probably expired or lacks 'Actions: write' on ${listingRepo}. Run it by hand: https://github.com/${listingRepo}/actions/workflows/${listingWorkflow}"
+            echo "::error::Could not dispatch the listing workflow. The VPM token is probably expired or lacks 'Actions: write' on ${listingRepo}. Run it by hand: https://github.com/${listingRepo}/actions/workflows/${listingWorkflow}"
             exit 1
           fi
           echo "Dispatched ${listingWorkflow} on ${listingRepo}: https://github.com/${listingRepo}/actions/workflows/${listingWorkflow}"
