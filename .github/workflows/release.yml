@@ -53,13 +53,13 @@ jobs:
     env:
       version: ${{ needs.version.outputs.version }}
       tag: ${{ needs.version.outputs.tag }}
-      packagePath: Packages/${{ env.packageName }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Set file names
         run: |
+          echo "packagePath=Packages/${packageName}" >> "$GITHUB_ENV"
           echo "zipFile=${packageFileName}_v${version}.zip" >> "$GITHUB_ENV"
           echo "unityPackage=${packageFileName}_v${version}.unitypackage" >> "$GITHUB_ENV"
 
