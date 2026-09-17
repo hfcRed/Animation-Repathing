@@ -1,5 +1,9 @@
 name: Build Release
 
+# Builds a .zip and .unitypackage for the version in package.json, publishes a
+# GitHub release tagged "v<version>" and then asks the VPM listing to rebuild.
+# Runs automatically when package.json changes on main. A version that already
+# has a release tag is skipped, bumping the version is what publishes.
 on:
   workflow_dispatch:
   push:
@@ -7,93 +11,102 @@ on:
     paths: package.json
 
 env:
-  packageName: "com.hfcred.animationrepathing"
-  packagePath: "Packages/com.hfcred.animationrepathing"
-  packageFileName: "animationrepathing"
-  packageReleaseName: "Animation Repathing"
-  triggerRepoUpdate: ${{ true }}
+  packageName: com.hfcred.animationrepathing
+  packageFileName: animationrepathing
+  packageReleaseName: Animation Repathing
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  version:
+    name: Check version
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      exists: ${{ steps.version.outputs.exists }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
-      - name: Get Version
+      - name: Read version from package.json
         id: version
-        uses: zoexx/github-action-json-file-properties@b9f36ce6ee6fe2680cd3c32b2c62e22eade7e590
-        with:
-          file_path: "./package.json"
-          prop_path: "version"
-
-      - name: Generate Tag
-        id: tag
-        run: echo prop="v${{ steps.version.outputs.value }}" >> $GITHUB_OUTPUT
-
-      - name: Check If Release Tag Exists
-        id: checkReleaseTag
-        uses: mukunku/tag-exists-action@v1.2.0
-        with:
-          tag: ${{ steps.tag.outputs.prop }}
-
-      - name: Set Environment Variables
-        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
         run: |
-          echo "zipFile=${{ env.packageFileName }}_v${{ steps.version.outputs.value }}".zip >> $GITHUB_ENV
-          echo "unityPackage=${{ env.packageFileName }}_v${{ steps.version.outputs.value }}.unitypackage" >> $GITHUB_ENV
+          version=$(jq -r .version package.json)
+          tag="v$version"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+            exists=true
+            echo "::notice::Release tag $tag already exists, nothing to release."
+          else
+            exists=false
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
 
-      - name: Create directory and move files
-        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+  build:
+    name: Build and release
+    needs: version
+    if: needs.version.outputs.exists == 'false'
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.version.outputs.version }}
+      tag: ${{ needs.version.outputs.tag }}
+      packagePath: Packages/${{ env.packageName }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set file names
         run: |
-          mkdir -p ${{env.packagePath}}
-          rsync -r --exclude="${{ env.packagePath }}" ./ "${{ env.packagePath }}"/
+          echo "zipFile=${packageFileName}_v${version}.zip" >> "$GITHUB_ENV"
+          echo "unityPackage=${packageFileName}_v${version}.unitypackage" >> "$GITHUB_ENV"
 
-      - name: Create Zip
-        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
-        uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
-        with:
-          type: "zip"
-          directory: "${{ env.packagePath }}/"
-          filename: "../../${{ env.zipFile }}" # make the zip file two directories up, since we start two directories in above
-          exclusions: "*.git* *.github* .gitignore Packages/"
+      # The .unitypackage must contain paths starting with Packages/<name>/ so
+      # Unity imports it as a package, so the repo is staged under that folder.
+      - name: Stage package under Packages/
+        run: |
+          mkdir -p "$packagePath"
+          rsync -a --exclude .git --exclude .github --exclude .gitignore --exclude Packages ./ "$packagePath/"
 
-      - run: find "${{ env.packagePath }}" -name \*.meta >> metaList
-        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+      - name: Create zip
+        working-directory: ${{ env.packagePath }}
+        run: zip -r "$GITHUB_WORKSPACE/$zipFile" .
+
+      - name: Track package meta files
+        run: find "$packagePath" -name '*.meta' > metaList
 
       - name: Create UnityPackage
-        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
-        uses: pCYSl5EDgo/create-unitypackage@cfcd3cf0391a5ef1306342794866a9897c32af0b
+        uses: pCYSl5EDgo/create-unitypackage@v1.2.3
         with:
           package-path: ${{ env.unityPackage }}
           include-files: metaList
 
-      - name: Add Icon to UnityPackage
-        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
+      - name: Add icon to UnityPackage
         uses: foxscore/add-icon-to-unitypackage@v1
         with:
           package_path: ${{ env.unityPackage }}
-          icon_path: ".github/thumbnail.png"
-          package_not_found_behavior: "warn"
-          icon_not_found_behavior: "warn"
-          icon_already_present_behavior: "warn"
+          icon_path: .github/thumbnail.png
+          package_not_found_behavior: warn
+          icon_not_found_behavior: warn
+          icon_already_present_behavior: warn
 
-      - name: Make Release
-        if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
+      - name: Make release
+        uses: softprops/action-gh-release@v2
         with:
-          name: "${{ env.packageReleaseName }} v${{ steps.version.outputs.value }}"
-          tag_name: "v${{ steps.version.outputs.value }}"
+          name: ${{ env.packageReleaseName }} ${{ env.tag }}
+          tag_name: ${{ env.tag }}
+          generate_release_notes: true
           files: |
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
-            ./package.json
+            package.json
 
-      - name: Trigger VPM Repo Listing Update
-        if: ${{ env.triggerRepoUpdate == 'true' && steps.checkReleaseTag.outputs.exists == 'false'}}
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          event-type: trigger-repo-update
+  # Releases created with GITHUB_TOKEN do not fire "release" events, so the
+  # listing update is called directly instead of relying on that trigger.
+  update-listing:
+    name: Update VPM listing
+    needs: build
+    uses: ./.github/workflows/trigger-repo-update.yml
+    secrets: inherit
